@@ -63,7 +63,7 @@ Now you can happilty create new instances of this class and save it to the datab
 public void saveStuff() {
 	Note n = new Note();
 	n.title = "Sprinkles is awesome!";
-	n.body = "yup, sure is!;
+	n.body = "yup, sure is!";
 	n.save(); // when this call finishes n.getId() will return a valid id
 }
 ```
@@ -113,16 +113,16 @@ void deleteAsync(OnDeletedCallback callback);
 ###Querying
 Start a query with on of the following static methods:
 ```java
-Query.One(Class clazz, String sql, Object[] args);
-Query.Many(Class clazz, String sql, Object[] args);
+Query.One(Class<? extends Model> clazz, String sql, Object[] args);
+Query.Many(Class<? extends Model> clazz, String sql, Object[] args);
 ```
 Notice that unlike android built in query methods you can send in an array of objects instead of an array of strings.
 
 Once the query has been started you can get the result with three different methods:
 ```java
 get();
-getAsync(LoaderManager lm, OnQueryResultHandler handler);
-getAsyncWithUpdates(LoaderManager lm, OnQueryResultHandler handler, Class... dependencies);
+getAsync(LoaderManager lm, OnQueryResultHandler<? extends Model> handler);
+getAsyncWithUpdates(LoaderManager lm, OnQueryResultHandler<? extends Model> handler, Class<? extends Model>... dependencies);
 ```
 
 `get()` return either the model or a list of the model represented by the `Class` you sent in as the first argument to the query method. `getAsync()` is the same only that the result is delivered on a callback function after the executeing `get()` on another thread. `getAsyncWithUpdates()` is the same as `getAsync()` only that it delivers updated results once the backing model of the query is updated. Both of the async methods use loaders and therefore need a `LoaderManager` instance. `getAsyncWithUpdates()` takes in an optional array of classes, this is used when the query relies on more models than the one you are querying for and you want the query to updated when those models change as well.

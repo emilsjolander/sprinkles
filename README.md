@@ -38,7 +38,7 @@ public class Note extends Model {
 	
 }
 ```
-Ok, a lot of important stuff in this short class. First of all. A model must subclass `se.emilsjolander.sprinkles.Model` and it also must have a `@Table` annotations specifying the table name the model corresponds to. After the class declaration we have declared three members: `id`, `title` and `body`. Notice how all of them have a `@Column` annotation to mark that they are not only a member of this class but also a column of the table that this class represents. We have one last annotation in the above example: @AutoIncrementPrimaryKey, this annotation tells sprinkles that the field is both an autoincrement field and a primary key field. A field with this annotation will automatically be set upon the creation of its corresponding row in the table.
+Ok, a lot of important stuff in this short class. First of all. A model must subclass `se.emilsjolander.sprinkles.Model` and it also must have a `@Table` annotations specifying the table name the model corresponds to. After the class declaration we have declared three members: `id`, `title` and `body`. Notice how all of them have a `@Column` annotation to mark that they are not only a member of this class but also a column of the table that this class represents. We have one last annotation in the above example. The `@AutoIncrementPrimaryKey`, this annotation tells sprinkles that the field is both an autoincrement field and a primary key field. A field with this annotation will automatically be set upon the creation of its corresponding row in the table.
 
 Before using this class you must migrate it into the database. I recomend doing thing in the `onCreate()` method of an `Application` subclass like this:
 ```java
@@ -84,7 +84,7 @@ API
 - `@AutoIncrementPrimaryKey` Used to mark a field a an autoincrementing primary key. The field must be an `int` or a `long` and cannot be in the same class as any other primary key.
 - `@Column` Used to associate a class field with a sql column.
 - `@PrimaryKey` Used to mark a field as a primary key. Multiple primary keys in a class are allowed and will result in a composite primary key.
-- `@ForeignKey` Used to mark a field as a foreign key. The argument given to this annotation should be foreignKeyTable(foreignKeyColumn).
+- `@ForeignKey` Used to mark a field as a foreign key. The argument given to this annotation should be in the form of foreignKeyTable(foreignKeyColumn).
 - `@CascadeDelete` Used to mark a field also marked as a foreign key as a cascade deleting field.
 
 ###Saving
@@ -172,7 +172,7 @@ protected void beforeSave() {
 }
 ```
 
-User the following callback to clean up things related to the model but not stored in the databse. Perhaps a file on the internal storage?
+User the following callback to clean up things related to the model but not stored in the database. Perhaps a file on the internal storage?
 ```java
 @Override
 protected void afterDelete() {

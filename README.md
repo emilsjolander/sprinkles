@@ -2,6 +2,8 @@ Sprinkles ![Icon](https://github.com/emilsjolander/sprinkles/raw/master/sprinkle
 =========
 Sprinkles is a boiler-plate-reduction-library for dealing with databases in android applications. Some would call is a kind of ORM but i don't see it that way. Sprinkles does lets SQL do what it is good at, making complex queries. SQL is however a mess (in my opinion) when is comes to everything else. This is why sprinkles helps you with things such as inserting, updated and destroying models, spinkles will also help you with the tedious task of unpacking a cursor into a model. Sprinkles actively supports version 2.3 of android and above but it should work on alder versions as well.
 
+Sprinkles works great together with https://github.com/square/retrofit.
+
 Download
 --------
 I prefer cloning my libraries and adding them as a dependency manually. This way i can easily fix a bug in the library as part of my workflow and commit it upstream (pleas do!).

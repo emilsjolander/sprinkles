@@ -2,6 +2,8 @@ Sprinkles ![Icon](https://github.com/emilsjolander/sprinkles/raw/master/sprinkle
 =========
 Sprinkles is a boiler-plate-reduction-library for dealing with databases in android applications. Some would call is a kind of ORM but i don't see it that way. Sprinkles does lets SQL do what it is good at, making complex queries. SQL is however a mess (in my opinion) when is comes to everything else. This is why sprinkles helps you with things such as inserting, updated and destroying models, spinkles will also help you with the tedious task of unpacking a cursor into a model. Sprinkles actively supports version 2.3 of android and above but it should work on alder versions as well.
 
+Sprinkles works great together with https://github.com/square/retrofit.
+
 Download
 --------
 I prefer cloning my libraries and adding them as a dependency manually. This way i can easily fix a bug in the library as part of my workflow and commit it upstream (pleas do!).
@@ -63,7 +65,7 @@ Now you can happilty create new instances of this class and save it to the datab
 public void saveStuff() {
 	Note n = new Note();
 	n.title = "Sprinkles is awesome!";
-	n.body = "yup, sure is!;
+	n.body = "yup, sure is!";
 	n.save(); // when this call finishes n.getId() will return a valid id
 }
 ```
@@ -113,16 +115,16 @@ void deleteAsync(OnDeletedCallback callback);
 ###Querying
 Start a query with on of the following static methods:
 ```java
-Query.One(Class clazz, String sql, Object[] args);
-Query.Many(Class clazz, String sql, Object[] args);
+Query.One(Class<? extends Model> clazz, String sql, Object[] args);
+Query.Many(Class<? extends Model> clazz, String sql, Object[] args);
 ```
 Notice that unlike android built in query methods you can send in an array of objects instead of an array of strings.
 
 Once the query has been started you can get the result with three different methods:
 ```java
 get();
-getAsync(LoaderManager lm, OnQueryResultHandler handler);
-getAsyncWithUpdates(LoaderManager lm, OnQueryResultHandler handler, Class... dependencies);
+getAsync(LoaderManager lm, OnQueryResultHandler<? extends Model> handler);
+getAsyncWithUpdates(LoaderManager lm, OnQueryResultHandler<? extends Model> handler, Class<? extends Model>... dependencies);
 ```
 
 `get()` return either the model or a list of the model represented by the `Class` you sent in as the first argument to the query method. `getAsync()` is the same only that the result is delivered on a callback function after the executeing `get()` on another thread. `getAsyncWithUpdates()` is the same as `getAsync()` only that it delivers updated results once the backing model of the query is updated. Both of the async methods use loaders and therefore need a `LoaderManager` instance. `getAsyncWithUpdates()` takes in an optional array of classes, this is used when the query relies on more models than the one you are querying for and you want the query to updated when those models change as well.
@@ -200,10 +202,10 @@ public class MyApplication extends Application {
 ```
 The above example uses the `createTable()` method on a migration. Here is a full list of the methods it supports:
 ```java
-void createTable(Class clazz);
-void dropTable(Class clazz);
+void createTable(Class<? extends Model> clazz);
+void dropTable(Class<? extends Model> clazz);
 void renameTable(String from, String to);
-void addColumn(Class clazz, String columnName);
+void addColumn(Class<? extends Model> clazz, String columnName);
 void addRawStatement(String statement);
 ```
 Any number of calls to any of the above migrations are allowed, if for example `createTable()` is called twice than two tables will be created once that migration has been added. Remember to never edit a migration, always create a new migration (this only applies to production version of the app of course).

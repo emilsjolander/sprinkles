@@ -6,11 +6,13 @@ import java.util.Locale;
 
 import se.emilsjolander.sprinkles.models.Note;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class CreateNoteActivity extends Activity {
 
@@ -27,6 +29,7 @@ public class CreateNoteActivity extends Activity {
 		long noteId = getIntent().getLongExtra(EXTRA_NOTE_ID, -1);
 		if (noteId < 0) {
 			mNote = new Note();
+			mNote.save();
 		} else {
 			mNote = Query.one(Note.class, "select * from Notes where id=?", noteId).get();
 		}
@@ -47,11 +50,26 @@ public class CreateNoteActivity extends Activity {
 	@Override
 	public void finish() {
 		mNote.setContent(mNoteContent.getText().toString());
-		if (mNote.save()) {
-			super.finish();
-		} else {
-			Toast.makeText(this, R.string.could_not_save_note, Toast.LENGTH_SHORT).show();
+		mNote.save();
+		super.finish();
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.activity_create_note, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.tags:
+			Intent i = new Intent(this, ChooseTagActivity.class);
+			i.putExtra(ChooseTagActivity.EXTRA_NOTE_ID, mNote.getId());
+			startActivity(i);
+			return true;
 		}
+		return super.onOptionsItemSelected(item);
 	}
 
 }

@@ -46,10 +46,5 @@ public class Note extends Model {
 		super.beforeSave();
 		updatedAt = System.currentTimeMillis();
 	}
-	
-	@Override
-	public boolean isValid() {
-		return content != null && !content.isEmpty();
-	}
 
 }

@@ -9,5 +9,8 @@
     <string name="note_content">Note content</string>
     <string name="last_updated">Last updated %s</string>
     <string name="could_not_save_note">Could not save note</string>
+    <string name="tags">Tags</string>
+    <string name="no_tags">Currently no tags in list</string>
+    <string name="new_tag">New tag</string>
 
 </resources>

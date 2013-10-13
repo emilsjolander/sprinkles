@@ -26,6 +26,12 @@
         <activity
             android:name=".CreateNoteActivity" >
         </activity>
+        <activity
+            android:name=".ChooseTagActivity" >
+        </activity>
+        <activity
+            android:name=".CreateTagActivity" >
+        </activity>
     </application>
 
 </manifest>

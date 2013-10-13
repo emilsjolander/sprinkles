@@ -28,4 +28,12 @@ public class NoteTagLink extends Model {
 		this.tagId = tagId;
 	}
 	
+	public long getNoteId() {
+		return noteId;
+	}
+
+	public long getTagId() {
+		return tagId;
+	}
+	
 }

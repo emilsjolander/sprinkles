@@ -12,7 +12,6 @@ public class Tag extends Model {
 	@Column("id") private long id;
 
 	@Column("name") private String name;
-	@Column("color") private int color;
 	
 	public long getId() {
 		return id;
@@ -26,12 +25,4 @@ public class Tag extends Model {
 		this.name = name;
 	}
 	
-	public int getColor() {
-		return color;
-	}
-	
-	public void setColor(int color) {
-		this.color = color;
-	}
-
 }

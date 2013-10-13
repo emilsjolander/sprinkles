@@ -12,6 +12,8 @@ public class Note extends Model {
 	@Column("id") private long id;
 
 	@Column("content") private String content;
+	@Column("created_at") private long createdAt;
+	@Column("updated_at") private long updatedAt;
 	
 	public long getId() {
 		return id;
@@ -23,6 +25,31 @@ public class Note extends Model {
 	
 	public void setContent(String content) {
 		this.content = content;
+	}
+	
+	public long getCreatedAt() {
+		return createdAt;
+	}
+	
+	public long getUpdatedAt() {
+		return updatedAt;
+	}
+	
+	@Override
+	protected void beforeCreate() {
+		super.beforeCreate();
+		createdAt = System.currentTimeMillis();
+	}
+	
+	@Override
+	protected void beforeSave() {
+		super.beforeSave();
+		updatedAt = System.currentTimeMillis();
+	}
+	
+	@Override
+	public boolean isValid() {
+		return content != null && !content.isEmpty();
 	}
 
 }

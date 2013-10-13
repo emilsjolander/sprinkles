@@ -35,18 +35,18 @@ class Utils {
 			final List<ColumnField> columns = Utils.getColumns(resultClass);
 			for (ColumnField column : columns) {
 				column.field.setAccessible(true);
-				final Object value = column.field.get(result);
-				if (value instanceof String) {
+				final Class<?> type = column.field.getType();
+				if (isTypeOneOf(type, String.class)) {
 					column.field.set(result, c.getString(c.getColumnIndexOrThrow(column.name)));
-				} else if (value instanceof Integer) {
+				} else if (isTypeOneOf(type, Integer.class, int.class)) {
 					column.field.set(result, c.getInt(c.getColumnIndexOrThrow(column.name)));
-				} else if (value instanceof Long) {
+				} else if (isTypeOneOf(type, Long.class, long.class)) {
 					column.field.set(result, c.getLong(c.getColumnIndexOrThrow(column.name)));
-				} else if (value instanceof Boolean) {
+				} else if (isTypeOneOf(type, Boolean.class, boolean.class)) {
 					column.field.set(result, c.getInt(c.getColumnIndexOrThrow(column.name)) > 0);
-				} else if (value instanceof Float) {
+				} else if (isTypeOneOf(type, Float.class, float.class)) {
 					column.field.set(result, c.getFloat(c.getColumnIndexOrThrow(column.name)));
-				} else if (value instanceof Double) {
+				} else if (isTypeOneOf(type, Double.class, double.class)) {
 					column.field.set(result, c.getDouble(c.getColumnIndexOrThrow(column.name)));
 				}
 			}
@@ -239,6 +239,19 @@ class Utils {
 	private static Field[] concatFieldArrays(Field[] one, Field[] two) {
 		final int length = one.length + two.length;
 		final Field[] result = new Field[length];
+		for (int i = 0; i < length; i++) {
+			if (i < one.length) {
+				result[i] = one[i];
+			} else {
+				result[i] = two[i - one.length];
+			}
+		}
+		return result;
+	}
+
+	static Class<?>[] concatClassArrays(Class<?>[] one, Class<?>[] two) {
+		final int length = one.length + two.length;
+		final Class<?>[] result = new Class<?>[length];
 		for (int i = 0; i < length; i++) {
 			if (i < one.length) {
 				result[i] = one[i];

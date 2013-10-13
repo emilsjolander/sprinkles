@@ -200,10 +200,10 @@ public class MyApplication extends Application {
 ```
 The above example uses the `createTable()` method on a migration. Here is a full list of the methods it supports:
 ```java
-void createTable(Class clazz);
-void dropTable(Class clazz);
+void createTable(Class<? extends Model> clazz);
+void dropTable(Class<? extends Model> clazz);
 void renameTable(String from, String to);
-void addColumn(Class clazz, String columnName);
+void addColumn(Class<? extends Model> clazz, String columnName);
 void addRawStatement(String statement);
 ```
 Any number of calls to any of the above migrations are allowed, if for example `createTable()` is called twice than two tables will be created once that migration has been added. Remember to never edit a migration, always create a new migration (this only applies to production version of the app of course).

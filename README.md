@@ -1,4 +1,4 @@
-Sprinkles [![Icon](https://github.com/emilsjolander/sprinkles/raw/master/sprinkles.png)]
+Sprinkles ![Icon](https://github.com/emilsjolander/sprinkles/raw/master/sprinkles.png)
 =========
 Sprinkles is a boiler-plate-reduction-library for dealing with databases in android applications. Some would call is a kind of ORM but i don't see it that way. Sprinkles does lets SQL do what it is good at, making complex queries. SQL is however a mess (in my opinion) when is comes to everything else. This is why sprinkles helps you with things such as inserting, updated and destroying models, spinkles will also help you with the tedious task of unpacking a cursor into a model. Sprinkles actively supports version 2.3 of android and above but it should work on alder versions as well.
 
@@ -80,12 +80,12 @@ There is a lot more you can do with sprinkles so please read the next section wh
 API
 ---
 ###Annotations
-- `@Table`: Used to associate a model class with a sql table.
-- `@AutoIncrementPrimaryKey`: Used to mark a field a an autoincrementing primary key. The field must be an `int` or a `long` and cannot be in the same class as any other primary key.
-- `@Column`: Used to associate a class field with a sql column.
-- `@PrimaryKey`: Used to mark a field as a primary key. Multiple primary keys in a class are allowed and will result in a composite primary key.
-- `@ForeignKey`: Used to mark a field as a foreign key. The argument given to this annotation should be foreignKeyTable(foreignKeyColumn).
-- `@CascadeDelete`: Used to mark a field also marked as a foreign key as a cascade deleting field.
+- `@Table` Used to associate a model class with a sql table.
+- `@AutoIncrementPrimaryKey` Used to mark a field a an autoincrementing primary key. The field must be an `int` or a `long` and cannot be in the same class as any other primary key.
+- `@Column` Used to associate a class field with a sql column.
+- `@PrimaryKey` Used to mark a field as a primary key. Multiple primary keys in a class are allowed and will result in a composite primary key.
+- `@ForeignKey` Used to mark a field as a foreign key. The argument given to this annotation should be foreignKeyTable(foreignKeyColumn).
+- `@CascadeDelete` Used to mark a field also marked as a foreign key as a cascade deleting field.
 
 ###Saving
 The save method is both an insert and a update method, the correct thing will be done depending on if the model exists in the database or not. The two first methods below and syncronous, the second is for using together with a transaction (more on the later). There are also two asyncronous methods, one with a callback and one without. The syncronous methods will return a boolean indicating if the model was saved or not, The asyncronous method with a callback will just not invoke the callback if saving failed.

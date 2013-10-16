@@ -11,6 +11,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 public class ChooseTagActivity extends Activity {
@@ -42,22 +45,38 @@ public class ChooseTagActivity extends Activity {
 		}
 	};
 
+	private OnItemClickListener onListItemClicked = new OnItemClickListener() {
+		@Override
+		public void onItemClick(AdapterView<?> l, View v, int pos,
+				long id) {
+			NoteTagLink link = new NoteTagLink(mNoteId, id);
+			if (mListView.isItemChecked(pos)) {
+				link.saveAsync();
+			} else {
+				link.deleteAsync();
+			}
+		}
+	};
+	
+	private long mNoteId;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.acitivty_choose_tag);
 
-		long noteId = getIntent().getLongExtra(EXTRA_NOTE_ID, -1);
+		mNoteId = getIntent().getLongExtra(EXTRA_NOTE_ID, -1);
 
 		Query.many(Tag.class, "select * from Tags").getAsyncWithUpdates(
 				getLoaderManager(), onTagsLoaded);
 		Query.many(NoteTagLink.class,
-				"select * from NoteTagLinks where note_id=?", noteId).getAsyncWithUpdates(
+				"select * from NoteTagLinks where note_id=?", mNoteId).getAsyncWithUpdates(
 				getLoaderManager(), onLinksLoaded, Note.class, Tag.class);
 
 		mListView = (ListView) findViewById(R.id.list);
 		mListView.setEmptyView(findViewById(R.id.empty));
 		mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+		mListView.setOnItemClickListener(onListItemClicked);
 
 		mAdapter = new TagsAdapter(this);
 		mListView.setAdapter(mAdapter);
@@ -65,13 +84,16 @@ public class ChooseTagActivity extends Activity {
 
 	private void updateCheckedPositions() {
 		for (int i = 0 ; i<mAdapter.getCount() ; i++) {
-			for (NoteTagLink link : mLinks) {
-				if (link.getTagId() == mTags.get(i).getId()) {
-					mListView.setItemChecked(i, true);
-					continue;
+			if (mLinks != null) {
+				for (NoteTagLink link : mLinks) {
+					if (link.getTagId() == mTags.get(i).getId()) {
+						mListView.setItemChecked(i, true);
+						break;
+					}
 				}
+			} else {
+				mListView.setItemChecked(i, false);
 			}
-			mListView.setItemChecked(i, false);
 		}
 	}
 	

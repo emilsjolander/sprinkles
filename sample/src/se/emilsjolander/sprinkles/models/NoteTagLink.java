@@ -20,6 +20,15 @@ public class NoteTagLink extends Model {
 	@ForeignKey("Tags(id)")
 	@Column("tag_id") private long tagId;
 	
+	public NoteTagLink() {
+	}
+	
+	public NoteTagLink(long noteId, long tagId) {
+		this();
+		this.noteId = noteId;
+		this.tagId = tagId;
+	}
+	
 	public void setNoteId(long noteId) {
 		this.noteId = noteId;
 	}

@@ -12,5 +12,7 @@
     <string name="tags">Tags</string>
     <string name="no_tags">Currently no tags in list</string>
     <string name="new_tag">New tag</string>
+    <string name="create">create</string>
+    <string name="tag_name">Tag name</string>
 
 </resources>

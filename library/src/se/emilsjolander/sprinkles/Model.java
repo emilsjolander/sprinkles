@@ -104,7 +104,7 @@ public abstract class Model {
 			}
 
 			protected void onPostExecute(Boolean result) {
-				if (result) {
+				if (result && callback != null) {
 					callback.onSaved();
 				}
 			}
@@ -140,7 +140,9 @@ public abstract class Model {
 			}
 
 			protected void onPostExecute(Void result) {
-				callback.onDeleted();
+				if (callback != null) {
+					callback.onDeleted();
+				}
 			}
 
 		}.execute(this);

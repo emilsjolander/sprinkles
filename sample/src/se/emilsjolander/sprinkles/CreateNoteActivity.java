@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -45,13 +46,16 @@ public class CreateNoteActivity extends Activity {
 		}
 		
 		mNoteContent.setText(mNote.getContent());
-	}
-	
-	@Override
-	public void finish() {
-		mNote.setContent(mNoteContent.getText().toString());
-		mNote.save();
-		super.finish();
+		
+		findViewById(R.id.create).setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				mNote.setContent(mNoteContent.getText().toString());
+				mNote.save();
+				finish();
+			}
+		});
 	}
 	
 	@Override

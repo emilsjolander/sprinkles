@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.TextView;
 
 public class TagsAdapter extends BaseAdapter {
 	
@@ -29,7 +30,7 @@ public class TagsAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public Object getItem(int position) {
+	public Tag getItem(int position) {
 		return mTags.get(position);
 	}
 
@@ -46,20 +47,20 @@ public class TagsAdapter extends BaseAdapter {
 			holder = new ViewHolder();
 			convertView = mInflater.inflate(R.layout.list_item_tag, parent, false);
 			
-			// TODO
+			holder.name = (TextView) convertView.findViewById(R.id.name);
 			
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolder) convertView.getTag();
 		}
 		
-		// TODO
+		holder.name.setText(getItem(position).getName());
 		
 		return convertView;
 	}
 	
 	private static class ViewHolder {
-		// TODO
+		TextView name;
 	}
 
 }

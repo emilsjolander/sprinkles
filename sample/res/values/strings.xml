@@ -14,5 +14,7 @@
     <string name="new_tag">New tag</string>
     <string name="create">create</string>
     <string name="tag_name">Tag name</string>
+    <string name="could_not_save_tag">Could not save tag</string>
+    <string name="untitled">Untitled</string>
 
 </resources>

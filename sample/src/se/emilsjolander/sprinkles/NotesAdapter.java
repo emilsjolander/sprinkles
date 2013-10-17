@@ -54,7 +54,14 @@ public class NotesAdapter extends BaseAdapter {
 			holder = (ViewHolder) convertView.getTag();
 		}
 		
-		holder.content.setText(getItem(position).getContent());
+		String content = getItem(position).getContent();
+		if (content == null || content.isEmpty()) {
+			holder.content.setTextColor(0x99000000);
+			holder.content.setText(R.string.untitled);
+		} else {
+			holder.content.setTextColor(0xff000000);
+			holder.content.setText(content);	
+		}
 		
 		return convertView;
 	}

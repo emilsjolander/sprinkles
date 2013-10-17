@@ -19,7 +19,6 @@ public class CreateNoteActivity extends Activity {
 
 	public static final String EXTRA_NOTE_ID = "note_id";
 	
-	private EditText mNoteContent;
 	private Note mNote;
 	
 	@Override
@@ -36,7 +35,8 @@ public class CreateNoteActivity extends Activity {
 		}
 		
 		final TextView lastUpdatedAt = (TextView) findViewById(R.id.last_updated);
-		mNoteContent = (EditText) findViewById(R.id.note_content);
+		final EditText noteContent = (EditText) findViewById(R.id.note_content);
+		noteContent.setText(mNote.getContent());
 		
 		if (mNote.exists()) {
 			String updatedAtString = new SimpleDateFormat("HH:mm EEEE", Locale.getDefault()).format(new Date(mNote.getUpdatedAt()));
@@ -45,13 +45,11 @@ public class CreateNoteActivity extends Activity {
 			lastUpdatedAt.setVisibility(View.GONE);
 		}
 		
-		mNoteContent.setText(mNote.getContent());
-		
 		findViewById(R.id.create).setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				mNote.setContent(mNoteContent.getText().toString());
+				mNote.setContent(noteContent.getText().toString());
 				mNote.save();
 				finish();
 			}
@@ -68,7 +66,7 @@ public class CreateNoteActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.tags:
-			Intent i = new Intent(this, ChooseTagActivity.class);
+			final Intent i = new Intent(this, ChooseTagActivity.class);
 			i.putExtra(ChooseTagActivity.EXTRA_NOTE_ID, mNote.getId());
 			startActivity(i);
 			return true;

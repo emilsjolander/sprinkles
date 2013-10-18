@@ -11,10 +11,10 @@ I prefer cloning my libraries and adding them as a dependency manually. This way
 However i know a lot of people like using gradle/maven so here is the dependency to add to your `build.gradle` or `pom.xml`.
 
 ```Groovy
-__TODO__
+TODO add build.gradle dependency
 ```
 ```xml
-__TODO__
+TODO add pom.xml dependency
 ```
 
 Getting started

@@ -129,6 +129,9 @@ getAsyncWithUpdates(LoaderManager lm, OnQueryResultHandler<? extends Model> hand
 
 `get()` return either the model or a list of the model represented by the `Class` you sent in as the first argument to the query method. `getAsync()` is the same only that the result is delivered on a callback function after the executeing `get()` on another thread. `getAsyncWithUpdates()` is the same as `getAsync()` only that it delivers updated results once the backing model of the query is updated. Both of the async methods use loaders and therefore need a `LoaderManager` instance. `getAsyncWithUpdates()` takes in an optional array of classes, this is used when the query relies on more models than the one you are querying for and you want the query to updated when those models change as well.
 
+###ModelList
+All Queries return a `ModelList` subclass. You can also instantiate a instance of this `List` subclass yourself. It has some nice helper methods for saving and deleting mutiple models in one go.
+
 ###Transactions
 Both `save()` and `delete()` methods exists which take in a `Transaction`. Here is a quick example on how t use them. If any exception is thrown while saving a note or if any note fails to save the transaction will be rolled back.
 ```java

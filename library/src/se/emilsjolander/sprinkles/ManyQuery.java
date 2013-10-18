@@ -1,5 +1,7 @@
 package se.emilsjolander.sprinkles;
 
+import java.util.List;
+
 import se.emilsjolander.sprinkles.Query.OnQueryResultHandler;
 import android.app.LoaderManager;
 import android.app.LoaderManager.LoaderCallbacks;
@@ -16,7 +18,7 @@ public final class ManyQuery<T extends Model> {
 	ManyQuery() {
 	}
 
-	public ModelList<T> get() {
+	public List<T> get() {
 		final SQLiteDatabase db = DbOpenHelper.getInstance();
 		final Cursor c = db.rawQuery(sqlQuery, null);
 
@@ -29,14 +31,14 @@ public final class ManyQuery<T extends Model> {
 		return result;
 	}
 
-	public void getAsync(LoaderManager lm, OnQueryResultHandler<ModelList<T>> handler) {
+	public void getAsync(LoaderManager lm, OnQueryResultHandler<List<T>> handler) {
 		final int loaderId = sqlQuery.hashCode();
 		lm.initLoader(loaderId, null,
 				getLoaderCallbacks(sqlQuery, resultClass, handler, false, null));
 	}
 
 	public void getAsyncWithUpdates(LoaderManager lm,
-			OnQueryResultHandler<ModelList<T>> handler,
+			OnQueryResultHandler<List<T>> handler,
 			Class<?>... respondsToUpdatedOf) {
 		final int loaderId = sqlQuery.hashCode();
 		lm.initLoader(
@@ -50,7 +52,7 @@ public final class ManyQuery<T extends Model> {
 
 	private LoaderCallbacks<Cursor> getLoaderCallbacks(final String sqlQuery,
 			final Class<T> resultClass,
-			final OnQueryResultHandler<ModelList<T>> handler,
+			final OnQueryResultHandler<List<T>> handler,
 			final boolean getUpdates,
 			final Class<? extends Model>[] respondsToUpdatedOf) {
 		return new LoaderCallbacks<Cursor>() {
@@ -82,7 +84,7 @@ public final class ManyQuery<T extends Model> {
 	}
 
 	public void getAsync(android.support.v4.app.LoaderManager lm,
-			OnQueryResultHandler<ModelList<T>> handler) {
+			OnQueryResultHandler<List<T>> handler) {
 		final int loaderId = sqlQuery.hashCode();
 		lm.initLoader(
 				loaderId,
@@ -92,7 +94,7 @@ public final class ManyQuery<T extends Model> {
 	}
 
 	public void getAsyncWithUpdates(android.support.v4.app.LoaderManager lm,
-			OnQueryResultHandler<ModelList<T>> handler,
+			OnQueryResultHandler<List<T>> handler,
 			Class<?>... respondsToUpdatedOf) {
 		final int loaderId = sqlQuery.hashCode();
 		lm.initLoader(
@@ -106,7 +108,7 @@ public final class ManyQuery<T extends Model> {
 
 	private android.support.v4.app.LoaderManager.LoaderCallbacks<Cursor> getSupportLoaderCallbacks(
 			final String sqlQuery, final Class<T> resultClass,
-			final OnQueryResultHandler<ModelList<T>> handler,
+			final OnQueryResultHandler<List<T>> handler,
 			final boolean getUpdates,
 			final Class<? extends Model>[] respondsToUpdatedOf) {
 		return new android.support.v4.app.LoaderManager.LoaderCallbacks<Cursor>() {

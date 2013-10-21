@@ -1,6 +1,6 @@
-package se.emilsjolander.sprinkles;
+package se.emilsjolander.sprinkles.sample;
 
-import se.emilsjolander.sprinkles.models.Tag;
+import se.emilsjolander.sprinkles.sample.models.Tag;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;

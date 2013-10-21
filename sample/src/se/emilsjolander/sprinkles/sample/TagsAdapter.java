@@ -1,8 +1,8 @@
-package se.emilsjolander.sprinkles;
+package se.emilsjolander.sprinkles.sample;
 
 import java.util.List;
 
-import se.emilsjolander.sprinkles.models.Tag;
+import se.emilsjolander.sprinkles.sample.models.Tag;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;

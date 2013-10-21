@@ -1,10 +1,11 @@
-package se.emilsjolander.sprinkles;
+package se.emilsjolander.sprinkles.sample;
 
 import java.util.List;
 
+import se.emilsjolander.sprinkles.Query;
 import se.emilsjolander.sprinkles.Query.OnQueryResultHandler;
-import se.emilsjolander.sprinkles.models.Note;
-import se.emilsjolander.sprinkles.models.NoteTagLink;
+import se.emilsjolander.sprinkles.sample.models.Note;
+import se.emilsjolander.sprinkles.sample.models.NoteTagLink;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;

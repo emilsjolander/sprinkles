@@ -8,13 +8,12 @@ Download
 --------
 I prefer cloning my libraries and adding them as a dependency manually. This way i can easily fix a bug in the library as part of my workflow and commit it upstream (pleas do!).
 
-However i know a lot of people like using gradle/maven so here is the dependency to add to your `build.gradle` or `pom.xml`.
+However i know a lot of people like using gradle so here is the dependency to add to your `build.gradle`. Just replace `x.x.x` with the correct version of the library (found under the releases tab).
 
 ```Groovy
-TODO add build.gradle dependency
-```
-```xml
-TODO add pom.xml dependency
+dependencies {
+    compile 'se.emilsjolander.sprinkles:library:x.x.x'
+}
 ```
 
 Getting started

@@ -12,7 +12,7 @@ However i know a lot of people like using gradle so here is the dependency to ad
 
 ```Groovy
 dependencies {
-    compile 'se.emilsjolander.sprinkles:library:x.x.x'
+    compile 'se.emilsjolander:sprinkles:x.x.x'
 }
 ```
 

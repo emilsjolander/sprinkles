@@ -1,8 +1,8 @@
 Sprinkles ![Icon](https://github.com/emilsjolander/sprinkles/raw/master/sprinkles.png)
 =========
-Sprinkles is a boiler-plate-reduction-library for dealing with databases in android applications. Some would call is a kind of ORM but i don't see it that way. Sprinkles does lets SQL do what it is good at, making complex queries. SQL is however a mess (in my opinion) when is comes to everything else. This is why sprinkles helps you with things such as inserting, updated and destroying models, spinkles will also help you with the tedious task of unpacking a cursor into a model. Sprinkles actively supports version 2.3 of android and above but it should work on alder versions as well.
+Sprinkles is a boiler-plate-reduction-library for dealing with databases in android applications. Some would call it a kind of ORM but i don't see it that way. Sprinkles lets SQL do what it is good at, making complex queries. SQL however is a mess (in my opinion) when is comes to everything else. This is why sprinkles helps you with things such as inserting, updated and destroying models. Spinkles will also help you with the tedious task of unpacking a cursor into a model. Sprinkles actively supports version 2.3 of android and above but it should work on older versions as well.
 
-Sprinkles works great together with https://github.com/square/retrofit.
+Sprinkles works great together with https://github.com/square/retrofit for saving information from your server.
 
 Download
 --------
@@ -18,7 +18,7 @@ dependencies {
 
 Getting started
 ---------------
-When you have added the library to your project add a model class to it. I will demonstrate this with a `Note.java` class. I have omitted import statements to keep it brief.
+When you have added the library to your project add a model class to it. I will demonstrate this with a `Note.java` class. I have omitted the import statements to keep it brief.
 ```java
 @Table("Notes")
 public class Note extends Model {
@@ -39,7 +39,7 @@ public class Note extends Model {
 	
 }
 ```
-Ok, a lot of important stuff in this short class. First of all. A model must subclass `se.emilsjolander.sprinkles.Model` and it also must have a `@Table` annotations specifying the table name the model corresponds to. After the class declaration we have declared three members: `id`, `title` and `body`. Notice how all of them have a `@Column` annotation to mark that they are not only a member of this class but also a column of the table that this class represents. We have one last annotation in the above example. The `@AutoIncrementPrimaryKey`, this annotation tells sprinkles that the field is both an autoincrement field and a primary key field. A field with this annotation will automatically be set upon the creation of its corresponding row in the table.
+Ok, a lot of important stuff in this short class. First of all. A model must subclass `se.emilsjolander.sprinkles.Model` and it also must have a `@Table` annotations specifying the table name that the model corresponds to. After the class declaration we have declared three members: `id`, `title` and `body`. Notice how all of them have a `@Column` annotation to mark that they are not only a member of this class but also a column of the table that this class represents. We have one last annotation in the above example. The `@AutoIncrementPrimaryKey`, this annotation tells sprinkles that the field is both an autoincrement field and a primary key field. A field with this annotation will automatically be set upon the creation of its corresponding row in the table.
 
 Before using this class you must migrate it into the database. I recomend doing thing in the `onCreate()` method of an `Application` subclass like this:
 ```java
@@ -85,11 +85,11 @@ API
 - `@AutoIncrementPrimaryKey` Used to mark a field a an autoincrementing primary key. The field must be an `int` or a `long` and cannot be in the same class as any other primary key.
 - `@Column` Used to associate a class field with a sql column.
 - `@PrimaryKey` Used to mark a field as a primary key. Multiple primary keys in a class are allowed and will result in a composite primary key.
-- `@ForeignKey` Used to mark a field as a foreign key. The argument given to this annotation should be in the form of foreignKeyTable(foreignKeyColumn).
+- `@ForeignKey` Used to mark a field as a foreign key. The argument given to this annotation should be in the form of `"foreignKeyTable(foreignKeyColumn)"`.
 - `@CascadeDelete` Used to mark a field also marked as a foreign key as a cascade deleting field.
 
 ###Saving
-The save method is both an insert and a update method, the correct thing will be done depending on if the model exists in the database or not. The two first methods below and syncronous, the second is for using together with a transaction (more on the later). There are also two asyncronous methods, one with a callback and one without. The syncronous methods will return a boolean indicating if the model was saved or not, The asyncronous method with a callback will just not invoke the callback if saving failed.
+The save method is both an insert and a update method, the correct thing will be done depending on if the model exists in the database or not. The two first methods below are syncronous, the second is for using together with a transaction (more on the later). There are also two asyncronous methods, one with a callback and one without. The syncronous methods will return a boolean indicating if the model was saved or not, The asyncronous method with a callback will just not invoke the callback if saving failed.
 ```java
 boolean save();
 boolean save(Transaction t);
@@ -126,13 +126,19 @@ getAsync(LoaderManager lm, OnQueryResultHandler<? extends Model> handler);
 getAsyncWithUpdates(LoaderManager lm, OnQueryResultHandler<? extends Model> handler, Class<? extends Model>... dependencies);
 ```
 
-`get()` return either the model or a list of the model represented by the `Class` you sent in as the first argument to the query method. `getAsync()` is the same only that the result is delivered on a callback function after the executeing `get()` on another thread. `getAsyncWithUpdates()` is the same as `getAsync()` only that it delivers updated results once the backing model of the query is updated. Both of the async methods use loaders and therefore need a `LoaderManager` instance. `getAsyncWithUpdates()` takes in an optional array of classes, this is used when the query relies on more models than the one you are querying for and you want the query to updated when those models change as well.
+`get()` returns either the model or a list of the model represented by the `Class` you sent in as the first argument to the query method. `getAsync()` is the same only that the result is delivered on a callback function after the executeing `get()` on another thread. `getAsyncWithUpdates()` is the same as `getAsync()` only that it delivers updated results once the backing model of the query is updated. Both of the async methods use loaders and therefore need a `LoaderManager` instance. `getAsyncWithUpdates()` takes in an optional array of classes, this is used when the query relies on more models than the one you are querying for and you want the query to updated when those models change as well.
 
-###ModelList
-All Queries return a `ModelList` subclass. You can also instantiate a instance of this `List` subclass yourself. It has some nice helper methods for saving and deleting mutiple models in one go.
+###CursorList
+All Queries return a `CursorList` subclass. This is a `Iterable` subclass which lazily unpacks a cursor into its corresponding model when you ask for the next item. This leads to having the efficiency of a `Cursor` but without the pain. Excluding the `Iterable` methods `CursorList` also provides the following methods.
+```java
+public int size();
+public T get(int pos);
+public List<T> asList();
+``` 
+Remember to always call `close()` on a `CursorList` instance! This will close the underlying cursor.
 
 ###Transactions
-Both `save()` and `delete()` methods exists which take in a `Transaction`. Here is a quick example on how t use them. If any exception is thrown while saving a note or if any note fails to save the transaction will be rolled back.
+Both `save()` and `delete()` methods exists which take in a `Transaction`. Here is a quick example on how to use them. If any exception is thrown while saving a model or if any model fails to save the transaction will be rolled back.
 ```java
 public void doTransaction(List<Note> notes) {
 	Transaction t = new Transaction();
@@ -176,7 +182,7 @@ protected void beforeSave() {
 }
 ```
 
-User the following callback to clean up things related to the model but not stored in the database. Perhaps a file on the internal storage?
+Use the following callback to clean up things related to the model but not stored in the database. Perhaps a file on the internal storage?
 ```java
 @Override
 protected void afterDelete() {
@@ -210,7 +216,7 @@ void renameTable(String from, String to);
 void addColumn(Class<? extends Model> clazz, String columnName);
 void addRawStatement(String statement);
 ```
-Any number of calls to any of the above migrations are allowed, if for example `createTable()` is called twice than two tables will be created once that migration has been added. Remember to never edit a migration, always create a new migration (this only applies to production version of the app of course).
+Any number of calls to any of the above migrations are allowed, if for example `createTable()` is called twice than two tables will be created once that migration has been added. Remember to never edit a migration, always create a new migration (this only applies to the production version of your app of course).
 
 ###Relationships
 Sprinkles does nothing to handle relationships for you, this is by design. You will have to use the regular ways to handle relationships in sql. Sprinkles gives you all the tools needed for this and it works very well.

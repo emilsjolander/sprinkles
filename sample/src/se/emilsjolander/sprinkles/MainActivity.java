@@ -1,10 +1,5 @@
 package se.emilsjolander.sprinkles;
 
-import java.util.List;
-
-import se.emilsjolander.sprinkles.Query.OnQueryResultHandler;
-import se.emilsjolander.sprinkles.models.Note;
-import se.emilsjolander.sprinkles.models.NoteTagLink;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,15 +10,20 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
+import se.emilsjolander.sprinkles.Query.OnQueryResultHandler;
+import se.emilsjolander.sprinkles.models.Note;
+import se.emilsjolander.sprinkles.models.NoteTagLink;
+
 public class MainActivity extends Activity {
 
 	private ListView mListView;
 	private NotesAdapter mAdapter;
 
-	private OnQueryResultHandler<List<Note>> onNotesLoaded = new OnQueryResultHandler<List<Note>>() {
+	private OnQueryResultHandler<CursorList<Note>> onNotesLoaded = new OnQueryResultHandler<CursorList<Note>>() {
 		@Override
-		public void onResult(List<Note> result) {
-			mAdapter.setNotes(result);
+		public void onResult(CursorList<Note> result) {
+			mAdapter.setNotes(result.asList());
+            result.close();
 		}
 	};
 

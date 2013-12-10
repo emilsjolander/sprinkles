@@ -1,20 +1,21 @@
 package se.emilsjolander.sprinkles;
 
-import java.util.List;
-
-import se.emilsjolander.sprinkles.Query.OnQueryResultHandler;
-import se.emilsjolander.sprinkles.models.Note;
-import se.emilsjolander.sprinkles.models.NoteTagLink;
-import se.emilsjolander.sprinkles.models.Tag;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+
+import java.util.List;
+
+import se.emilsjolander.sprinkles.Query.OnQueryResultHandler;
+import se.emilsjolander.sprinkles.models.Note;
+import se.emilsjolander.sprinkles.models.NoteTagLink;
+import se.emilsjolander.sprinkles.models.Tag;
 
 public class ChooseTagActivity extends Activity {
 
@@ -26,21 +27,23 @@ public class ChooseTagActivity extends Activity {
 	private List<Tag> mTags;
 	private List<NoteTagLink> mLinks;
 
-	private OnQueryResultHandler<List<Tag>> onTagsLoaded = new OnQueryResultHandler<List<Tag>>() {
+	private OnQueryResultHandler<CursorList<Tag>> onTagsLoaded = new OnQueryResultHandler<CursorList<Tag>>() {
 
 		@Override
-		public void onResult(List<Tag> result) {
-			mTags = result;
+		public void onResult(CursorList<Tag> result) {
+			mTags = result.asList();
+            result.close();
 			mAdapter.setTags(mTags);
 			updateCheckedPositions();
 		}
 	};
 
-	private OnQueryResultHandler<List<NoteTagLink>> onLinksLoaded = new OnQueryResultHandler<List<NoteTagLink>>() {
+	private OnQueryResultHandler<CursorList<NoteTagLink>> onLinksLoaded = new OnQueryResultHandler<CursorList<NoteTagLink>>() {
 
 		@Override
-		public void onResult(List<NoteTagLink> result) {
-			mLinks = result;
+		public void onResult(CursorList<NoteTagLink> result) {
+			mLinks = result.asList();
+            result.close();
 			updateCheckedPositions();
 		}
 	};

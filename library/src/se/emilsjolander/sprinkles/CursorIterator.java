@@ -12,16 +12,17 @@ public class CursorIterator<T extends Model> implements Iterator<T> {
     private Cursor cursor;
     private Class<T> type;
     private int pos = -1;
+    private int count;
 
     CursorIterator(Cursor cursor, Class<T> type) {
         this.cursor = cursor;
         this.type = type;
+        this.count = cursor == null ? 0 : cursor.getCount();
     }
 
     @Override
     public boolean hasNext() {
-        cursor.moveToPosition(pos);
-        return !cursor.isLast();
+        return (pos+1) < count;
     }
 
     @Override

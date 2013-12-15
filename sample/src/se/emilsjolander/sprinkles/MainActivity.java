@@ -10,7 +10,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import se.emilsjolander.sprinkles.Query.OnQueryResultHandler;
 import se.emilsjolander.sprinkles.models.Note;
 import se.emilsjolander.sprinkles.models.NoteTagLink;
 
@@ -19,9 +18,9 @@ public class MainActivity extends Activity {
 	private ListView mListView;
 	private NotesAdapter mAdapter;
 
-	private OnQueryResultHandler<CursorList<Note>> onNotesLoaded = new OnQueryResultHandler<CursorList<Note>>() {
+	private ManyQuery.ResultHandler<Note> onNotesLoaded = new ManyQuery.ResultHandler<Note>() {
 		@Override
-		public void onResult(CursorList<Note> result) {
+		public void handleResult(CursorList<Note> result) {
 			mAdapter.setNotes(result.asList());
             result.close();
 		}

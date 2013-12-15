@@ -12,7 +12,6 @@ import android.widget.ListView;
 
 import java.util.List;
 
-import se.emilsjolander.sprinkles.Query.OnQueryResultHandler;
 import se.emilsjolander.sprinkles.models.Note;
 import se.emilsjolander.sprinkles.models.NoteTagLink;
 import se.emilsjolander.sprinkles.models.Tag;
@@ -27,10 +26,11 @@ public class ChooseTagActivity extends Activity {
 	private List<Tag> mTags;
 	private List<NoteTagLink> mLinks;
 
-	private OnQueryResultHandler<CursorList<Tag>> onTagsLoaded = new OnQueryResultHandler<CursorList<Tag>>() {
+	private ManyQuery.ResultHandler<Tag> onTagsLoaded =
+            new ManyQuery.ResultHandler<Tag>() {
 
 		@Override
-		public void onResult(CursorList<Tag> result) {
+		public void handleResult(CursorList<Tag> result) {
 			mTags = result.asList();
             result.close();
 			mAdapter.setTags(mTags);
@@ -38,10 +38,11 @@ public class ChooseTagActivity extends Activity {
 		}
 	};
 
-	private OnQueryResultHandler<CursorList<NoteTagLink>> onLinksLoaded = new OnQueryResultHandler<CursorList<NoteTagLink>>() {
+	private ManyQuery.ResultHandler<NoteTagLink> onLinksLoaded =
+            new ManyQuery.ResultHandler<NoteTagLink>() {
 
 		@Override
-		public void onResult(CursorList<NoteTagLink> result) {
+		public void handleResult(CursorList<NoteTagLink> result) {
 			mLinks = result.asList();
             result.close();
 			updateCheckedPositions();

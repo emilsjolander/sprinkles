@@ -7,9 +7,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
-import se.emilsjolander.sprinkles.Query.OnQueryResultHandler;
-
 public final class ManyQuery<T extends Model> {
+
+    public interface ResultHandler<T extends Model> {
+        void handleResult(CursorList<T> result);
+    }
 
 	Class<T> resultClass;
 	String sqlQuery;
@@ -23,14 +25,14 @@ public final class ManyQuery<T extends Model> {
 		return new CursorList<T>(c, resultClass);
 	}
 
-	public void getAsync(LoaderManager lm, OnQueryResultHandler<CursorList<T>> handler) {
+	public void getAsync(LoaderManager lm, ResultHandler<T> handler) {
 		final int loaderId = sqlQuery.hashCode();
 		lm.initLoader(loaderId, null,
 				getLoaderCallbacks(sqlQuery, resultClass, handler, false, null));
 	}
 
 	public void getAsyncWithUpdates(LoaderManager lm,
-			OnQueryResultHandler<CursorList<T>> handler,
+			ResultHandler<T> handler,
 			Class<?>... respondsToUpdatedOf) {
 		final int loaderId = sqlQuery.hashCode();
 		lm.initLoader(
@@ -44,19 +46,19 @@ public final class ManyQuery<T extends Model> {
 
 	private LoaderCallbacks<Cursor> getLoaderCallbacks(final String sqlQuery,
 			final Class<T> resultClass,
-			final OnQueryResultHandler<CursorList<T>> handler,
+			final ResultHandler<T> handler,
 			final boolean getUpdates,
 			final Class<? extends Model>[] respondsToUpdatedOf) {
 		return new LoaderCallbacks<Cursor>() {
 
 			@Override
 			public void onLoaderReset(Loader<Cursor> arg0) {
-				handler.onResult(new CursorList<T>(null, null));
+				handler.handleResult(new CursorList<T>(null, null));
 			}
 
 			@Override
 			public void onLoadFinished(Loader<Cursor> loader, Cursor c) {
-				handler.onResult(new CursorList<T>(c, resultClass));
+				handler.handleResult(new CursorList<T>(c, resultClass));
 				if (!getUpdates) {
 					loader.abandon();
 				}
@@ -71,7 +73,7 @@ public final class ManyQuery<T extends Model> {
 	}
 
 	public void getAsync(android.support.v4.app.LoaderManager lm,
-			OnQueryResultHandler<CursorList<T>> handler) {
+			ResultHandler<T> handler) {
 		final int loaderId = sqlQuery.hashCode();
 		lm.initLoader(
 				loaderId,
@@ -81,7 +83,7 @@ public final class ManyQuery<T extends Model> {
 	}
 
 	public void getAsyncWithUpdates(android.support.v4.app.LoaderManager lm,
-			OnQueryResultHandler<CursorList<T>> handler,
+			ResultHandler<T> handler,
 			Class<?>... respondsToUpdatedOf) {
 		final int loaderId = sqlQuery.hashCode();
 		lm.initLoader(
@@ -95,7 +97,7 @@ public final class ManyQuery<T extends Model> {
 
 	private android.support.v4.app.LoaderManager.LoaderCallbacks<Cursor> getSupportLoaderCallbacks(
 			final String sqlQuery, final Class<T> resultClass,
-			final OnQueryResultHandler<CursorList<T>> handler,
+			final ResultHandler<T> handler,
 			final boolean getUpdates,
 			final Class<? extends Model>[] respondsToUpdatedOf) {
 		return new android.support.v4.app.LoaderManager.LoaderCallbacks<Cursor>() {
@@ -103,13 +105,13 @@ public final class ManyQuery<T extends Model> {
 			@Override
 			public void onLoaderReset(
 					android.support.v4.content.Loader<Cursor> arg0) {
-				handler.onResult(new CursorList<T>(null, null));
+				handler.handleResult(new CursorList<T>(null, null));
 			}
 
 			@Override
 			public void onLoadFinished(
 					android.support.v4.content.Loader<Cursor> loader, Cursor c) {
-                handler.onResult(new CursorList<T>(c, resultClass));
+                handler.handleResult(new CursorList<T>(c, resultClass));
                 if (!getUpdates) {
                     loader.abandon();
                 }

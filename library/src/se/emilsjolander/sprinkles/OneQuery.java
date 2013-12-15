@@ -1,6 +1,5 @@
 package se.emilsjolander.sprinkles;
 
-import se.emilsjolander.sprinkles.Query.OnQueryResultHandler;
 import android.app.LoaderManager;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
@@ -9,6 +8,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
 public final class OneQuery<T extends Model> {
+
+    public interface ResultHandler<T extends Model> {
+        void handleResult(T result);
+    }
 
 	Class<T> resultClass;
 	String sqlQuery;
@@ -29,14 +32,14 @@ public final class OneQuery<T extends Model> {
 		return result;
 	}
 
-	public void getAsync(LoaderManager lm, OnQueryResultHandler<T> handler) {
+	public void getAsync(LoaderManager lm, ResultHandler<T> handler) {
 		final int loaderId = sqlQuery.hashCode();
 		lm.initLoader(loaderId, null,
 				getLoaderCallbacks(sqlQuery, resultClass, handler, false, null));
 	}
 
 	public void getAsyncWithUpdates(LoaderManager lm,
-			OnQueryResultHandler<T> handler, Class<?>... respondsToUpdatedOf) {
+			ResultHandler<T> handler, Class<?>... respondsToUpdatedOf) {
 		final int loaderId = sqlQuery.hashCode();
 		lm.initLoader(
 				loaderId,
@@ -48,14 +51,14 @@ public final class OneQuery<T extends Model> {
 	}
 
 	private LoaderCallbacks<Cursor> getLoaderCallbacks(final String sqlQuery,
-			final Class<T> resultClass, final OnQueryResultHandler<T> handler,
+			final Class<T> resultClass, final ResultHandler<T> handler,
 			final boolean getUpdates,
 			final Class<? extends Model>[] respondsToUpdatedOf) {
 		return new LoaderCallbacks<Cursor>() {
 
 			@Override
 			public void onLoaderReset(Loader<Cursor> arg0) {
-				handler.onResult(null);
+				handler.handleResult(null);
 			}
 
 			@Override
@@ -64,7 +67,7 @@ public final class OneQuery<T extends Model> {
 				if (c.moveToFirst()) {
 					result = Utils.getModelFromCursor(resultClass, c);
 				}
-				handler.onResult(result);
+				handler.handleResult(result);
 
 				if (!getUpdates) {
 					loader.abandon();
@@ -80,7 +83,7 @@ public final class OneQuery<T extends Model> {
 	}
 
 	public void getAsync(android.support.v4.app.LoaderManager lm,
-			OnQueryResultHandler<T> handler) {
+			ResultHandler<T> handler) {
 		final int loaderId = sqlQuery.hashCode();
 		lm.initLoader(
 				loaderId,
@@ -90,7 +93,7 @@ public final class OneQuery<T extends Model> {
 	}
 
 	public void getAsyncWithUpdates(android.support.v4.app.LoaderManager lm,
-			OnQueryResultHandler<T> handler, Class<?>... respondsToUpdatedOf) {
+			ResultHandler<T> handler, Class<?>... respondsToUpdatedOf) {
 		final int loaderId = sqlQuery.hashCode();
 		lm.initLoader(
 				loaderId,
@@ -103,14 +106,14 @@ public final class OneQuery<T extends Model> {
 
 	private android.support.v4.app.LoaderManager.LoaderCallbacks<Cursor> getSupportLoaderCallbacks(
 			final String sqlQuery, final Class<T> resultClass,
-			final OnQueryResultHandler<T> handler, final boolean getUpdates,
+			final ResultHandler<T> handler, final boolean getUpdates,
 			final Class<? extends Model>[] respondsToUpdatedOf) {
 		return new android.support.v4.app.LoaderManager.LoaderCallbacks<Cursor>() {
 
 			@Override
 			public void onLoaderReset(
 					android.support.v4.content.Loader<Cursor> arg0) {
-				handler.onResult(null);
+				handler.handleResult(null);
 			}
 
 			@Override
@@ -120,7 +123,7 @@ public final class OneQuery<T extends Model> {
 				if (c.moveToFirst()) {
 					result = Utils.getModelFromCursor(resultClass, c);
 				}
-				handler.onResult(result);
+				handler.handleResult(result);
 
 				if (!getUpdates) {
 					loader.abandon();

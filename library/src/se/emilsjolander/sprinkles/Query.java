@@ -3,10 +3,6 @@ package se.emilsjolander.sprinkles;
 
 public final class Query {
 
-	public interface OnQueryResultHandler<T> {
-		void onResult(T result);
-	}
-
 	private Query() {
 	}
 

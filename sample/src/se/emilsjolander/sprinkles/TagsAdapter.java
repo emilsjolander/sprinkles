@@ -1,8 +1,5 @@
 package se.emilsjolander.sprinkles;
 
-import java.util.List;
-
-import se.emilsjolander.sprinkles.models.Tag;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,19 +7,24 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import se.emilsjolander.sprinkles.models.Tag;
+
 public class TagsAdapter extends BaseAdapter {
 	
-	private List<Tag> mTags;
+	private CursorList<Tag> mTags;
 	private LayoutInflater mInflater;
 	
 	public TagsAdapter(Context context) {
 		mInflater = LayoutInflater.from(context);
 	}
-	
-	public void setTags(List<Tag> tags) {
-		mTags = tags;
-		notifyDataSetChanged();
-	}
+
+    public void swapTags(CursorList<Tag> tags) {
+        if (mTags != null) {
+            mTags.close();
+        }
+        mTags = tags;
+        notifyDataSetChanged();
+    }
 
 	@Override
 	public int getCount() {

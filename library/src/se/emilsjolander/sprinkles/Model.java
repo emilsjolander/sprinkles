@@ -1,37 +1,63 @@
 package se.emilsjolander.sprinkles;
 
+import android.os.AsyncTask;
+
 import java.util.List;
 
 import se.emilsjolander.sprinkles.Transaction.OnTransactionCommittedListener;
-import android.os.AsyncTask;
 
 public abstract class Model {
 
+    /**
+     * Notifies you when a model has been saved
+     */
 	public interface OnSavedCallback {
 		void onSaved();
 	}
 
+    /**
+     * Notifies you when a model has been deleted
+     */
 	public interface OnDeletedCallback {
 		void onDeleted();
 	}
 
+    /**
+     * Check if this model is valid. Returning false will not allow this model to be saved.
+     *
+     * @return whether or not this model is valid.
+     */
 	public boolean isValid() {
 		// optionally implemented by subclass
 		return true;
 	}
 
+    /**
+     * Override to perform an action before this model is created
+     */
 	protected void beforeCreate() {
 		// optionally implemented by subclass
 	}
 
+    /**
+     * Override to perform an action before this model is saved
+     */
 	protected void beforeSave() {
 		// optionally implemented by subclass
 	}
 
+    /**
+     * Override to perform an action before this model is deleted
+     */
 	protected void afterDelete() {
 		// optionally implemented by subclass
 	}
 
+    /**
+     * Check whether this model exists in the database
+     *
+     * @return true if this model is currently saved in the database (could be an older version)
+     */
 	final public boolean exists() {
 		final Model m = Query.one(
 				getClass(),
@@ -41,6 +67,13 @@ public abstract class Model {
 		return m != null;
 	}
 
+    /**
+     * Save this model to the database.
+     * If this model has an @AutoIncrementPrimaryKey annotation on a property
+     * than that property will be set when this method returns.
+     *
+     * @return whether or not the save was successful.
+     */
 	final public boolean save() {
 		Transaction t = new Transaction();
 		try {
@@ -51,6 +84,16 @@ public abstract class Model {
 		return t.isSuccessful();
 	}
 
+    /**
+     * Save this model to the database within the given transaction.
+     * If this model has an @AutoIncrementPrimaryKey annotation on a property
+     * than that property will be set when this method returns.
+     *
+     * @param t
+     *      The transaction to save this model in
+     *
+     * @return whether or not the save was successful.
+     */
 	final public boolean save(Transaction t) {
 		if (!isValid()) {
 			return false;
@@ -92,10 +135,19 @@ public abstract class Model {
 		return true;
 	}
 
+    /**
+     * Call save() asynchronously
+     */
 	final public void saveAsync() {
 		saveAsync(null);
 	}
 
+    /**
+     * Call save() asynchronously
+     *
+     * @param callback
+     *      The callback to invoke when this model has been saved.
+     */
 	final public void saveAsync(final OnSavedCallback callback) {
 		new AsyncTask<Model, Void, Boolean>() {
 
@@ -112,6 +164,9 @@ public abstract class Model {
 		}.execute(this);
 	}
 
+    /**
+     * Delete this model
+     */
 	final public void delete() {
 		Transaction t = new Transaction();
 		try {
@@ -122,15 +177,30 @@ public abstract class Model {
 		}
 	}
 
+    /**
+     * Delete this model within the given transaction
+     *
+     * @param t
+     *      The transaction to delete this model in
+     */
 	final public void delete(Transaction t) {
 		t.delete(Utils.getTableName(getClass()), Utils.getWhereStatement(this));
 		afterDelete();
 	}
 
+    /**
+     * Call delete() asynchronously
+     */
 	final public void deleteAsync() {
 		deleteAsync(null);
 	}
 
+    /**
+     * Call delete() asynchronously
+     *
+     * @param callback
+     *      The callback to invoke when this model has been deleted.
+     */
 	final public void deleteAsync(final OnDeletedCallback callback) {
 		new AsyncTask<Model, Void, Void>() {
 

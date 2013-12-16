@@ -119,14 +119,13 @@ Query.Many(Class<? extends Model> clazz, String sql, Object[] args);
 ```
 Notice that unlike android built in query methods you can send in an array of objects instead of an array of strings.
 
-Once the query has been started you can get the result with three different methods:
+Once the query has been started you can get the result with two different methods:
 ```java
-get();
-getAsync(LoaderManager lm, ResultHandler<? extends Model> handler);
-getAsyncWithUpdates(LoaderManager lm, ResultHandler<? extends Model> handler, Class<? extends Model>... dependencies);
+<T extends Model> get();
+boolean getAsync(LoaderManager lm, ResultHandler<? extends Model> handler, Class<? extends Model>... respondsToUpdatedOf);
 ```
 
-`get()` returns either the model or a list of the model represented by the `Class` you sent in as the first argument to the query method. `getAsync()` is the same only that the result is delivered on a callback function after the executing `get()` on another thread. `getAsyncWithUpdates()` is the same as `getAsync()` only that it delivers updated results once the backing model of the query is updated. Both of the async methods use loaders and therefore need a `LoaderManager` instance. `getAsyncWithUpdates()` takes in an optional array of classes, this is used when the query relies on more models than the one you are querying for and you want the query to updated when those models change as well.
+`get()` returns either the model or a list of the model represented by the `Class` you sent in as the first argument to the query method. `getAsync()` is the same only that the result is delivered on a callback function after executing `get()` on another thread. `getAsync()` also delivers updated results once the backing model of the query is updated if you return `true` indicating you want firther updates. `getAsync()` uses loaders and therefore needs a `LoaderManager` instance. `getAsync()` also takes in an optional array of classes, this is used when the query relies on more models than the one you are querying for and you want the query to updated when those models change as well.
 
 ###CursorList
 All Queries return a `CursorList` subclass. This is a `Iterable` subclass which lazily unpacks a cursor into its corresponding model when you ask for the next item. This leads to having the efficiency of a `Cursor` but without the pain. Excluding the `Iterable` methods `CursorList` also provides the following methods.

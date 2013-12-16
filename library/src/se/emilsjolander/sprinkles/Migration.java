@@ -1,11 +1,17 @@
 package se.emilsjolander.sprinkles;
 
+import android.database.sqlite.SQLiteDatabase;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import se.emilsjolander.sprinkles.exceptions.NoSuchColumnFoundException;
-import android.database.sqlite.SQLiteDatabase;
 
+/**
+ * A class representing database migration. Multiple statements can be made within one migration.
+ * Once a production app has shipped with a migration it should never be altered or removed.
+ * Sprinkles will make sure that the correct migrations are performed when a user upgrades to the lastest version of your app.
+ */
 public class Migration {
 
 	private List<String> mStatements = new ArrayList<String>();
@@ -15,7 +21,13 @@ public class Migration {
 			db.execSQL(sql);
 		}
 	}
-	
+
+    /**
+     * Create a table
+     *
+     * @param clazz
+     *      The class representing the table to add. This will also add all the annotated columns within that class.
+     */
 	public void createTable(Class<? extends Model> clazz) {
 		final String tableName = Utils.getTableName(clazz);
 		final StringBuilder createStatement = new StringBuilder();
@@ -95,15 +107,38 @@ public class Migration {
 		mStatements.add(createStatement.toString());
 	}
 
+    /**
+     * Remove a table
+     *
+     * @param clazz
+     *      The class representing the table to remove
+     */
 	public void dropTable(Class<? extends Model> clazz) {
 		final String tableName = Utils.getTableName(clazz);
 		mStatements.add(String.format("DROP TABLE IF EXISTS %s;", tableName));
 	}
 
+    /**
+     * Rename a table
+     *
+     * @param from
+     *      The current name
+     * @param to
+     *      The new name
+     */
 	public void renameTable(String from, String to) {
 		mStatements.add(String.format("ALTER TABLE %s RENAME TO %s;", from, to));
 	}
 
+    /**
+     * Add a column
+     *
+     * @param clazz
+     *      The class representing the table which should hold the new model.
+     *
+     * @param columnName
+     *      The name of the new column. The type of the new column is taken from the class.
+     */
 	public void addColumn(Class<? extends Model> clazz, String columnName) {
 		final String tableName = Utils.getTableName(clazz);
 		ColumnField column = null;
@@ -122,7 +157,14 @@ public class Migration {
 		mStatements.add(String.format("ALTER TABLE %s ADD COLUMN %s %s;",
 				tableName, column, column.type));
 	}
-	
+
+    /**
+     * Add a raw sql statement to be executed within a migration.
+     * This should be used when none of the other methods fit your needs.
+     *
+     * @param statement
+     *      The statement to execute
+     */
 	public void addRawStatement(String statement) {
 		mStatements.add(statement);
 	}

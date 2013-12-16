@@ -4,10 +4,7 @@ import android.database.Cursor;
 
 import java.util.Iterator;
 
-/**
- * Created by emilsjolander on 28/11/13.
- */
-public class CursorIterator<T extends Model> implements Iterator<T> {
+class CursorIterator<T extends Model> implements Iterator<T> {
 
     private Cursor cursor;
     private Class<T> type;

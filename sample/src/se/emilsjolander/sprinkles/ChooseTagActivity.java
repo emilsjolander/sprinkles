@@ -30,11 +30,10 @@ public class ChooseTagActivity extends Activity {
             new ManyQuery.ResultHandler<Tag>() {
 
 		@Override
-		public void handleResult(CursorList<Tag> result) {
-			mTags = result.asList();
-            result.close();
-			mAdapter.setTags(mTags);
+		public boolean handleResult(CursorList<Tag> result) {
+			mAdapter.swapTags(result);
 			updateCheckedPositions();
+            return true;
 		}
 	};
 
@@ -42,10 +41,11 @@ public class ChooseTagActivity extends Activity {
             new ManyQuery.ResultHandler<NoteTagLink>() {
 
 		@Override
-		public void handleResult(CursorList<NoteTagLink> result) {
+		public boolean handleResult(CursorList<NoteTagLink> result) {
 			mLinks = result.asList();
             result.close();
 			updateCheckedPositions();
+            return true;
 		}
 	};
 
@@ -71,10 +71,10 @@ public class ChooseTagActivity extends Activity {
 
 		mNoteId = getIntent().getLongExtra(EXTRA_NOTE_ID, -1);
 
-		Query.many(Tag.class, "select * from Tags").getAsyncWithUpdates(
+		Query.many(Tag.class, "select * from Tags").getAsync(
 				getLoaderManager(), onTagsLoaded);
 		Query.many(NoteTagLink.class,
-				"select * from NoteTagLinks where note_id=?", mNoteId).getAsyncWithUpdates(
+				"select * from NoteTagLinks where note_id=?", mNoteId).getAsync(
 				getLoaderManager(), onLinksLoaded, Note.class, Tag.class);
 
 		mListView = (ListView) findViewById(R.id.list);

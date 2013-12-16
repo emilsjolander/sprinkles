@@ -1,8 +1,5 @@
 package se.emilsjolander.sprinkles;
 
-import java.util.List;
-
-import se.emilsjolander.sprinkles.models.Note;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,16 +7,21 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import se.emilsjolander.sprinkles.models.Note;
+
 public class NotesAdapter extends BaseAdapter {
 	
 	private LayoutInflater mInflater;
-	private List<Note> mNotes;
+	private CursorList<Note> mNotes;
 	
 	public NotesAdapter(Context context) {
 		mInflater = LayoutInflater.from(context);
 	}
 	
-	public void setNotes(List<Note> notes) {
+	public void swapNotes(CursorList<Note> notes) {
+        if (mNotes != null) {
+            mNotes.close();
+        }
 		mNotes = notes;
 		notifyDataSetChanged();
 	}

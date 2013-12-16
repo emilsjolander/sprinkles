@@ -20,9 +20,9 @@ public class MainActivity extends Activity {
 
 	private ManyQuery.ResultHandler<Note> onNotesLoaded = new ManyQuery.ResultHandler<Note>() {
 		@Override
-		public void handleResult(CursorList<Note> result) {
-			mAdapter.setNotes(result.asList());
-            result.close();
+		public boolean handleResult(CursorList<Note> result) {
+			mAdapter.swapNotes(result);
+            return true;
 		}
 	};
 
@@ -47,7 +47,7 @@ public class MainActivity extends Activity {
 		mListView.setOnItemClickListener(onNoteSelected);
 
 		Query.many(Note.class, "select * from Notes order by created_at desc")
-				.getAsyncWithUpdates(getLoaderManager(), onNotesLoaded,
+				.getAsync(getLoaderManager(), onNotesLoaded,
 						NoteTagLink.class);
 	}
 

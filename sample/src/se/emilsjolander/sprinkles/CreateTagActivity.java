@@ -1,13 +1,13 @@
-package se.emilsjolander.sprinkles.sample;
+package se.emilsjolander.sprinkles;
 
-import se.emilsjolander.sprinkles.R;
-import se.emilsjolander.sprinkles.sample.models.Tag;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import se.emilsjolander.sprinkles.models.Tag;
 
 public class CreateTagActivity extends Activity {
 

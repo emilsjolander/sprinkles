@@ -8,7 +8,7 @@
         android:id="@+id/last_updated"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#ff999999" />
+        android:textColor="@color/text_gray" />
 
     <EditText
         android:id="@+id/note_content"

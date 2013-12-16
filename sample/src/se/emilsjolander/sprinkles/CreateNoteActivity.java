@@ -1,12 +1,5 @@
-package se.emilsjolander.sprinkles.sample;
+package se.emilsjolander.sprinkles;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-
-import se.emilsjolander.sprinkles.Query;
-import se.emilsjolander.sprinkles.R;
-import se.emilsjolander.sprinkles.sample.models.Note;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,6 +9,12 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+import se.emilsjolander.sprinkles.models.Note;
 
 public class CreateNoteActivity extends Activity {
 
@@ -67,7 +66,7 @@ public class CreateNoteActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.tags:
+        case R.id.tags:
 			final Intent i = new Intent(this, ChooseTagActivity.class);
 			i.putExtra(ChooseTagActivity.EXTRA_NOTE_ID, mNote.getId());
 			startActivity(i);

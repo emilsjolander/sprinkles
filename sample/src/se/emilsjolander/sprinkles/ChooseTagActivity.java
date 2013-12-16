@@ -1,4 +1,4 @@
-package se.emilsjolander.sprinkles.sample;
+package se.emilsjolander.sprinkles;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,13 +10,9 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import se.emilsjolander.sprinkles.CursorList;
-import se.emilsjolander.sprinkles.ManyQuery;
-import se.emilsjolander.sprinkles.Query;
-import se.emilsjolander.sprinkles.R;
-import se.emilsjolander.sprinkles.sample.models.Note;
-import se.emilsjolander.sprinkles.sample.models.NoteTagLink;
-import se.emilsjolander.sprinkles.sample.models.Tag;
+import se.emilsjolander.sprinkles.models.Note;
+import se.emilsjolander.sprinkles.models.NoteTagLink;
+import se.emilsjolander.sprinkles.models.Tag;
 
 public class ChooseTagActivity extends Activity {
 

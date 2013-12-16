@@ -1,4 +1,4 @@
-package se.emilsjolander.sprinkles.sample;
+package se.emilsjolander.sprinkles;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import se.emilsjolander.sprinkles.CursorList;
 import se.emilsjolander.sprinkles.R;
-import se.emilsjolander.sprinkles.sample.models.Tag;
+import se.emilsjolander.sprinkles.models.Tag;
 
 public class TagsAdapter extends BaseAdapter {
 	

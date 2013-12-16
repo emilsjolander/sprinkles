@@ -1,4 +1,4 @@
-package se.emilsjolander.sprinkles;
+package se.emilsjolander.sprinkles.sample;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -7,7 +7,9 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import se.emilsjolander.sprinkles.models.Note;
+import se.emilsjolander.sprinkles.CursorList;
+import se.emilsjolander.sprinkles.R;
+import se.emilsjolander.sprinkles.sample.models.Note;
 
 public class NotesAdapter extends BaseAdapter {
 	

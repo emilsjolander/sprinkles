@@ -1,4 +1,4 @@
-package se.emilsjolander.sprinkles.models;
+package se.emilsjolander.sprinkles.sample.models;
 
 import se.emilsjolander.sprinkles.Model;
 import se.emilsjolander.sprinkles.annotations.CascadeDelete;

@@ -10,8 +10,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import java.util.List;
-
 import se.emilsjolander.sprinkles.CursorList;
 import se.emilsjolander.sprinkles.ManyQuery;
 import se.emilsjolander.sprinkles.Query;
@@ -27,14 +25,15 @@ public class ChooseTagActivity extends Activity {
 	private ListView mListView;
 	private TagsAdapter mAdapter;
 
-	private List<Tag> mTags;
-	private List<NoteTagLink> mLinks;
+	private CursorList<Tag> mTags;
+	private CursorList<NoteTagLink> mLinks;
 
 	private ManyQuery.ResultHandler<Tag> onTagsLoaded =
             new ManyQuery.ResultHandler<Tag>() {
 
 		@Override
 		public boolean handleResult(CursorList<Tag> result) {
+            mTags = result;
 			mAdapter.swapTags(result);
 			updateCheckedPositions();
             return true;
@@ -46,8 +45,10 @@ public class ChooseTagActivity extends Activity {
 
 		@Override
 		public boolean handleResult(CursorList<NoteTagLink> result) {
-			mLinks = result.asList();
-            result.close();
+            if (mLinks != null) {
+                mLinks.close();
+            }
+			mLinks = result;
 			updateCheckedPositions();
             return true;
 		}

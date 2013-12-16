@@ -12,11 +12,13 @@ import se.emilsjolander.sprinkles.R;
 import se.emilsjolander.sprinkles.sample.models.Note;
 
 public class NotesAdapter extends BaseAdapter {
-	
+
+    private Context mContext;
 	private LayoutInflater mInflater;
 	private CursorList<Note> mNotes;
 	
 	public NotesAdapter(Context context) {
+        mContext = context;
 		mInflater = LayoutInflater.from(context);
 	}
 	
@@ -60,10 +62,10 @@ public class NotesAdapter extends BaseAdapter {
 		
 		String content = getItem(position).getContent();
 		if (content == null || content.isEmpty()) {
-			holder.content.setTextColor(0x99000000);
+			holder.content.setTextColor(mContext.getResources().getColor(R.color.text_gray));
 			holder.content.setText(R.string.untitled);
 		} else {
-			holder.content.setTextColor(0xff000000);
+			holder.content.setTextColor(mContext.getResources().getColor(R.color.text_black));
 			holder.content.setText(content);	
 		}
 		

@@ -17,7 +17,7 @@ import se.emilsjolander.sprinkles.R;
 import se.emilsjolander.sprinkles.sample.models.Note;
 import se.emilsjolander.sprinkles.sample.models.NoteTagLink;
 
-public class MainActivity extends Activity {
+public class NotesActivity extends Activity {
 
 	private ListView mListView;
 	private NotesAdapter mAdapter;
@@ -33,7 +33,7 @@ public class MainActivity extends Activity {
 	private OnItemClickListener onNoteSelected = new OnItemClickListener() {
 		@Override
 		public void onItemClick(AdapterView<?> l, View v, int position, long id) {
-			Intent i = new Intent(MainActivity.this, CreateNoteActivity.class);
+			Intent i = new Intent(NotesActivity.this, CreateNoteActivity.class);
 			i.putExtra(CreateNoteActivity.EXTRA_NOTE_ID, id);
 			startActivity(i);
 		}
@@ -65,7 +65,7 @@ public class MainActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.new_note:
-			startActivity(new Intent(MainActivity.this,
+			startActivity(new Intent(NotesActivity.this,
 					CreateNoteActivity.class));
 			return true;
 		}

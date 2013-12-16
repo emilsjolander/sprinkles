@@ -72,7 +72,7 @@ public final class OneQuery<T extends Model> {
     @SuppressWarnings("unchecked")
 	public void getAsync(LoaderManager lm,
 			ResultHandler<T> handler,
-            Class<? extends Model>... respondsToUpdatedOf) {
+            Class<?>... respondsToUpdatedOf) {
 		final int loaderId = sqlQuery.hashCode();
 		lm.initLoader(
 				loaderId,
@@ -98,7 +98,7 @@ public final class OneQuery<T extends Model> {
     @SuppressWarnings("unchecked")
 	public void getAsync(android.support.v4.app.LoaderManager lm,
 			ResultHandler<T> handler,
-            Class<? extends Model>... respondsToUpdatedOf) {
+            Class<?>... respondsToUpdatedOf) {
 		final int loaderId = sqlQuery.hashCode();
 		lm.initLoader(loaderId, null,
 				getSupportLoaderCallbacks(sqlQuery, resultClass, handler,

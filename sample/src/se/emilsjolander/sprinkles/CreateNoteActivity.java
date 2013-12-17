@@ -46,7 +46,7 @@ public class CreateNoteActivity extends Activity {
 			lastUpdatedAt.setVisibility(View.GONE);
 		}
 		
-		findViewById(R.id.create).setOnClickListener(new OnClickListener() {
+		findViewById(R.id.save).setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {

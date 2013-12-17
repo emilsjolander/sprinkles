@@ -16,5 +16,6 @@
     <string name="tag_name">Tag name</string>
     <string name="could_not_save_tag">Could not save tag</string>
     <string name="untitled">Untitled</string>
+    <string name="save">save</string>
 
 </resources>

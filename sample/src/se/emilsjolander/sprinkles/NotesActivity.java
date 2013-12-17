@@ -18,15 +18,19 @@ public class NotesActivity extends Activity {
 	private ListView mListView;
 	private NotesAdapter mAdapter;
 
-	private ManyQuery.ResultHandler<Note> onNotesLoaded = new ManyQuery.ResultHandler<Note>() {
-		@Override
+	private ManyQuery.ResultHandler<Note> onNotesLoaded =
+            new ManyQuery.ResultHandler<Note>() {
+
+        @Override
 		public boolean handleResult(CursorList<Note> result) {
-			mAdapter.swapNotes(result);
+            mAdapter.swapNotes(result);
             return true;
 		}
 	};
 
-	private OnItemClickListener onNoteSelected = new OnItemClickListener() {
+	private OnItemClickListener onNoteSelected =
+            new OnItemClickListener() {
+
 		@Override
 		public void onItemClick(AdapterView<?> l, View v, int position, long id) {
 			Intent i = new Intent(NotesActivity.this, CreateNoteActivity.class);

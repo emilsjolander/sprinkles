@@ -19,8 +19,9 @@ public class NoteTagLink extends Model {
 	@CascadeDelete
 	@ForeignKey("Tags(id)")
 	@Column("tag_id") private long tagId;
-	
+
 	public NoteTagLink() {
+        // default constructor
 	}
 	
 	public NoteTagLink(long noteId, long tagId) {

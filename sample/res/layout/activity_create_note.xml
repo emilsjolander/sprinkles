@@ -17,9 +17,9 @@
         android:hint="@string/note_content" />
 
     <Button
-        android:id="@+id/create"
+        android:id="@+id/save"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/create" />
+        android:text="@string/save" />
 
 </LinearLayout>

@@ -4,6 +4,8 @@ Sprinkles is a boiler-plate-reduction-library for dealing with databases in andr
 
 Sprinkles works great together with https://github.com/square/retrofit for saving information from your server.
 
+A intro into sprinkles can be found in this blog post http://emilsjolander.github.io/blog/2013/12/18/android-with-sprinkles/
+
 Download
 --------
 I prefer cloning my libraries and adding them as a dependency manually. This way, I can easily fix a bug in the library as part of my workflow and commit it upstream (please do!).

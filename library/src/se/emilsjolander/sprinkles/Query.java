@@ -24,7 +24,7 @@ public final class Query {
      * @param <T>
      *      The type of the model you want returned
      *
-     * @return
+     * @return the query to execute
      */
 	public static <T extends Model> OneQuery<T> one(Class<T> clazz, String sql,
 			Object... sqlArgs) {
@@ -50,7 +50,7 @@ public final class Query {
      * @param <T>
      *      The type of the list you want returned
      *
-     * @return
+     * @return the query to execute
      */
 	public static <T extends Model> ManyQuery<T> many(Class<T> clazz, String sql,
 			Object... sqlArgs) {

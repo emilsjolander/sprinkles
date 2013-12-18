@@ -1,12 +1,14 @@
 Sprinkles ![Icon](https://github.com/emilsjolander/sprinkles/raw/master/sprinkles.png)
 =========
-Sprinkles is a boiler-plate-reduction-library for dealing with databases in android applications. Some would call it a kind of ORM but i don't see it that way. Sprinkles lets SQL do what it is good at, making complex queries. SQL however is a mess (in my opinion) when is comes to everything else. This is why sprinkles helps you with things such as inserting, updating, and destroying models. Spinkles will also help you with the tedious task of unpacking a cursor into a model. Sprinkles actively supports version 2.3 of Android and above but it should work on older versions as well.
+Sprinkles is a boiler-plate-reduction-library for dealing with databases in android applications. Some would call it a kind of ORM but I don't see it that way. Sprinkles lets SQL do what it is good at, making complex queries. SQL however is a mess (in my opinion) when is comes to everything else. This is why sprinkles helps you with things such as inserting, updating, and destroying models. Spinkles will also help you with the tedious task of unpacking a cursor into a model. Sprinkles actively supports version 2.3 of Android and above but it should work on older versions as well.
 
 Sprinkles works great together with https://github.com/square/retrofit for saving information from your server.
 
+A intro into sprinkles can be found in this blog post http://emilsjolander.github.io/blog/2013/12/18/android-with-sprinkles/
+
 Download
 --------
-I prefer cloning my libraries and adding them as a dependency manually. This way I can easily fix a bug in the library as part of my workflow and commit it upstream (please do!).
+I prefer cloning my libraries and adding them as a dependency manually. This way, I can easily fix a bug in the library as part of my workflow and commit it upstream (please do!).
 
 However I know a lot of people like using gradle so here is the dependency to add to your `build.gradle`. Just replace `x.x.x` with the correct version of the library (found under the releases tab).
 
@@ -39,7 +41,7 @@ public class Note extends Model {
 	
 }
 ```
-Ok, a lot of important stuff in this short class. First of all. A model must subclass `se.emilsjolander.sprinkles.Model` and it also must have a `@Table` annotations specifying the table name that the model corresponds to. After the class declaration we have declared three members: `id`, `title` and `body`. Notice how all of them have a `@Column` annotation to mark that they are not only a member of this class but also a column of the table that this class represents. We have one last annotation in the above example. The `@AutoIncrementPrimaryKey`, this annotation tells sprinkles that the field is both an autoincrement field and a primary key field. A field with this annotation will automatically be set upon the creation of its corresponding row in the table.
+Ok, a lot of important stuff in this short class. First of all, a model must subclass `se.emilsjolander.sprinkles.Model` and it also must have a `@Table` annotations specifying the table name that the model corresponds to. After the class declaration we have declared three members: `id`, `title` and `body`. Notice how all of them have a `@Column` annotation to mark that they are not only a member of this class but also a column of the table that this class represents. We have one last annotation in the above example. The `@AutoIncrementPrimaryKey`, this annotation tells sprinkles that the field is both an autoincrement field and a primary key field. A field with this annotation will automatically be set upon the creation of its corresponding row in the table.
 
 Before using this class you must migrate it into the database. I recommend doing this in the `onCreate()` method of an `Application` subclass like this:
 ```java
@@ -81,9 +83,9 @@ There is a lot more you can do with sprinkles so please read the next section wh
 API
 ---
 ###Annotations
-- `@Table` Used to associate a model class with a sql table.
+- `@Table` Used to associate a model class with a SQL table.
 - `@AutoIncrementPrimaryKey` Used to mark a field a an autoincrementing primary key. The field must be an `int` or a `long` and cannot be in the same class as any other primary key.
-- `@Column` Used to associate a class field with a sql column.
+- `@Column` Used to associate a class field with a SQL column.
 - `@PrimaryKey` Used to mark a field as a primary key. Multiple primary keys in a class are allowed and will result in a composite primary key.
 - `@ForeignKey` Used to mark a field as a foreign key. The argument given to this annotation should be in the form of `"foreignKeyTable(foreignKeyColumn)"`.
 - `@CascadeDelete` Used to mark a field also marked as a foreign key as a cascade deleting field.
@@ -218,5 +220,5 @@ void addRawStatement(String statement);
 Any number of calls to any of the above migrations are allowed, if for example `createTable()` is called twice than two tables will be created once that migration has been added. Remember to never edit a migration, always create a new migration (this only applies to the production version of your app of course).
 
 ###Relationships
-Sprinkles does nothing to handle relationships for you, this is by design. You will have to use the regular ways to handle relationships in sql. Sprinkles gives you all the tools needed for this and it works very well.
+Sprinkles does nothing to handle relationships for you; this is by design. You will have to use the regular ways to handle relationships in SQL. Sprinkles gives you all the tools needed for this and it works very well.
 

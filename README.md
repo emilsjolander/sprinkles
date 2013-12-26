@@ -86,6 +86,7 @@ API
 - `@Table` Used to associate a model class with a SQL table.
 - `@AutoIncrementPrimaryKey` Used to mark a field a an autoincrementing primary key. The field must be an `int` or a `long` and cannot be in the same class as any other primary key.
 - `@Column` Used to associate a class field with a SQL column.
+- `@DynamicColumn` Used to associate a class field with a dynamic SQL column such as a alias is a query.
 - `@PrimaryKey` Used to mark a field as a primary key. Multiple primary keys in a class are allowed and will result in a composite primary key.
 - `@ForeignKey` Used to mark a field as a foreign key. The argument given to this annotation should be in the form of `"foreignKeyTable(foreignKeyColumn)"`.
 - `@CascadeDelete` Used to mark a field also marked as a foreign key as a cascade deleting field.
@@ -116,18 +117,18 @@ void deleteAsync(OnDeletedCallback callback);
 ###Querying
 Start a query with on of the following static methods:
 ```java
-Query.One(Class<? extends Model> clazz, String sql, Object[] args);
-Query.Many(Class<? extends Model> clazz, String sql, Object[] args);
+Query.One(Class<? extends QueryResult> clazz, String sql, Object[] args);
+Query.Many(Class<? extends QueryResult> clazz, String sql, Object[] args);
 ```
 Notice that unlike android built in query methods you can send in an array of objects instead of an array of strings.
 
 Once the query has been started you can get the result with two different methods:
 ```java
-<T extends Model> get();
+<T extends QueryResult> get();
 boolean getAsync(LoaderManager lm, ResultHandler<? extends Model> handler, Class<? extends Model>... respondsToUpdatedOf);
 ```
 
-`get()` returns either the model or a list of the model represented by the `Class` you sent in as the first argument to the query method. `getAsync()` is the same only that the result is delivered on a callback function after executing `get()` on another thread. `getAsync()` also delivers updated results once the backing model of the query is updated if you return `true` indicating you want firther updates. `getAsync()` uses loaders and therefore needs a `LoaderManager` instance. `getAsync()` also takes in an optional array of classes, this is used when the query relies on more models than the one you are querying for and you want the query to updated when those models change as well.
+`get()` returns either the `QueryResult` or a list of the `QueryResult` represented by the `Class` you sent in as the first argument to the query method. `getAsync()` is the same only that the result is delivered on a callback function after executing `get()` on another thread. `getAsync()` also delivers updated results once the backing model of the query is updated if you return `true` indicating you want firther updates. `getAsync()` uses loaders and therefore needs a `LoaderManager` instance. `getAsync()` also takes in an optional array of classes, this is used when the query relies on more models than the one you are querying for and you want the query to updated when those models change as well.
 
 ###CursorList
 All Queries return a `CursorList` subclass. This is a `Iterable` subclass which lazily unpacks a cursor into its corresponding model when you ask for the next item. This leads to having the efficiency of a `Cursor` but without the pain. Excluding the `Iterable` methods `CursorList` also provides the following methods.

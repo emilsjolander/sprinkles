@@ -65,14 +65,15 @@ public final class ManyQuery<T extends QueryResult> {
     public void getAsync(LoaderManager lm,
 			ResultHandler<T> handler,
 			Class<?>... respondsToUpdatedOf) {
+        if (Model.class.isAssignableFrom(resultClass)) {
+            respondsToUpdatedOf = Utils.concatArrays(respondsToUpdatedOf, new Class[]{resultClass});
+        }
 		final int loaderId = sqlQuery.hashCode();
 		lm.initLoader(
 				loaderId,
 				null,
 				getLoaderCallbacks(sqlQuery, resultClass, handler,
-						(Class<? extends Model>[]) Utils.concatArrays(
-								respondsToUpdatedOf,
-								new Class[] { resultClass })));
+						(Class<? extends Model>[]) respondsToUpdatedOf));
 	}
 
 
@@ -92,14 +93,15 @@ public final class ManyQuery<T extends QueryResult> {
 	public void getAsync(android.support.v4.app.LoaderManager lm,
 			ResultHandler<T> handler,
 			Class<?>... respondsToUpdatedOf) {
+        if (Model.class.isAssignableFrom(resultClass)) {
+            respondsToUpdatedOf = Utils.concatArrays(respondsToUpdatedOf, new Class[]{resultClass});
+        }
 		final int loaderId = sqlQuery.hashCode();
 		lm.initLoader(
 				loaderId,
 				null,
 				getSupportLoaderCallbacks(sqlQuery, resultClass, handler,
-                        (Class<? extends Model>[]) Utils.concatArrays(
-                                respondsToUpdatedOf,
-                                new Class[]{resultClass})));
+                        (Class<? extends Model>[]) respondsToUpdatedOf));
 	}
 
     private LoaderCallbacks<Cursor> getLoaderCallbacks(final String sqlQuery,

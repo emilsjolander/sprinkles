@@ -3,6 +3,7 @@ package se.emilsjolander.sprinkles.models;
 import se.emilsjolander.sprinkles.Model;
 import se.emilsjolander.sprinkles.annotations.AutoIncrementPrimaryKey;
 import se.emilsjolander.sprinkles.annotations.Column;
+import se.emilsjolander.sprinkles.annotations.DynamicColumn;
 import se.emilsjolander.sprinkles.annotations.Table;
 
 @Table("Notes")
@@ -14,6 +15,7 @@ public class Note extends Model {
 	@Column("content") private String content;
 	@Column("created_at") private long createdAt;
 	@Column("updated_at") private long updatedAt;
+    @DynamicColumn("tag_count") private int tagCount;
 	
 	public long getId() {
 		return id;
@@ -34,6 +36,10 @@ public class Note extends Model {
 	public long getUpdatedAt() {
 		return updatedAt;
 	}
+
+    public int getTagCount() {
+        return tagCount;
+    }
 	
 	@Override
 	protected void beforeCreate() {

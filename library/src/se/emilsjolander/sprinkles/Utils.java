@@ -8,6 +8,7 @@ import android.net.Uri;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import se.emilsjolander.sprinkles.annotations.AutoIncrementPrimaryKey;
@@ -44,7 +45,11 @@ class Utils {
                     columns.add(cf);
                 }
             }
+            List<String> colNames = Arrays.asList(c.getColumnNames());
             for (ColumnField column : columns) {
+                if (!colNames.contains(column.name)) {
+                    continue;
+                }
 				column.field.setAccessible(true);
 				final Class<?> type = column.field.getType();
 				if (isTypeOneOf(type, String.class)) {
@@ -159,7 +164,7 @@ class Utils {
 
     // TODO this method does way to much to be called on every save and query. Cache results!
 	static List<ColumnField> getColumns(Class<? extends QueryResult> clazz) {
-		final Field[] fields = getAllDeclaredFields(clazz, QueryResult.class);
+		final Field[] fields = getAllDeclaredFields(clazz, Object.class);
 		final List<ColumnField> columns = new ArrayList<ColumnField>();
 
 		for (Field field : fields) {
@@ -230,7 +235,7 @@ class Utils {
 	}
 
     private static List<ColumnField> getDynamicColumns(Class<? extends QueryResult> clazz) {
-        final Field[] fields = getAllDeclaredFields(clazz, QueryResult.class);
+        final Field[] fields = getAllDeclaredFields(clazz, Object.class);
         final List<ColumnField> columns = new ArrayList<ColumnField>();
 
         for (Field field : fields) {
@@ -260,8 +265,13 @@ class Utils {
 	}
 
     static <T> T[] concatArrays(T[] one, T[] two) {
+        if (one == null) {
+            return two;
+        } else if (two == null) {
+            return one;
+        }
         final int length = one.length + two.length;
-        final T[] result = (T[]) Array.newInstance(one.getClass(), length);
+        final T[] result = (T[]) Array.newInstance(one.getClass().getComponentType(), length);
         for (int i = 0; i < length; i++) {
             if (i < one.length) {
                 result[i] = one[i];

@@ -50,7 +50,10 @@ public class NotesActivity extends Activity {
 		mListView.setEmptyView(findViewById(R.id.empty));
 		mListView.setOnItemClickListener(onNoteSelected);
 
-		Query.many(Note.class, "select * from Notes order by created_at desc")
+		Query.many(Note.class,
+                "select Notes.*, " +
+                "(select count(*) from NoteTagLinks where NoteTagLinks.note_id = Notes.id) as tag_count " +
+                "from Notes order by created_at desc")
 				.getAsync(getLoaderManager(), onNotesLoaded,
 						NoteTagLink.class);
     }

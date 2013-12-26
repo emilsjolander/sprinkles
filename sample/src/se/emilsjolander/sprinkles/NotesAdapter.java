@@ -7,8 +7,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import se.emilsjolander.sprinkles.CursorList;
-import se.emilsjolander.sprinkles.R;
 import se.emilsjolander.sprinkles.models.Note;
 
 public class NotesAdapter extends BaseAdapter {
@@ -54,6 +52,7 @@ public class NotesAdapter extends BaseAdapter {
 			convertView = mInflater.inflate(R.layout.list_item_note, parent, false);
 			
 			holder.content = (TextView) convertView.findViewById(R.id.content);
+            holder.tagCount = (TextView) convertView.findViewById(R.id.tag_count);
 			
 			convertView.setTag(holder);
 		} else {
@@ -68,12 +67,15 @@ public class NotesAdapter extends BaseAdapter {
 			holder.content.setTextColor(mContext.getResources().getColor(R.color.text_black));
 			holder.content.setText(content);	
 		}
+
+        holder.tagCount.setText(""+getItem(position).getTagCount());
 		
 		return convertView;
 	}
 	
 	private static class ViewHolder {
 		TextView content;
+        TextView tagCount;
 	}
 
 }

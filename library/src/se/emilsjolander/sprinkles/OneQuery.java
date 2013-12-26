@@ -130,8 +130,7 @@ public final class OneQuery<T extends QueryResult> {
 
             @Override
             public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-                return new CursorLoader(Sprinkles.sInstance.mContext, sqlQuery,
-                        respondsToUpdatedOf);
+                return new CursorLoader(Sprinkles.sInstance.mContext, sqlQuery, respondsToUpdatedOf);
             }
         };
     }
@@ -165,8 +164,7 @@ public final class OneQuery<T extends QueryResult> {
 			@Override
 			public android.support.v4.content.Loader<Cursor> onCreateLoader(
 					int id, Bundle args) {
-				return new SupportCursorLoader(Sprinkles.sInstance.mContext,
-						sqlQuery, respondsToUpdatedOf);
+				return new SupportCursorLoader(Sprinkles.sInstance.mContext, sqlQuery, respondsToUpdatedOf);
 			}
 		};
 	}

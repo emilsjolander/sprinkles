@@ -69,9 +69,7 @@ public final class ManyQuery<T extends QueryResult> {
             respondsToUpdatedOf = Utils.concatArrays(respondsToUpdatedOf, new Class[]{resultClass});
         }
 		final int loaderId = sqlQuery.hashCode();
-		lm.initLoader(
-				loaderId,
-				null,
+		lm.initLoader(loaderId, null,
 				getLoaderCallbacks(sqlQuery, resultClass, handler,
 						(Class<? extends Model>[]) respondsToUpdatedOf));
 	}
@@ -97,9 +95,7 @@ public final class ManyQuery<T extends QueryResult> {
             respondsToUpdatedOf = Utils.concatArrays(respondsToUpdatedOf, new Class[]{resultClass});
         }
 		final int loaderId = sqlQuery.hashCode();
-		lm.initLoader(
-				loaderId,
-				null,
+		lm.initLoader(loaderId, null,
 				getSupportLoaderCallbacks(sqlQuery, resultClass, handler,
                         (Class<? extends Model>[]) respondsToUpdatedOf));
 	}
@@ -124,8 +120,7 @@ public final class ManyQuery<T extends QueryResult> {
 
             @Override
             public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-                return new CursorLoader(Sprinkles.sInstance.mContext, sqlQuery,
-                        respondsToUpdatedOf);
+                return new CursorLoader(Sprinkles.sInstance.mContext, sqlQuery, respondsToUpdatedOf);
             }
         };
     }

@@ -1,5 +1,11 @@
 package se.emilsjolander.sprinkles;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.DatabaseUtils;
+import android.net.Uri;
+
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +13,7 @@ import java.util.List;
 import se.emilsjolander.sprinkles.annotations.AutoIncrementPrimaryKey;
 import se.emilsjolander.sprinkles.annotations.CascadeDelete;
 import se.emilsjolander.sprinkles.annotations.Column;
+import se.emilsjolander.sprinkles.annotations.DynamicColumn;
 import se.emilsjolander.sprinkles.annotations.ForeignKey;
 import se.emilsjolander.sprinkles.annotations.PrimaryKey;
 import se.emilsjolander.sprinkles.annotations.Table;
@@ -18,10 +25,6 @@ import se.emilsjolander.sprinkles.exceptions.MultipleAutoIncrementFieldsExceptio
 import se.emilsjolander.sprinkles.exceptions.NoPrimaryKeysException;
 import se.emilsjolander.sprinkles.exceptions.NoSuchSqlTypeExistsException;
 import se.emilsjolander.sprinkles.exceptions.NoTableAnnotationException;
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.database.DatabaseUtils;
-import android.net.Uri;
 
 class Utils {
 	
@@ -29,11 +32,19 @@ class Utils {
 		return Uri.parse("sprinkles://"+resultClass.getAnnotation(Table.class).value());
 	}
 	
-	static <T extends Model> T getModelFromCursor(Class<T> resultClass, Cursor c) {
+	static <T extends QueryResult> T getResultFromCursor(Class<T> resultClass, Cursor c) {
 		try {
 			T result = resultClass.newInstance();
-			final List<ColumnField> columns = Utils.getColumns(resultClass);
-			for (ColumnField column : columns) {
+			final List<ColumnField> columns = getColumns(resultClass);
+            final List<ColumnField> dynamicColumns = getDynamicColumns(resultClass);
+            for (ColumnField cf : dynamicColumns) {
+                if (columns.contains(cf)) {
+                    throw new DuplicateColumnException(cf.name);
+                } else {
+                    columns.add(cf);
+                }
+            }
+            for (ColumnField column : columns) {
 				column.field.setAccessible(true);
 				final Class<?> type = column.field.getType();
 				if (isTypeOneOf(type, String.class)) {
@@ -72,8 +83,7 @@ class Utils {
 			if (o instanceof Number) {
 				sql = sql.replaceFirst("\\?", o.toString());
 			} else {
-				String escapedString = DatabaseUtils.sqlEscapeString(o
-						.toString());
+				String escapedString = DatabaseUtils.sqlEscapeString(o.toString());
 				sql = sql.replaceFirst("\\?", escapedString);
 			}
 		}
@@ -147,33 +157,27 @@ class Utils {
 		return values;
 	}
 
-	static List<ColumnField> getColumns(Class<? extends Model> clazz) {
-		final Field[] fields = getAllDeclaredField(clazz, Model.class);
+    // TODO this method does way to much to be called on every save and query. Cache results!
+	static List<ColumnField> getColumns(Class<? extends QueryResult> clazz) {
+		final Field[] fields = getAllDeclaredFields(clazz, QueryResult.class);
 		final List<ColumnField> columns = new ArrayList<ColumnField>();
 
 		for (Field field : fields) {
-			if (field
-					.isAnnotationPresent(Column.class)) {
+			if (field.isAnnotationPresent(Column.class)) {
 				ColumnField column = new ColumnField();
-				column.name = field.getAnnotation(Column.class)
-						.value();
+				column.name = field.getAnnotation(Column.class).value();
 
 				if (columns.contains(column)) {
 					throw new DuplicateColumnException(column.name);
 				}
 
-				column.isAutoIncrementPrimaryKey = field
-						.isAnnotationPresent(AutoIncrementPrimaryKey.class);
-				column.isForeignKey = field
-						.isAnnotationPresent(ForeignKey.class);
-				column.isPrimaryKey = field
-						.isAnnotationPresent(PrimaryKey.class);
-				column.isCascadeDelete = field
-						.isAnnotationPresent(CascadeDelete.class);
+				column.isAutoIncrementPrimaryKey = field.isAnnotationPresent(AutoIncrementPrimaryKey.class);
+				column.isForeignKey = field.isAnnotationPresent(ForeignKey.class);
+				column.isPrimaryKey = field.isAnnotationPresent(PrimaryKey.class);
+				column.isCascadeDelete = field.isAnnotationPresent(CascadeDelete.class);
 
 				if (column.isForeignKey) {
-					column.foreignKey = field.getAnnotation(ForeignKey.class)
-							.value();
+					column.foreignKey = field.getAnnotation(ForeignKey.class).value();
 				} else if (column.isCascadeDelete) {
 					throw new CannotCascadeDeleteNonForeignKey();
 				}
@@ -225,42 +229,48 @@ class Utils {
 		return columns;
 	}
 
-	@SuppressWarnings("unchecked")
-	private static Field[] getAllDeclaredField(Class<? extends Model> clazz,
-			Class<Model> stopAt) {
+    private static List<ColumnField> getDynamicColumns(Class<? extends QueryResult> clazz) {
+        final Field[] fields = getAllDeclaredFields(clazz, QueryResult.class);
+        final List<ColumnField> columns = new ArrayList<ColumnField>();
+
+        for (Field field : fields) {
+            if (field.isAnnotationPresent(DynamicColumn.class)) {
+                ColumnField column = new ColumnField();
+                column.name = field.getAnnotation(DynamicColumn.class).value();
+
+                if (columns.contains(column)) {
+                    throw new DuplicateColumnException(column.name);
+                }
+
+                column.type = getSqlType(field);
+                column.field = field;
+                columns.add(column);
+            }
+        }
+        return columns;
+    }
+
+	private static Field[] getAllDeclaredFields(Class<?> clazz, Class<?> stopAt) {
 		Field[] result = new Field[] {};
 		while (!clazz.equals(stopAt)) {
-			result = concatFieldArrays(result, clazz.getDeclaredFields());
-			clazz = (Class<? extends Model>) clazz.getSuperclass();
+			result = concatArrays(result, clazz.getDeclaredFields());
+			clazz = clazz.getSuperclass();
 		}
 		return result;
 	}
 
-	private static Field[] concatFieldArrays(Field[] one, Field[] two) {
-		final int length = one.length + two.length;
-		final Field[] result = new Field[length];
-		for (int i = 0; i < length; i++) {
-			if (i < one.length) {
-				result[i] = one[i];
-			} else {
-				result[i] = two[i - one.length];
-			}
-		}
-		return result;
-	}
-
-	static Class<?>[] concatClassArrays(Class<?>[] one, Class<?>[] two) {
-		final int length = one.length + two.length;
-		final Class<?>[] result = new Class<?>[length];
-		for (int i = 0; i < length; i++) {
-			if (i < one.length) {
-				result[i] = one[i];
-			} else {
-				result[i] = two[i - one.length];
-			}
-		}
-		return result;
-	}
+    static <T> T[] concatArrays(T[] one, T[] two) {
+        final int length = one.length + two.length;
+        final T[] result = (T[]) Array.newInstance(one.getClass(), length);
+        for (int i = 0; i < length; i++) {
+            if (i < one.length) {
+                result[i] = one[i];
+            } else {
+                result[i] = two[i - one.length];
+            }
+        }
+        return result;
+    }
 
 	private static String getSqlType(Field field) {
 		Class<?> type = field.getType();

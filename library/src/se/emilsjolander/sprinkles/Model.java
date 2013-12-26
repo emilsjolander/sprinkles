@@ -6,7 +6,7 @@ import java.util.List;
 
 import se.emilsjolander.sprinkles.Transaction.OnTransactionCommittedListener;
 
-public abstract class Model {
+public abstract class Model implements QueryResult {
 
     /**
      * Notifies you when a model has been saved

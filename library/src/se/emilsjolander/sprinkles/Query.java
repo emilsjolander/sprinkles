@@ -26,7 +26,7 @@ public final class Query {
      *
      * @return the query to execute
      */
-	public static <T extends Model> OneQuery<T> one(Class<T> clazz, String sql,
+	public static <T extends QueryResult> OneQuery<T> one(Class<T> clazz, String sql,
 			Object... sqlArgs) {
 		final OneQuery<T> query = new OneQuery<T>();
 		query.resultClass = clazz;
@@ -52,7 +52,7 @@ public final class Query {
      *
      * @return the query to execute
      */
-	public static <T extends Model> ManyQuery<T> many(Class<T> clazz, String sql,
+	public static <T extends QueryResult> ManyQuery<T> many(Class<T> clazz, String sql,
 			Object... sqlArgs) {
 		final ManyQuery<T> query = new ManyQuery<T>();
 		query.resultClass = clazz;

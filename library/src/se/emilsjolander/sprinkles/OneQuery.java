@@ -13,7 +13,7 @@ import android.os.Bundle;
  * @param <T>
  *     The type of model to return
  */
-public final class OneQuery<T extends Model> {
+public final class OneQuery<T extends QueryResult> {
 
     /**
      * Implement to get results delivered from a asynchronous query.
@@ -21,7 +21,7 @@ public final class OneQuery<T extends Model> {
      * @param <T>
      *     The type of model that the result will represent.
      */
-    public interface ResultHandler<T extends Model> {
+    public interface ResultHandler<T extends QueryResult> {
 
         /**
          * @param result
@@ -50,7 +50,7 @@ public final class OneQuery<T extends Model> {
 
 		T result = null;
 		if (c.moveToFirst()) {
-			result = Utils.getModelFromCursor(resultClass, c);
+			result = Utils.getResultFromCursor(resultClass, c);
 		}
 
 		c.close();
@@ -78,7 +78,7 @@ public final class OneQuery<T extends Model> {
 				loaderId,
 				null,
 				getLoaderCallbacks(sqlQuery, resultClass, handler,
-						(Class<? extends Model>[]) Utils.concatClassArrays(
+						(Class<? extends Model>[]) Utils.concatArrays(
 								respondsToUpdatedOf,
 								new Class[] { resultClass })));
 	}
@@ -102,7 +102,7 @@ public final class OneQuery<T extends Model> {
 		final int loaderId = sqlQuery.hashCode();
 		lm.initLoader(loaderId, null,
 				getSupportLoaderCallbacks(sqlQuery, resultClass, handler,
-                        (Class<? extends Model>[]) Utils.concatClassArrays(
+                        (Class<? extends Model>[]) Utils.concatArrays(
                                 respondsToUpdatedOf,
                                 new Class[]{resultClass})));
 	}
@@ -122,7 +122,7 @@ public final class OneQuery<T extends Model> {
             public void onLoadFinished(Loader<Cursor> loader, Cursor c) {
                 T result = null;
                 if (c.moveToFirst()) {
-                    result = Utils.getModelFromCursor(resultClass, c);
+                    result = Utils.getResultFromCursor(resultClass, c);
                 }
 
                 if (!handler.handleResult(result)) {
@@ -156,7 +156,7 @@ public final class OneQuery<T extends Model> {
 					android.support.v4.content.Loader<Cursor> loader, Cursor c) {
 				T result = null;
 				if (c.moveToFirst()) {
-					result = Utils.getModelFromCursor(resultClass, c);
+					result = Utils.getResultFromCursor(resultClass, c);
 				}
 
 				if (!handler.handleResult(result)) {

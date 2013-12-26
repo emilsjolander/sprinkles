@@ -26,7 +26,7 @@ class CursorIterator<T extends Model> implements Iterator<T> {
     public T next() {
         pos++;
         cursor.moveToPosition(pos);
-        return Utils.getModelFromCursor(type, cursor);
+        return Utils.getResultFromCursor(type, cursor);
     }
 
     @Override

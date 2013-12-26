@@ -13,7 +13,7 @@ import android.os.Bundle;
  * @param <T>
  *     The type of list to return
  */
-public final class ManyQuery<T extends Model> {
+public final class ManyQuery<T extends QueryResult> {
 
     /**
      * Implement to get results delivered from a asynchronous query.
@@ -21,7 +21,7 @@ public final class ManyQuery<T extends Model> {
      * @param <T>
      *     The type of model that the result will represent.
      */
-    public interface ResultHandler<T extends Model> {
+    public interface ResultHandler<T extends QueryResult> {
         /**
          * @param result
          *      The result of the query. Will never be null, instead a empty list is given. Remember to close me!
@@ -70,7 +70,7 @@ public final class ManyQuery<T extends Model> {
 				loaderId,
 				null,
 				getLoaderCallbacks(sqlQuery, resultClass, handler,
-						(Class<? extends Model>[]) Utils.concatClassArrays(
+						(Class<? extends Model>[]) Utils.concatArrays(
 								respondsToUpdatedOf,
 								new Class[] { resultClass })));
 	}
@@ -97,7 +97,7 @@ public final class ManyQuery<T extends Model> {
 				loaderId,
 				null,
 				getSupportLoaderCallbacks(sqlQuery, resultClass, handler,
-                        (Class<? extends Model>[]) Utils.concatClassArrays(
+                        (Class<? extends Model>[]) Utils.concatArrays(
                                 respondsToUpdatedOf,
                                 new Class[]{resultClass})));
 	}

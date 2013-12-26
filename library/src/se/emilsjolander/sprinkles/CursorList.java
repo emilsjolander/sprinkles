@@ -15,7 +15,7 @@ import java.util.List;
  * @param <T>
  *     The type of model this list contains.
  */
-public class CursorList<T extends Model> implements Iterable<T>, Closeable {
+public class CursorList<T extends QueryResult> implements Iterable<T>, Closeable {
 
     private Cursor cursor;
     private Class<T> type;
@@ -45,7 +45,7 @@ public class CursorList<T extends Model> implements Iterable<T>, Closeable {
     public T get(int pos) {
         requireOpen();
         cursor.moveToPosition(pos);
-        return Utils.getModelFromCursor(type, cursor);
+        return Utils.getResultFromCursor(type, cursor);
     }
 
     /**

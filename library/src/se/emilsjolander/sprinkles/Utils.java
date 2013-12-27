@@ -24,7 +24,6 @@ import se.emilsjolander.sprinkles.exceptions.DuplicateColumnException;
 import se.emilsjolander.sprinkles.exceptions.EmptyTableException;
 import se.emilsjolander.sprinkles.exceptions.MultipleAutoIncrementFieldsException;
 import se.emilsjolander.sprinkles.exceptions.NoPrimaryKeysException;
-import se.emilsjolander.sprinkles.exceptions.NoSuchSqlTypeExistsException;
 import se.emilsjolander.sprinkles.exceptions.NoTableAnnotationException;
 
 class Utils {
@@ -52,19 +51,8 @@ class Utils {
                 }
 				column.field.setAccessible(true);
 				final Class<?> type = column.field.getType();
-				if (isTypeOneOf(type, String.class)) {
-					column.field.set(result, c.getString(c.getColumnIndexOrThrow(column.name)));
-				} else if (isTypeOneOf(type, Integer.class, int.class)) {
-					column.field.set(result, c.getInt(c.getColumnIndexOrThrow(column.name)));
-				} else if (isTypeOneOf(type, Long.class, long.class)) {
-					column.field.set(result, c.getLong(c.getColumnIndexOrThrow(column.name)));
-				} else if (isTypeOneOf(type, Boolean.class, boolean.class)) {
-					column.field.set(result, c.getInt(c.getColumnIndexOrThrow(column.name)) > 0);
-				} else if (isTypeOneOf(type, Float.class, float.class)) {
-					column.field.set(result, c.getFloat(c.getColumnIndexOrThrow(column.name)));
-				} else if (isTypeOneOf(type, Double.class, double.class)) {
-					column.field.set(result, c.getDouble(c.getColumnIndexOrThrow(column.name)));
-				}
+                Object o = Sprinkles.sInstance.typeSerializers.get(type).unpack(c, column.name);
+                column.field.set(result, o);
 			}
 			return result;
 		} catch (Exception e) {
@@ -143,19 +131,7 @@ class Utils {
 				throw new RuntimeException(e);
 			}
 			if (value != null) {
-				if (value instanceof String) {
-					values.put(column.name, (String) value);
-				} else if (value instanceof Integer) {
-					values.put(column.name, (Integer) value);
-				} else if (value instanceof Long) {
-					values.put(column.name, (Long) value);
-				} else if (value instanceof Boolean) {
-					values.put(column.name, (Boolean) value);
-				} else if (value instanceof Float) {
-					values.put(column.name, (Float) value);
-				} else if (value instanceof Double) {
-					values.put(column.name, (Double) value);
-				}
+                Sprinkles.sInstance.typeSerializers.get(value.getClass()).pack(value, values, column.name);
 			}
 		}
 		
@@ -187,7 +163,7 @@ class Utils {
 					throw new CannotCascadeDeleteNonForeignKey();
 				}
 
-				column.type = getSqlType(field);
+				column.type = Sprinkles.sInstance.typeSerializers.get(field.getType()).getSqlType().name();
 				
 				if (column.isAutoIncrementPrimaryKey && !column.type.equals("INTEGER")) {
 					throw new AutoIncrementMustBeIntegerException(column.name);
@@ -247,7 +223,7 @@ class Utils {
                     throw new DuplicateColumnException(column.name);
                 }
 
-                column.type = getSqlType(field);
+                column.type = Sprinkles.sInstance.typeSerializers.get(field.getType()).getSqlType().name();
                 column.field = field;
                 columns.add(column);
             }
@@ -255,14 +231,14 @@ class Utils {
         return columns;
     }
 
-	private static Field[] getAllDeclaredFields(Class<?> clazz, Class<?> stopAt) {
-		Field[] result = new Field[] {};
-		while (!clazz.equals(stopAt)) {
-			result = concatArrays(result, clazz.getDeclaredFields());
-			clazz = clazz.getSuperclass();
-		}
-		return result;
-	}
+    private static Field[] getAllDeclaredFields(Class<?> clazz, Class<?> stopAt) {
+        Field[] result = new Field[] {};
+        while (!clazz.equals(stopAt)) {
+            result = concatArrays(result, clazz.getDeclaredFields());
+            clazz = clazz.getSuperclass();
+        }
+        return result;
+    }
 
     static <T> T[] concatArrays(T[] one, T[] two) {
         if (one == null) {
@@ -281,18 +257,6 @@ class Utils {
         }
         return result;
     }
-
-	private static String getSqlType(Field field) {
-		Class<?> type = field.getType();
-		if (isTypeOneOf(type, int.class, long.class, boolean.class, Integer.class, Long.class, Boolean.class)) {
-			return "INTEGER";
-		} else if(isTypeOneOf(type, float.class, double.class, Float.class, Double.class)) {
-			return "REAL";
-		} else if(isTypeOneOf(type, String.class)) {
-			return "TEXT";
-		}
-		throw new NoSuchSqlTypeExistsException(field.getName());
-	}
 
 	private static boolean isTypeOneOf(Class<?> type, Class<?>... types) {
 		for (Class<?> t : types) {

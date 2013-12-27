@@ -14,7 +14,6 @@ class ColumnField {
 	boolean isCascadeDelete;
 	
 	public Field field;
-    public boolean dynamic;
 	
 	@Override
 	public boolean equals(Object o) {

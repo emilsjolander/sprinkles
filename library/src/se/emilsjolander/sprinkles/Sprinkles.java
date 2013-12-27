@@ -3,16 +3,45 @@ package se.emilsjolander.sprinkles;
 import android.content.Context;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import se.emilsjolander.sprinkles.typeserializers.BooleanSerializer;
+import se.emilsjolander.sprinkles.typeserializers.DateSerializer;
+import se.emilsjolander.sprinkles.typeserializers.DoubleSerializer;
+import se.emilsjolander.sprinkles.typeserializers.FloatSerializer;
+import se.emilsjolander.sprinkles.typeserializers.IntSerializer;
+import se.emilsjolander.sprinkles.typeserializers.LongSerializer;
+import se.emilsjolander.sprinkles.typeserializers.StringSerializer;
+import se.emilsjolander.sprinkles.typeserializers.TypeSerializer;
 
 public class Sprinkles {
 
 	static Sprinkles sInstance;
 	Context mContext;
 	List<Migration> mMigrations = new ArrayList<Migration>();
+    Map<Class, TypeSerializer> typeSerializers = new ConcurrentHashMap<Class, TypeSerializer>();
 
 	private Sprinkles() {
-		// do nothing
+		typeSerializers.put(int.class, new IntSerializer());
+        typeSerializers.put(Integer.class, new IntSerializer());
+
+        typeSerializers.put(long.class, new LongSerializer());
+        typeSerializers.put(Long.class, new LongSerializer());
+
+        typeSerializers.put(float.class, new FloatSerializer());
+        typeSerializers.put(Float.class, new FloatSerializer());
+
+        typeSerializers.put(double.class, new DoubleSerializer());
+        typeSerializers.put(Double.class, new DoubleSerializer());
+
+        typeSerializers.put(boolean.class, new BooleanSerializer());
+        typeSerializers.put(Boolean.class, new BooleanSerializer());
+
+        typeSerializers.put(String.class, new StringSerializer());
+        typeSerializers.put(Date.class, new DateSerializer());
 	}
 
     /**
@@ -39,5 +68,9 @@ public class Sprinkles {
 	public void addMigration(Migration migration) {
 		mMigrations.add(migration);
 	}
+
+    public <T> void registerType(Class<T> clazz, TypeSerializer<T> serializer) {
+        typeSerializers.put(clazz, serializer);
+    }
 
 }

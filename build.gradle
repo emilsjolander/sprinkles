@@ -5,6 +5,7 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:0.6.+'
+        classpath 'com.squareup.gradle:gradle-android-test-plugin:0.9.+'
     }
 }
 

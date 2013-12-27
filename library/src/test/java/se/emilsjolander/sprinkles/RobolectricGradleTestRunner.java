@@ -1,3 +1,5 @@
+package se.emilsjolander.sprinkles;
+
 import org.junit.runners.model.InitializationError;
 import org.robolectric.AndroidManifest;
 import org.robolectric.RobolectricTestRunner;

@@ -15,7 +15,7 @@ public class BooleanSerializer implements TypeSerializer<Boolean> {
 
     @Override
     public void pack(Boolean object, ContentValues cv, String name) {
-        cv.put(name, object);
+        cv.put(name, object ? 1 : 0);
     }
 
     @Override

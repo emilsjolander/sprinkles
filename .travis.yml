@@ -1,10 +1,10 @@
 language: java
 
 jdk:
-	- oraclejdk7
+  - oraclejdk7
 
 before_install:
-	- chmod +x gradlew
+  - chmod +x gradlew
 
 script:
-	- ./gradlew clean check --stacktrace
+  - ./gradlew clean check --stacktrace

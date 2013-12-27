@@ -218,6 +218,10 @@ void renameTable(String from, String to);
 void addColumn(Class<? extends Model> clazz, String columnName);
 void addRawStatement(String statement);
 ```
+
+###Type serializers
+Through an instance of `Sprinkles` you can register your own `TypeSerializer` instances via `registerType()` for serializing an object in your model into a column in the database. Sprinkles uses a `TypeSerializer` implementations internally for all the different datatypes that it supports. So check out the `se.emilsjolander.sprinkles.typeserializers` package for example implementations. These serializers will be used both when saving a model and when querying rows from the database.
+
 Any number of calls to any of the above migrations are allowed, if for example `createTable()` is called twice than two tables will be created once that migration has been added. Remember to never edit a migration, always create a new migration (this only applies to the production version of your app of course).
 
 ###Relationships

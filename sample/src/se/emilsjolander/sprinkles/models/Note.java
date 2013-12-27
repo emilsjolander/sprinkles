@@ -1,5 +1,7 @@
 package se.emilsjolander.sprinkles.models;
 
+import java.util.Date;
+
 import se.emilsjolander.sprinkles.Model;
 import se.emilsjolander.sprinkles.annotations.AutoIncrementPrimaryKey;
 import se.emilsjolander.sprinkles.annotations.Column;
@@ -13,8 +15,8 @@ public class Note extends Model {
 	@Column("id") private long id;
 
 	@Column("content") private String content;
-	@Column("created_at") private long createdAt;
-	@Column("updated_at") private long updatedAt;
+	@Column("created_at") private Date createdAt;
+	@Column("updated_at") private Date updatedAt;
     @DynamicColumn("tag_count") private int tagCount;
 	
 	public long getId() {
@@ -29,11 +31,11 @@ public class Note extends Model {
 		this.content = content;
 	}
 	
-	public long getCreatedAt() {
+	public Date getCreatedAt() {
 		return createdAt;
 	}
 	
-	public long getUpdatedAt() {
+	public Date getUpdatedAt() {
 		return updatedAt;
 	}
 
@@ -44,13 +46,13 @@ public class Note extends Model {
 	@Override
 	protected void beforeCreate() {
 		super.beforeCreate();
-		createdAt = System.currentTimeMillis();
+		createdAt = new Date();
 	}
 	
 	@Override
 	protected void beforeSave() {
 		super.beforeSave();
-		updatedAt = System.currentTimeMillis();
+		updatedAt = new Date();
 	}
 
 }

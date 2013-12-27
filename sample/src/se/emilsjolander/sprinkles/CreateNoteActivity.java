@@ -11,7 +11,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
 
 import se.emilsjolander.sprinkles.models.Note;
@@ -40,7 +39,7 @@ public class CreateNoteActivity extends Activity {
 		noteContent.setText(mNote.getContent());
 		
 		if (mNote.exists()) {
-			String updatedAtString = new SimpleDateFormat("HH:mm EEEE", Locale.getDefault()).format(new Date(mNote.getUpdatedAt()));
+			String updatedAtString = new SimpleDateFormat("HH:mm EEEE", Locale.getDefault()).format(mNote.getUpdatedAt());
 			lastUpdatedAt.setText(getString(R.string.last_updated, updatedAtString));
 		} else {
 			lastUpdatedAt.setVisibility(View.GONE);

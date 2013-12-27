@@ -1,30 +1,55 @@
-language: java
-
+# First, declare language
+language:
+  - java
+# I'm using openjdk6, because Android Java code has 1.6 compatibility
 jdk:
-  - openjdk7
-
+  - openjdk6
+env:
+  matrix:
+    - ANDROID_SDKS=android-19,sysimg-19  ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a
+# just to map the environment, and see the tool versions
 before_install:
-  # environment info
-  - mvn -version
-  - gradle -v
-  - uname -a
+
   # required libs for android build tools
   - if [ `uname -m` = x86_64 ]; then sudo apt-get update; fi
   - if [ `uname -m` = x86_64 ]; then sudo apt-get install -qq --force-yes libgd2-xpm ia32-libs ia32-libs-multiarch; fi
   # for gradle output style
+  # only needed for Travis, not for standard xterm
   - export TERM=dumb
-  # newer version of gradle
-  - wget http://services.gradle.org/distributions/gradle-1.9-bin.zip
-  - unzip -qq gradle-1.8-bin.zip
-  - export GRADLE_HOME=$PWD/gradle-1.8
-  - export PATH=$GRADLE_HOME/bin:$PATH
-  # just to test gradle version, against our provided one
-  - gradle -v
-  # newest android SDK 22.3
+
+  # Install base Android SDK
   - wget http://dl.google.com/android/android-sdk_r22.3-linux.tgz
-  - tar -zxf android-sdk_r22.3-linux.tgz
-  - export ANDROID_HOME=`pwd`/android-sdk-linux
+  - tar xzf android-sdk_r22.3-linux.tgz
+  - export ANDROID_HOME=$PWD/android-sdk-linux
   - export PATH=${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
+
+  # install android build tools
+  - wget https://dl-ssl.google.com/android/repository/build-tools_r19-linux.zip
+  - unzip build-tools_r19-linux.zip -d $ANDROID_HOME
+  - mkdir -p $ANDROID_HOME/build-tools/
+  - mv $ANDROID_HOME/android-4.4 $ANDROID_HOME/build-tools/19
+
+  # Install required components.
+  # For a full list, run `android list sdk -a --extended`
+  # Note that sysimg-18 downloads the ARM, x86 and MIPS images (we should optimize this).
+  # Other relevant API's
+  - echo yes | android update sdk --filter platform-tools --no-ui --force > /dev/null
+  - echo yes | android update sdk --filter android-18 --no-ui --force > /dev/null
+  - echo yes | android update sdk --filter android-19 --no-ui --force > /dev/null
+  - echo yes | android update sdk --filter sysimg-19 --no-ui --force > /dev/null
+  - echo yes | android update sdk --filter extra-android-support --no-ui --force > /dev/null
+  - echo yes | android update sdk --filter extra-android-m2repository --no-ui --force > /dev/null
+
   # manually set sdk.dir variable, according to local paths
   - echo "sdk.dir=$ANDROID_HOME" > local.properties
-  - echo yes | android update sdk -t tools,platform-tools,extra-android-support,extra-android-m2repository,android-19,build-tools-19.0.0 --force --no-ui
+
+  # build tools cannot be installed through "android update sdk" as of now
+  - wget http://dl.google.com/android/repository/build-tools_r19.0.1-linux.zip
+  - mkdir -p $ANDROID_HOME/build-tools
+  - unzip -qq build-tools_r19.0.1-linux.zip -d $ANDROID_HOME/build-tools/
+  - mv $ANDROID_HOME/build-tools/android-4.4 $ANDROID_HOME/build-tools/19.0.1
+
+  # verify files exist in right paths
+  - find $ANDROID_HOME/build-tools
+  - file $ANDROID_HOME/build-tools/19.0.1/aapt
+

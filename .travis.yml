@@ -44,12 +44,12 @@ before_install:
   - echo "sdk.dir=$ANDROID_HOME" > local.properties
 
   # build tools cannot be installed through "android update sdk" as of now
-  - wget http://dl.google.com/android/repository/build-tools_r19.0.1-linux.zip
-  - mkdir -p $ANDROID_HOME/build-tools
-  - unzip -qq build-tools_r19.0.1-linux.zip -d $ANDROID_HOME/build-tools/
-  - mv $ANDROID_HOME/build-tools/android-4.4 $ANDROID_HOME/build-tools/19.0.1
+  # - wget http://dl.google.com/android/repository/build-tools_r19.0.1-linux.zip
+  # - mkdir -p $ANDROID_HOME/build-tools
+  # - unzip -qq build-tools_r19.0.1-linux.zip -d $ANDROID_HOME/build-tools/
+  # - mv $ANDROID_HOME/build-tools/android-4.4 $ANDROID_HOME/build-tools/19.0.1
 
   # verify files exist in right paths
-  - find $ANDROID_HOME/build-tools
-  - file $ANDROID_HOME/build-tools/19.0.1/aapt
+  # - find $ANDROID_HOME/build-tools
+  # - file $ANDROID_HOME/build-tools/19.0.1/aapt
 

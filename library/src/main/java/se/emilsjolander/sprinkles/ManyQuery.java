@@ -1,10 +1,12 @@
 package se.emilsjolander.sprinkles;
 
+import android.annotation.TargetApi;
 import android.app.LoaderManager;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Bundle;
 
 /**
@@ -62,6 +64,7 @@ public final class ManyQuery<T extends QueryResult> {
      *      A list of models excluding the queried model that should also trigger a update to the result if they change.
      */
 	@SuppressWarnings("unchecked")
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public void getAsync(LoaderManager lm,
 			ResultHandler<T> handler,
 			Class<?>... respondsToUpdatedOf) {
@@ -100,6 +103,7 @@ public final class ManyQuery<T extends QueryResult> {
                         (Class<? extends Model>[]) respondsToUpdatedOf));
 	}
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private LoaderCallbacks<Cursor> getLoaderCallbacks(final String sqlQuery,
                                                        final Class<T> resultClass,
                                                        final ResultHandler<T> handler,

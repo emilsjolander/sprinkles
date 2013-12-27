@@ -1,10 +1,13 @@
 package se.emilsjolander.sprinkles;
 
+import android.annotation.TargetApi;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 
+@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 class CursorLoader extends AsyncTaskLoader<Cursor> {
 
 	private final ForceLoadContentObserver mObserver;

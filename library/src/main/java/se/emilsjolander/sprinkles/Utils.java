@@ -28,10 +28,6 @@ import se.emilsjolander.sprinkles.exceptions.NoTableAnnotationException;
 
 class Utils {
 	
-	static <T extends Model> Uri getNotificationUri(Class<T> resultClass) {
-		return Uri.parse("sprinkles://"+resultClass.getAnnotation(Table.class).value());
-	}
-	
 	static <T extends QueryResult> T getResultFromCursor(Class<T> resultClass, Cursor c) {
 		try {
 			T result = resultClass.newInstance();
@@ -58,29 +54,6 @@ class Utils {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	static String getTableName(Class<? extends Model> clazz) {
-		if (clazz.isAnnotationPresent(Table.class)) {
-			Table table = clazz.getAnnotation(Table.class);
-			return table.value();
-		}
-		throw new NoTableAnnotationException();
-	}
-
-	static String insertSqlArgs(String sql, Object[] args) {
-		if (args == null) {
-			return sql;
-		}
-		for (Object o : args) {
-			if (o instanceof Number) {
-				sql = sql.replaceFirst("\\?", o.toString());
-			} else {
-				String escapedString = DatabaseUtils.sqlEscapeString(o.toString());
-				sql = sql.replaceFirst("\\?", escapedString);
-			}
-		}
-		return sql;
 	}
 	
 	static String getWhereStatement(Model m) {
@@ -210,7 +183,7 @@ class Utils {
 		return columns;
 	}
 
-    private static List<ColumnField> getDynamicColumns(Class<? extends QueryResult> clazz) {
+    static List<ColumnField> getDynamicColumns(Class<? extends QueryResult> clazz) {
         final Field[] fields = getAllDeclaredFields(clazz, Object.class);
         final List<ColumnField> columns = new ArrayList<ColumnField>();
 
@@ -231,7 +204,37 @@ class Utils {
         return columns;
     }
 
-    private static Field[] getAllDeclaredFields(Class<?> clazz, Class<?> stopAt) {
+    static <T extends Model> Uri getNotificationUri(Class<T> clazz) {
+        if (clazz.isAnnotationPresent(Table.class)) {
+            return Uri.parse("sprinkles://"+clazz.getAnnotation(Table.class).value());
+        }
+        throw new NoTableAnnotationException();
+    }
+
+    static String getTableName(Class<? extends Model> clazz) {
+        if (clazz.isAnnotationPresent(Table.class)) {
+            Table table = clazz.getAnnotation(Table.class);
+            return table.value();
+        }
+        throw new NoTableAnnotationException();
+    }
+
+    static String insertSqlArgs(String sql, Object[] args) {
+        if (args == null) {
+            return sql;
+        }
+        for (Object o : args) {
+            if (o instanceof Number) {
+                sql = sql.replaceFirst("\\?", o.toString());
+            } else {
+                String escapedString = DatabaseUtils.sqlEscapeString(o.toString());
+                sql = sql.replaceFirst("\\?", escapedString);
+            }
+        }
+        return sql;
+    }
+
+    static Field[] getAllDeclaredFields(Class<?> clazz, Class<?> stopAt) {
         Field[] result = new Field[] {};
         while (!clazz.equals(stopAt)) {
             result = concatArrays(result, clazz.getDeclaredFields());
@@ -257,14 +260,5 @@ class Utils {
         }
         return result;
     }
-
-	private static boolean isTypeOneOf(Class<?> type, Class<?>... types) {
-		for (Class<?> t : types) {
-			if (type.equals(t)) {
-				return true;
-			}
-		}
-		return false;
-	}
 
 }

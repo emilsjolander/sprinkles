@@ -116,8 +116,10 @@ public final class OneQuery<T extends QueryResult> {
         return new LoaderCallbacks<Cursor>() {
 
             @Override
-            public void onLoaderReset(Loader<Cursor> arg0) {
-                handler.handleResult(null);
+            public void onLoaderReset(Loader<Cursor> loader) {
+                if (!loader.isAbandoned()) {
+                    handler.handleResult(null);
+                }
             }
 
             @Override
@@ -148,8 +150,10 @@ public final class OneQuery<T extends QueryResult> {
 
 			@Override
 			public void onLoaderReset(
-					android.support.v4.content.Loader<Cursor> arg0) {
-				handler.handleResult(null);
+					android.support.v4.content.Loader<Cursor> loader) {
+                if (!loader.isAbandoned()) {
+                    handler.handleResult(null);
+                }
 			}
 
 			@Override

@@ -1,8 +1,8 @@
 package se.emilsjolander.sprinkles;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,7 +13,7 @@ import android.widget.ListView;
 import se.emilsjolander.sprinkles.models.Note;
 import se.emilsjolander.sprinkles.models.NoteTagLink;
 
-public class NotesActivity extends Activity {
+public class NotesActivity extends FragmentActivity {
 
 	private ListView mListView;
 	private NotesAdapter mAdapter;
@@ -56,6 +56,7 @@ public class NotesActivity extends Activity {
                 "from Notes order by created_at desc")
 				.getAsync(getLoaderManager(), onNotesLoaded,
 						NoteTagLink.class);
+        
     }
 
 	@Override

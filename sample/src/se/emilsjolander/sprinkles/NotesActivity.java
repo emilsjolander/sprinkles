@@ -56,7 +56,7 @@ public class NotesActivity extends FragmentActivity {
                 "from Notes order by created_at desc")
 				.getAsync(getLoaderManager(), onNotesLoaded,
 						NoteTagLink.class);
-        
+
     }
 
 	@Override

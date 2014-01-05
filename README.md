@@ -78,21 +78,21 @@ public void queryStuff() {
 }
 ```
 
-There is a lot more you can do with sprinkles so please read the next section which covers the whole api!
+There is a lot more you can do with sprinkles so please read the next section which covers the whole API!
 
 API
 ---
 ###Annotations
 - `@Table` Used to associate a model class with a SQL table.
-- `@AutoIncrementPrimaryKey` Used to mark a field a an autoincrementing primary key. The field must be an `int` or a `long` and cannot be in the same class as any other primary key.
+- `@AutoIncrementPrimaryKey` Used to mark a field as an auto-incrementing primary key. The field must be an `int` or a `long` and cannot be in the same class as any other primary key.
 - `@Column` Used to associate a class field with a SQL column.
-- `@DynamicColumn` Used to associate a class field with a dynamic SQL column such as a alias is a query.
+- `@DynamicColumn` Used to associate a class field with a dynamic SQL column such as an alias in a query.
 - `@PrimaryKey` Used to mark a field as a primary key. Multiple primary keys in a class are allowed and will result in a composite primary key.
 - `@ForeignKey` Used to mark a field as a foreign key. The argument given to this annotation should be in the form of `"foreignKeyTable(foreignKeyColumn)"`.
-- `@CascadeDelete` Used to mark a field also marked as a foreign key as a cascade deleting field.
+- `@CascadeDelete` Used to mark a field which is also marked as a foreign key as a cascade deleting field.
 
 ###Saving
-The save method is both an insert and a update method, the correct thing will be done depending on if the model exists in the database or not. The two first methods below are syncronous, the second is for using together with a transaction (more on the later). There are also two asyncronous methods, one with a callback and one without. The syncronous methods will return a boolean indicating if the model was saved or not, The asyncronous method with a callback will just not invoke the callback if saving failed.
+The save method is both an insert and an update method, the correct thing will be done depending on the model existance in the database. The first two methods below are syncronous, the second is for using together with a transaction (more on that later). There are also two asyncronous methods, one with a callback and one without. The syncronous methods will return a boolean indicating if the model was saved or not. The asyncronous method with a callback will just not invoke the callback if saving failed.
 ```java
 boolean save();
 boolean save(Transaction t);
@@ -120,7 +120,7 @@ Start a query with on of the following static methods:
 Query.One(Class<? extends QueryResult> clazz, String sql, Object[] args);
 Query.Many(Class<? extends QueryResult> clazz, String sql, Object[] args);
 ```
-Notice that unlike android built in query methods you can send in an array of objects instead of an array of strings.
+Notice that unlike androids built in query methods you can send in an array of objects instead of an array of strings.
 
 Once the query has been started you can get the result with two different methods:
 ```java
@@ -128,7 +128,7 @@ Once the query has been started you can get the result with two different method
 boolean getAsync(LoaderManager lm, ResultHandler<? extends Model> handler, Class<? extends Model>... respondsToUpdatedOf);
 ```
 
-`get()` returns either the `QueryResult` or a list of the `QueryResult` represented by the `Class` you sent in as the first argument to the query method. `getAsync()` is the same only that the result is delivered on a callback function after executing `get()` on another thread. `getAsync()` also delivers updated results once the backing model of the query is updated if you return `true` indicating you want firther updates. `getAsync()` uses loaders and therefore needs a `LoaderManager` instance. `getAsync()` also takes in an optional array of classes, this is used when the query relies on more models than the one you are querying for and you want the query to updated when those models change as well.
+`get()` returns either the `QueryResult` or a list of the `QueryResult` represented by the `Class` you sent in as the first argument to the query method. `getAsync()` is the same only that the result is delivered on a callback function after executing `get()` on another thread. `getAsync()` also delivers updated results once the backing model of the query is updated if you return `true` indicating you want firther updates. `getAsync()` uses loaders and therefore needs a `LoaderManager` instance. `getAsync()` also takes an optional array of classes which is used when the query relies on more models than the one you are querying for and you want the query to be updated when those models change as well.
 
 ###CursorList
 All Queries return a `CursorList` subclass. This is a `Iterable` subclass which lazily unpacks a cursor into its corresponding model when you ask for the next item. This leads to having the efficiency of a `Cursor` but without the pain. Excluding the `Iterable` methods `CursorList` also provides the following methods.
@@ -140,7 +140,7 @@ public List<T> asList();
 Remember to always call `close()` on a `CursorList` instance! This will close the underlying cursor.
 
 ###Transactions
-Both `save()` and `delete()` methods exists which take in a `Transaction`. Here is a quick example on how to use them. If any exception is thrown while saving a model or if any model fails to save the transaction will be rolled back.
+Both `save()` and `delete()` methods exist which take in a `Transaction`. Here is a quick example on how to use them. If any exception is thrown while saving a model or if any model fails to save the transaction will be rolled back.
 ```java
 public void doTransaction(List<Note> notes) {
 	Transaction t = new Transaction();
@@ -218,11 +218,10 @@ void renameTable(String from, String to);
 void addColumn(Class<? extends Model> clazz, String columnName);
 void addRawStatement(String statement);
 ```
+Any number of calls to any of the above migrations are allowed, if for example `createTable()` is called twice then two tables will be created once that migration has been added. Remember to never edit a migration, always create a new migration (this only applies to the production version of your app of course).
 
 ###Type serializers
-Through an instance of `Sprinkles` you can register your own `TypeSerializer` instances via `registerType()` for serializing an object in your model into a column in the database. Sprinkles uses a `TypeSerializer` implementations internally for all the different datatypes that it supports. So check out the `se.emilsjolander.sprinkles.typeserializers` package for example implementations. These serializers will be used both when saving a model and when querying rows from the database.
-
-Any number of calls to any of the above migrations are allowed, if for example `createTable()` is called twice than two tables will be created once that migration has been added. Remember to never edit a migration, always create a new migration (this only applies to the production version of your app of course).
+Through an instance of `Sprinkles` you can register your own `TypeSerializer` instances via `registerType()` for serializing an object in your model into a column in the database. Sprinkles uses a `TypeSerializer` implementation internally for all the different datatypes that it supports. So check out the `se.emilsjolander.sprinkles.typeserializers` package for example implementations. These serializers will be used both when saving a model and when querying rows from the database.
 
 ###Relationships
 Sprinkles does nothing to handle relationships for you; this is by design. You will have to use the regular ways to handle relationships in SQL. Sprinkles gives you all the tools needed for this and it works very well.

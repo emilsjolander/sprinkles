@@ -60,4 +60,18 @@ public final class Query {
 		return query;
 	}
 
+    /**
+     * Start a query for the entire list of instance of type T
+     *
+     * @param clazz
+     *      The class representing the type of the list you want returned
+     *
+     * @param <T>
+     *      The type of the list you want returned
+     *
+     * @return the query to execute
+     */
+    public static <T extends QueryResult> ManyQuery<T> all(Class<T> clazz) {
+        return many(clazz, "SELECT * FROM " + Utils.getTableName((Class<? extends Model>) clazz));
+    }
 }

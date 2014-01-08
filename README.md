@@ -119,6 +119,7 @@ Start a query with on of the following static methods:
 ```java
 Query.One(Class<? extends QueryResult> clazz, String sql, Object[] args);
 Query.Many(Class<? extends QueryResult> clazz, String sql, Object[] args);
+Query.All(Class<? extends QueryResult> clazz);
 ```
 Notice that unlike androids built in query methods you can send in an array of objects instead of an array of strings.
 

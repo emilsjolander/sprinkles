@@ -21,7 +21,7 @@ public class UtilsTest {
 
     @Test
     public void getTableName() {
-        assertTrue(Utils.getTableName(ImprovedTestModel.class).equals("Tests"));
+        assertEquals("Tests", Utils.getTableName(ImprovedTestModel.class));
     }
 
     @Test(expected = NoTableAnnotationException.class)
@@ -32,16 +32,16 @@ public class UtilsTest {
     @Test
     public void insertSqlArgs() {
         String result = Utils.insertSqlArgs("? ?", new Object[]{1, "hej"});
-        assertTrue(result.equals("1 'hej'"));
+        assertEquals("1 'hej'", result);
     }
 
     @Test
     public void getAllDeclaredFields() {
         Field[] fields = Utils.getAllDeclaredFields(ImprovedTestModel.class, Model.class);
         System.out.println(fields[0].getName());
-        assertTrue(fields.length == 2);
-        assertTrue(fields[0].getName().equals("title"));
-        assertTrue(fields[1].getName().equals("id"));
+        assertEquals(2, fields.length);
+        assertEquals("title", fields[0].getName());
+        assertEquals("id", fields[1].getName());
     }
 
     @Test
@@ -49,5 +49,4 @@ public class UtilsTest {
         String[] result = Utils.concatArrays(new String[]{"1", "2", "3"}, new String[]{"4", "5"});
         assertTrue(Arrays.equals(result, new String[]{"1", "2", "3", "4", "5"}));
     }
-
 }

@@ -1,29 +1,30 @@
 package se.emilsjolander.sprinkles;
 
+import com.google.common.testing.EqualsTester;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static junit.framework.Assert.*;
 
 @RunWith(RobolectricGradleTestRunner.class)
 public class ColumnFieldTest {
 
-    @Test
-    public void equals() {
-        ColumnField f1 = new ColumnField();
-        f1.name = "a_name";
-        ColumnField f2 = new ColumnField();
-        f2.name = "a_name";
-        assertTrue(f1.equals(f2));
-    }
+	@Test
+	public void equals() {
+		EqualsTester tester = new EqualsTester();
 
-    @Test
-    public void notEquals() {
-        ColumnField f1 = new ColumnField();
-        f1.name = "a_name";
-        ColumnField f2 = new ColumnField();
-        f2.name = "another_name";
-        assertFalse(f1.equals(f2));
-    }
+		ColumnField f1 = new ColumnField();
+		f1.name = "a_name";
+		ColumnField f2 = new ColumnField();
+		f2.name = "a_name";
+		tester.addEqualityGroup(f1, f2);
 
+		ColumnField f3 = new ColumnField();
+		f3.name = "another_name";
+		tester.addEqualityGroup(f3);
+
+		ColumnField f4 = new ColumnField();
+		tester.addEqualityGroup(f4);
+
+		tester.testEquals();
+	}
 }

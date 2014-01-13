@@ -74,7 +74,8 @@ public void saveStuff() {
 You can also query for this note like this:
 ```java
 public void queryStuff() {
-	Note n = Query.one("select * from Notes where title=?", "Sprinkles is awesome!").get();
+	Note n = Query.one("select * from ? where title=?",
+	    Utils.getTableName(Note.class), "Sprinkles is awesome!").get();
 }
 ```
 

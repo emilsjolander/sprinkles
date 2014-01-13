@@ -4,13 +4,15 @@ import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import se.emilsjolander.sprinkles.exceptions.NoSuchColumnFoundException;
 
 /**
  * A class representing database migration. Multiple statements can be made within one migration.
  * Once a production app has shipped with a migration it should never be altered or removed.
- * Sprinkles will make sure that the correct migrations are performed when a user upgrades to the lastest version of your app.
+ * Sprinkles will make sure that the correct migrations are performed when a user upgrades to the
+ * latest version of your app.
  */
 public class Migration {
 
@@ -36,12 +38,13 @@ public class Migration {
 		createStatement.append(tableName);
 		createStatement.append("(");
 
-		final List<ColumnField> columns = Utils.getColumns(clazz);
+		final Set<ColumnField> columns = Utils.getColumns(clazz);
 		final List<ColumnField> primaryColumns = new ArrayList<ColumnField>();
 		final List<ColumnField> foreignColumns = new ArrayList<ColumnField>();
-		for (int i = 0; i < columns.size(); i++) {
-			final ColumnField column = columns.get(i);
-			createStatement.append(column.name + " ");
+		int i = 0;
+	for (ColumnField column : columns) {
+			createStatement.append(column.name);
+			createStatement.append(" ");
 			createStatement.append(column.type);
 
 			if (column.isAutoIncrementPrimaryKey) {
@@ -62,12 +65,13 @@ public class Migration {
 					|| !foreignColumns.isEmpty()) {
 				createStatement.append(", ");
 			}
+			i++;
 		}
 
 		if (!primaryColumns.isEmpty()) {
 			createStatement.append("PRIMARY KEY(");
 
-			for (int i = 0; i < primaryColumns.size(); i++) {
+			for (i = 0; i < primaryColumns.size(); i++) {
 				final ColumnField column = primaryColumns.get(i);
 				createStatement.append(column.name);
 
@@ -86,7 +90,7 @@ public class Migration {
 			}
 		}
 
-		for (int i = 0; i < foreignColumns.size(); i++) {
+		for (i = 0; i < foreignColumns.size(); i++) {
 			final ColumnField column = foreignColumns.get(i);
 			createStatement.append("FOREIGN KEY(");
 			createStatement.append(column.name);
@@ -143,7 +147,7 @@ public class Migration {
 		final String tableName = Utils.getTableName(clazz);
 		ColumnField column = null;
 
-		List<ColumnField> fields = Utils.getColumns(clazz);
+		Iterable<ColumnField> fields = Utils.getColumns(clazz);
 		for (ColumnField field : fields) {
 			if (field.name.equals(columnName)) {
 				column = field;

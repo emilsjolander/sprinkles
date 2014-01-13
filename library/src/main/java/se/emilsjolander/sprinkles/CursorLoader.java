@@ -89,9 +89,12 @@ class CursorLoader extends AsyncTaskLoader<Cursor> {
 	 * Must be called from the UI thread
 	 */
 	@Override
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	protected void onStopLoading() {
 		// Attempt to cancel the current load task if possible.
-		cancelLoad();
+		if (Build.VERSION.SDK_INT >= 16) {
+        	cancelLoad();
+		}
 	}
 
 	@Override

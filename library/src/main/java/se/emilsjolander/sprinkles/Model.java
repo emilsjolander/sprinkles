@@ -2,8 +2,6 @@ package se.emilsjolander.sprinkles;
 
 import android.os.AsyncTask;
 
-import java.util.List;
-
 import se.emilsjolander.sprinkles.Transaction.OnTransactionCommittedListener;
 
 public abstract class Model implements QueryResult {
@@ -109,7 +107,7 @@ public abstract class Model implements QueryResult {
 					Utils.getContentValues(this));
 
 			// set the @AutoIncrement column if one exists
-			final List<ColumnField> columns = Utils.getColumns(getClass());
+			final Iterable<ColumnField> columns = Utils.getColumns(getClass());
 			for (ColumnField column : columns) {
 				if (column.isAutoIncrementPrimaryKey) {
 					column.field.setAccessible(true);

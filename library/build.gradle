@@ -8,11 +8,13 @@ dependencies {
     testCompile 'org.mockito:mockito-all:1.9.5'
     testCompile 'org.robolectric:robolectric:2.1.+'
     testCompile 'com.squareup:fest-android:1.0.+'
+    testCompile 'com.google.guava:guava-testlib:+'
 
     instrumentTestCompile 'junit:junit:4.10'
     instrumentTestCompile 'org.mockito:mockito-all:1.9.5'
     instrumentTestCompile 'org.robolectric:robolectric:2.1.+'
     instrumentTestCompile 'com.squareup:fest-android:1.0.+'
+    instrumentTestCompile 'com.google.guava:guava-testlib:+'
 }
 
 android {

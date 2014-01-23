@@ -25,7 +25,11 @@ public class Sprinkles {
     Map<Class, TypeSerializer> typeSerializers = new ConcurrentHashMap<Class, TypeSerializer>();
 
 	private Sprinkles() {
-		typeSerializers.put(int.class, new IntSerializer());
+		addStandardTypeSerializers();
+	}
+
+    private void addStandardTypeSerializers() {
+        typeSerializers.put(int.class, new IntSerializer());
         typeSerializers.put(Integer.class, new IntSerializer());
 
         typeSerializers.put(long.class, new LongSerializer());
@@ -42,7 +46,7 @@ public class Sprinkles {
 
         typeSerializers.put(String.class, new StringSerializer());
         typeSerializers.put(Date.class, new DateSerializer());
-	}
+    }
 
     /**
      *

@@ -13,6 +13,7 @@ import java.util.List;
 
 import se.emilsjolander.sprinkles.annotations.AutoIncrementPrimaryKey;
 import se.emilsjolander.sprinkles.annotations.CascadeDelete;
+import se.emilsjolander.sprinkles.annotations.Check;
 import se.emilsjolander.sprinkles.annotations.Column;
 import se.emilsjolander.sprinkles.annotations.DynamicColumn;
 import se.emilsjolander.sprinkles.annotations.ForeignKey;
@@ -133,6 +134,7 @@ class Utils {
 				column.isCascadeDelete = field.isAnnotationPresent(CascadeDelete.class);
 				column.isUnique = field.isAnnotationPresent(Unique.class);
                 column.isNotNull = field.isAnnotationPresent(NotNull.class);
+                column.hasCheck = field.isAnnotationPresent(Check.class);
 
 				if (column.isForeignKey) {
 					column.foreignKey = field.getAnnotation(ForeignKey.class).value();
@@ -153,6 +155,10 @@ class Utils {
 				if (column.isUnique) {
 					column.uniqueConflictClause = field.getAnnotation(Unique.class).value();
 				}
+
+                if (column.hasCheck) {
+                    column.checkClause = field.getAnnotation(Check.class).value();
+                }
 
 				column.field = field;
 				columns.add(column);

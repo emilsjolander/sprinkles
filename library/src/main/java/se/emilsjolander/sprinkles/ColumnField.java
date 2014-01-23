@@ -10,6 +10,7 @@ class ColumnField {
 	String type;
 	String foreignKey;
 	ConflictClause uniqueConflictClause;
+    String checkClause;
 	
 	boolean isPrimaryKey;
 	boolean isForeignKey;
@@ -17,6 +18,7 @@ class ColumnField {
 	boolean isCascadeDelete;
 	boolean isUnique;
     boolean isNotNull;
+    boolean hasCheck;
 
 	public Field field;
 

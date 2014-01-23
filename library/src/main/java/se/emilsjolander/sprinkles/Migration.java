@@ -71,6 +71,10 @@ public class Migration {
                 createStatement.append(" NOT NULL");
             }
 
+            if (column.hasCheck) {
+                createStatement.append(" CHECK("+column.checkClause+")");
+            }
+
 			// add a comma separator between columns if it is not the last
 			// column
 			if (i < columns.size() - 1 || !primaryColumns.isEmpty()

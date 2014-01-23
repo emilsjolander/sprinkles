@@ -1,4 +1,4 @@
-![Icon](https://github.com/emilsjolander/sprinkles/raw/master/sprinkles.png) Sprinkles [![Build Status](https://travis-ci.org/emilsjolander/sprinkles.png)](https://travis-ci.org/emilsjolander/sprinkles)
+![Icon](https://github.com/emilsjolander/sprinkles/raw/master/sprinkles.png) Sprinkles <!-- [![Build Status](https://travis-ci.org/emilsjolander/sprinkles.png)](https://travis-ci.org/emilsjolander/sprinkles) -->
 =========
 Sprinkles is a boiler-plate-reduction-library for dealing with databases in android applications. Some would call it a kind of ORM but I don't see it that way. Sprinkles lets SQL do what it is good at, making complex queries. SQL however is a mess (in my opinion) when is comes to everything else. This is why sprinkles helps you with things such as inserting, updating, and destroying models. Spinkles will also help you with the tedious task of unpacking a cursor into a model. Sprinkles actively supports version 2.3 of Android and above but it should work on older versions as well.
 

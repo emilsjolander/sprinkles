@@ -5,12 +5,14 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
+import se.emilsjolander.sprinkles.annotations.ConflictClause;
 import se.emilsjolander.sprinkles.exceptions.NoSuchColumnFoundException;
 
 /**
  * A class representing database migration. Multiple statements can be made within one migration.
  * Once a production app has shipped with a migration it should never be altered or removed.
- * Sprinkles will make sure that the correct migrations are performed when a user upgrades to the lastest version of your app.
+ * Sprinkles will make sure that the correct migrations are performed when a user upgrades to the
+ * lastest version of your app.
  */
 public class Migration {
 
@@ -22,13 +24,14 @@ public class Migration {
 		}
 	}
 
-    /**
-     * Create a table
-     *
-     * @param clazz
-     *      The class representing the table to add. This will also add all the annotated columns within that class.
-     */
-	public void createTable(Class<? extends Model> clazz) {
+	/**
+	 * Create a table
+	 *
+	 * @param clazz The class representing the table to add. This will also add all the annotated
+	 *              columns within that class.
+	 * @return this Migration instance
+	 */
+	public Migration createTable(Class<? extends Model> clazz) {
 		final String tableName = Utils.getTableName(clazz);
 		final StringBuilder createStatement = new StringBuilder();
 
@@ -46,13 +49,20 @@ public class Migration {
 
 			if (column.isAutoIncrementPrimaryKey) {
 				createStatement.append(" PRIMARY KEY AUTOINCREMENT");
-			}else {
+			} else {
 				if (column.isPrimaryKey) {
 					primaryColumns.add(column);
 				}
 
 				if (column.isForeignKey) {
 					foreignColumns.add(column);
+				}
+			}
+			if (column.isUnique) {
+				createStatement.append(" UNIQUE");
+				if (column.uniqueConflictClause != ConflictClause.DEFAULT) {
+					createStatement.append(" ON CONFLICT ");
+					createStatement.append(column.uniqueConflictClause.toString());
 				}
 			}
 
@@ -105,41 +115,42 @@ public class Migration {
 		createStatement.append(");");
 
 		mStatements.add(createStatement.toString());
+		return this;
 	}
 
-    /**
-     * Remove a table
-     *
-     * @param clazz
-     *      The class representing the table to remove
-     */
-	public void dropTable(Class<? extends Model> clazz) {
+	/**
+	 * Remove a table
+	 *
+	 * @param clazz The class representing the table to remove
+	 * @return this Migration instance
+	 */
+	public Migration dropTable(Class<? extends Model> clazz) {
 		final String tableName = Utils.getTableName(clazz);
 		mStatements.add(String.format("DROP TABLE IF EXISTS %s;", tableName));
+		return this;
 	}
 
-    /**
-     * Rename a table
-     *
-     * @param from
-     *      The current name
-     * @param to
-     *      The new name
-     */
-	public void renameTable(String from, String to) {
+	/**
+	 * Rename a table
+	 *
+	 * @param from The current name
+	 * @param to   The new name
+	 * @return this Migration instance
+	 */
+	public Migration renameTable(String from, String to) {
 		mStatements.add(String.format("ALTER TABLE %s RENAME TO %s;", from, to));
+		return this;
 	}
 
-    /**
-     * Add a column
-     *
-     * @param clazz
-     *      The class representing the table which should hold the new model.
-     *
-     * @param columnName
-     *      The name of the new column. The type of the new column is taken from the class.
-     */
-	public void addColumn(Class<? extends Model> clazz, String columnName) {
+	/**
+	 * Add a column
+	 *
+	 * @param clazz      The class representing the table which should hold the new model.
+	 * @param columnName The name of the new column. The type of the new column is taken from the
+	 *                   class.
+	 * @return this Migration instance
+	 */
+	public Migration addColumn(Class<? extends Model> clazz, String columnName) {
 		final String tableName = Utils.getTableName(clazz);
 		ColumnField column = null;
 
@@ -156,17 +167,19 @@ public class Migration {
 
 		mStatements.add(String.format("ALTER TABLE %s ADD COLUMN %s %s;",
 				tableName, column, column.type));
+		return this;
 	}
 
-    /**
-     * Add a raw sql statement to be executed within a migration.
-     * This should be used when none of the other methods fit your needs.
-     *
-     * @param statement
-     *      The statement to execute
-     */
-	public void addRawStatement(String statement) {
+	/**
+	 * Add a raw sql statement to be executed within a migration.
+	 * This should be used when none of the other methods fit your needs.
+	 *
+	 * @param statement The statement to execute
+	 * @return this Migration instance
+	 */
+	public Migration addRawStatement(String statement) {
 		mStatements.add(statement);
+		return this;
 	}
 
 }

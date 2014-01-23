@@ -11,10 +11,12 @@ class DbOpenHelper extends SQLiteOpenHelper {
 				Sprinkles.sInstance.mMigrations.size());
 	}
 
+	@Override
 	public void onCreate(SQLiteDatabase db) {
 		executeMigrations(db, 0, Sprinkles.sInstance.mMigrations.size());
 	}
 
+	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		executeMigrations(db, oldVersion, newVersion);
 	}

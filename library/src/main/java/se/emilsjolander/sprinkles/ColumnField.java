@@ -16,6 +16,7 @@ class ColumnField {
 	boolean isAutoIncrementPrimaryKey;
 	boolean isCascadeDelete;
 	boolean isUnique;
+    boolean isNotNull;
 
 	public Field field;
 

@@ -91,6 +91,7 @@ API
 - `@ForeignKey` Used to mark a field as a foreign key. The argument given to this annotation should be in the form of `"foreignKeyTable(foreignKeyColumn)"`.
 - `@CascadeDelete` Used to mark a field which is also marked as a foreign key as a cascade deleting field.
 - `@Unique` Used to mark a field which should be unique in the database. Optionally, a conflict clause can be specified in the form of `@Unique(ConflictClause.FAIL)`.
+- `@NotNull` Used to mark a field which should not allow null values in the underlying database column.
 
 ###Saving
 The save method is both an insert and an update method, the correct operation will be done depending on the model's existence in the database. The first two methods below are synchronous, the second is for use together with a transaction (more on that later). There are also two asynchronous methods, one with a callback and one without. The synchronous methods will return a boolean indicating if the model was saved or not. The asynchronous method with a callback will just not invoke the callback if saving failed.

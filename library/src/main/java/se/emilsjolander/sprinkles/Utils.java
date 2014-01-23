@@ -16,6 +16,7 @@ import se.emilsjolander.sprinkles.annotations.CascadeDelete;
 import se.emilsjolander.sprinkles.annotations.Column;
 import se.emilsjolander.sprinkles.annotations.DynamicColumn;
 import se.emilsjolander.sprinkles.annotations.ForeignKey;
+import se.emilsjolander.sprinkles.annotations.NotNull;
 import se.emilsjolander.sprinkles.annotations.PrimaryKey;
 import se.emilsjolander.sprinkles.annotations.Table;
 import se.emilsjolander.sprinkles.annotations.Unique;
@@ -131,6 +132,7 @@ class Utils {
 				column.isPrimaryKey = field.isAnnotationPresent(PrimaryKey.class);
 				column.isCascadeDelete = field.isAnnotationPresent(CascadeDelete.class);
 				column.isUnique = field.isAnnotationPresent(Unique.class);
+                column.isNotNull = field.isAnnotationPresent(NotNull.class);
 
 				if (column.isForeignKey) {
 					column.foreignKey = field.getAnnotation(ForeignKey.class).value();

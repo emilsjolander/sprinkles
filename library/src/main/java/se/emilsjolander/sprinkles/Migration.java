@@ -58,6 +58,7 @@ public class Migration {
 					foreignColumns.add(column);
 				}
 			}
+
 			if (column.isUnique) {
 				createStatement.append(" UNIQUE");
 				if (column.uniqueConflictClause != ConflictClause.DEFAULT) {
@@ -65,6 +66,10 @@ public class Migration {
 					createStatement.append(column.uniqueConflictClause.toString());
 				}
 			}
+
+            if (column.isNotNull) {
+                createStatement.append(" NOT NULL");
+            }
 
 			// add a comma separator between columns if it is not the last
 			// column

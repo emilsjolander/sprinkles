@@ -18,6 +18,7 @@ import se.emilsjolander.sprinkles.annotations.DynamicColumn;
 import se.emilsjolander.sprinkles.annotations.ForeignKey;
 import se.emilsjolander.sprinkles.annotations.PrimaryKey;
 import se.emilsjolander.sprinkles.annotations.Table;
+import se.emilsjolander.sprinkles.annotations.Unique;
 import se.emilsjolander.sprinkles.exceptions.AutoIncrementMustBeIntegerException;
 import se.emilsjolander.sprinkles.exceptions.CannotCascadeDeleteNonForeignKey;
 import se.emilsjolander.sprinkles.exceptions.DuplicateColumnException;
@@ -129,6 +130,7 @@ class Utils {
 				column.isForeignKey = field.isAnnotationPresent(ForeignKey.class);
 				column.isPrimaryKey = field.isAnnotationPresent(PrimaryKey.class);
 				column.isCascadeDelete = field.isAnnotationPresent(CascadeDelete.class);
+				column.isUnique = field.isAnnotationPresent(Unique.class);
 
 				if (column.isForeignKey) {
 					column.foreignKey = field.getAnnotation(ForeignKey.class).value();
@@ -144,6 +146,10 @@ class Utils {
 				
 				if (column.isAutoIncrementPrimaryKey && (column.isPrimaryKey || column.isForeignKey)) {
 					throw new IllegalStateException("A @AutoIncrementPrimaryKey field may not also be an @PrimaryKey or @ForeignKey field");
+				}
+
+				if (column.isUnique) {
+					column.uniqueConflictClause = field.getAnnotation(Unique.class).value();
 				}
 
 				column.field = field;

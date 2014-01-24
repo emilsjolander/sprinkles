@@ -120,8 +120,9 @@ void deleteAsync(OnDeletedCallback callback);
 ###Querying
 Start a query with on of the following static methods:
 ```java
-Query.One(Class<? extends QueryResult> clazz, String sql, Object[] args);
-Query.Many(Class<? extends QueryResult> clazz, String sql, Object[] args);
+Query.one(Class<? extends QueryResult> clazz, String sql, Object[] args);
+Query.many(Class<? extends QueryResult> clazz, String sql, Object[] args);
+Query.all(Class<? extends Model> clazz);
 ```
 Notice that unlike androids built in query methods you can send in an array of objects instead of an array of strings.
 

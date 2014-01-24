@@ -1,6 +1,6 @@
 ![Icon](https://github.com/emilsjolander/sprinkles/raw/master/sprinkles.png) Sprinkles
 =========
-Sprinkles is a boiler-plate-reduction-library for dealing with databases in android applications. Some would call it a kind of ORM but I don't see it that way. Sprinkles lets SQL do what it is good at, making complex queries. SQL however is a mess (in my opinion) when is comes to everything else. This is why sprinkles helps you with things such as inserting, updating, and destroying models. Spinkles will also help you with the tedious task of unpacking a cursor into a model. Sprinkles actively supports version 2.3 of Android and above but it should work on older versions as well.
+Sprinkles is a boiler-plate-reduction-library for dealing with databases in android applications. Some would call it a kind of ORM but I don't see it that way. Sprinkles lets SQL do what it is good at, making complex queries. SQL however is a mess (in my opinion) when is comes to everything else. This is why sprinkles helps you with things such as inserting, updating, and destroying models. Sprinkles will also help you with the tedious task of unpacking a cursor into a model. Sprinkles actively supports version 2.3 of Android and above but it should work on older versions as well.
 
 Sprinkles works great together with https://github.com/square/retrofit for saving information from your server.
 
@@ -74,7 +74,7 @@ public void saveStuff() {
 You can also query for this note like this:
 ```java
 public void queryStuff() {
-	Note n = Query.one("select * from Notes where title=?", "Sprinkles is awesome!").get();
+	Note n = Query.one(Note.class, "select * from Notes where title=?", "Sprinkles is awesome!").get();
 }
 ```
 
@@ -150,7 +150,7 @@ public void doTransaction(List<Note> notes) {
 	Transaction t = new Transaction();
 	try {
 		for (Note n : notes) {
-			if (n.save(t)) {
+			if (!n.save(t)) {
 				return;
 			}
 		}
@@ -225,7 +225,7 @@ void addRawStatement(String statement);
 Any number of calls to any of the above migrations are allowed, if for example `createTable()` is called twice then two tables will be created once that migration has been added. Remember to never edit a migration, always create a new migration (this only applies to the production version of your app of course).
 
 ###Type serializers
-Through an instance of `Sprinkles` you can register your own `TypeSerializer` instances via `registerType()` for serializing an object in your model into a column in the database. Sprinkles uses a `TypeSerializer` implementation internally for all the different datatypes that it supports. So check out the `se.emilsjolander.sprinkles.typeserializers` package for example implementations. These serializers will be used both when saving a model and when querying rows from the database.
+Through an instance of `Sprinkles` you can register your own `TypeSerializer` instances via `registerType()` for serializing an object in your model into a column in the database. Sprinkles uses a `TypeSerializer` implementation internally for all the different data types that it supports. So check out the `se.emilsjolander.sprinkles.typeserializers` package for example implementations. These serializers will be used both when saving a model and when querying rows from the database.
 
 ###Relationships
 Sprinkles does nothing to handle relationships for you; this is by design. You will have to use the regular ways to handle relationships in SQL. Sprinkles gives you all the tools needed for this and it works very well.

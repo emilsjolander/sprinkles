@@ -85,16 +85,12 @@ class Utils {
 	}
 
     static <T extends Model> Uri getNotificationUri(Class<T> clazz) {
-        if (clazz.isAnnotationPresent(Table.class)) {
-            return Uri.parse("sprinkles://"+clazz.getAnnotation(Table.class).value());
-        }
-        throw new NoTableAnnotationException();
+        return Uri.parse("sprinkles://"+getTableName(clazz));
     }
 
     static String getTableName(Class<? extends Model> clazz) {
         if (clazz.isAnnotationPresent(Table.class)) {
-            Table table = clazz.getAnnotation(Table.class);
-            return table.value();
+            return clazz.getAnnotation(Table.class).value();
         }
         throw new NoTableAnnotationException();
     }

@@ -32,33 +32,24 @@ public class Migration {
 	 * @return this Migration instance
 	 */
 	public Migration createTable(Class<? extends Model> clazz) {
-		final String tableName = Utils.getTableName(clazz);
+        final ModelInfo info = ModelInfo.from(clazz);
 		final StringBuilder createStatement = new StringBuilder();
 
 		createStatement.append("CREATE TABLE ");
-		createStatement.append(tableName);
+		createStatement.append(info.tableName);
 		createStatement.append("(");
 
-		final List<ColumnField> columns = Utils.getColumns(clazz);
-		final List<ColumnField> primaryColumns = new ArrayList<ColumnField>();
-		final List<ColumnField> foreignColumns = new ArrayList<ColumnField>();
-		for (int i = 0; i < columns.size(); i++) {
-			final ColumnField column = columns.get(i);
+        final boolean hasPrimaryKeys = !info.primaryKeys.isEmpty();
+        final boolean hasForeignKeys = !info.foreignKeys.isEmpty();
+
+		for (int i = 0; i < info.staticColumns.size(); i++) {
+			final ModelInfo.StaticColumnField column = info.staticColumns.get(i);
 			createStatement.append(column.name + " ");
-			createStatement.append(column.type);
+			createStatement.append(column.sqlType);
 
-			if (column.isAutoIncrementPrimaryKey) {
+			if (column.isAutoIncrement && column.isPrimaryKey) {
 				createStatement.append(" PRIMARY KEY AUTOINCREMENT");
-			} else {
-				if (column.isPrimaryKey) {
-					primaryColumns.add(column);
-				}
-
-				if (column.isForeignKey) {
-					foreignColumns.add(column);
-				}
 			}
-
 			if (column.isUnique) {
 				createStatement.append(" UNIQUE");
 				if (column.uniqueConflictClause != ConflictClause.DEFAULT) {
@@ -66,33 +57,28 @@ public class Migration {
 					createStatement.append(column.uniqueConflictClause.toString());
 				}
 			}
-
             if (column.isNotNull) {
                 createStatement.append(" NOT NULL");
             }
-
             if (column.hasCheck) {
                 createStatement.append(" CHECK("+column.checkClause+")");
             }
 
-			// add a comma separator between columns if it is not the last
-			// column
-			if (i < columns.size() - 1 || !primaryColumns.isEmpty()
-					|| !foreignColumns.isEmpty()) {
+			// add a comma separator between columns if it is not the last column
+			if (i < info.staticColumns.size() - 1 || hasPrimaryKeys || hasForeignKeys) {
 				createStatement.append(", ");
 			}
 		}
 
-		if (!primaryColumns.isEmpty()) {
+		if (!info.primaryKeys.isEmpty()) {
 			createStatement.append("PRIMARY KEY(");
 
-			for (int i = 0; i < primaryColumns.size(); i++) {
-				final ColumnField column = primaryColumns.get(i);
+			for (int i = 0; i < info.primaryKeys.size(); i++) {
+				final ModelInfo.StaticColumnField column = info.primaryKeys.get(i);
 				createStatement.append(column.name);
 
-				// add a comma separator between keys if it is not the last
-				// primary key
-				if (i < primaryColumns.size() - 1) {
+				// add a comma separator between keys if it is not the last primary key
+				if (i < info.primaryKeys.size() - 1) {
 					createStatement.append(", ");
 				}
 			}
@@ -100,13 +86,13 @@ public class Migration {
 			createStatement.append(")");
 
 			// add a comma separator if there are foreign keys to add
-			if (!foreignColumns.isEmpty()) {
+			if (hasForeignKeys) {
 				createStatement.append(", ");
 			}
 		}
 
-		for (int i = 0; i < foreignColumns.size(); i++) {
-			final ColumnField column = foreignColumns.get(i);
+		for (int i = 0; i < info.foreignKeys.size(); i++) {
+            final ModelInfo.StaticColumnField column = info.foreignKeys.get(i);
 			createStatement.append("FOREIGN KEY(");
 			createStatement.append(column.name);
 			createStatement.append(") REFERENCES ");
@@ -116,7 +102,7 @@ public class Migration {
 			}
 
 			// add a comma separator if there are still foreign keys to add
-			if (i < foreignColumns.size() - 1) {
+			if (i < info.foreignKeys.size() - 1) {
 				createStatement.append(", ");
 			}
 		}
@@ -142,8 +128,8 @@ public class Migration {
 	/**
 	 * Rename a table
 	 *
-	 * @param from The current name
-	 * @param to   The new name
+	 * @param from The current tableName
+	 * @param to   The new tableName
 	 * @return this Migration instance
 	 */
 	public Migration renameTable(String from, String to) {
@@ -155,27 +141,26 @@ public class Migration {
 	 * Add a column
 	 *
 	 * @param clazz      The class representing the table which should hold the new model.
-	 * @param columnName The name of the new column. The type of the new column is taken from the
+	 * @param columnName The tableName of the new column. The type of the new column is taken from the
 	 *                   class.
 	 * @return this Migration instance
 	 */
 	public Migration addColumn(Class<? extends Model> clazz, String columnName) {
-		final String tableName = Utils.getTableName(clazz);
-		ColumnField column = null;
+        final ModelInfo info = ModelInfo.from(clazz);
+		ModelInfo.StaticColumnField newColumn = null;
 
-		List<ColumnField> fields = Utils.getColumns(clazz);
-		for (ColumnField field : fields) {
-			if (field.name.equals(columnName)) {
-				column = field;
+		for (ModelInfo.StaticColumnField column : info.staticColumns) {
+			if (column.name.equals(columnName)) {
+                newColumn = column;
 			}
 		}
 
-		if (column == null) {
+		if (newColumn == null) {
 			throw new NoSuchColumnFoundException(columnName);
 		}
 
 		mStatements.add(String.format("ALTER TABLE %s ADD COLUMN %s %s;",
-				tableName, column, column.type));
+                info.tableName, newColumn, newColumn.sqlType));
 		return this;
 	}
 

@@ -2,8 +2,6 @@ package se.emilsjolander.sprinkles;
 
 import android.os.AsyncTask;
 
-import java.util.List;
-
 import se.emilsjolander.sprinkles.Transaction.OnTransactionCommittedListener;
 
 public abstract class Model implements QueryResult {
@@ -105,22 +103,18 @@ public abstract class Model implements QueryResult {
 					Utils.getContentValues(this), Utils.getWhereStatement(this));
 		} else {
 			beforeCreate();
-			long id = t.insert(Utils.getTableName(getClass()),
-					Utils.getContentValues(this));
+			long id = t.insert(Utils.getTableName(getClass()), Utils.getContentValues(this));
 
 			// set the @AutoIncrement column if one exists
-			final List<ColumnField> columns = Utils.getColumns(getClass());
-			for (ColumnField column : columns) {
-				if (column.isAutoIncrementPrimaryKey) {
-					column.field.setAccessible(true);
-					try {
-						column.field.set(this, id);
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-					break;
-				}
-			}
+            final ModelInfo info = ModelInfo.from(getClass());
+            if (info.autoIncrementColumn != null) {
+                info.autoIncrementColumn.field.setAccessible(true);
+                try {
+                    info.autoIncrementColumn.field.set(this, id);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
 		}
 
 		t.addOnTransactionCommittedListener(new OnTransactionCommittedListener() {

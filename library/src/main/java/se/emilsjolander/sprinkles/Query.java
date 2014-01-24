@@ -71,7 +71,7 @@ public final class Query {
      *
      * @return the query to execute
      */
-    public static <T extends QueryResult> ManyQuery<T> all(Class<T> clazz) {
-        return many(clazz, "SELECT * FROM " + Utils.getTableName((Class<? extends Model>) clazz));
+    public static <T extends Model> ManyQuery<T> all(Class<T> clazz) {
+        return many(clazz, "SELECT * FROM " + Utils.getTableName(clazz));
     }
 }

@@ -65,6 +65,16 @@ public class CursorList<T extends QueryResult> implements Iterable<T>, Closeable
         return new CursorIterator(cursor, type);
     }
 
+    /**
+     *
+     * This method should not be needed unless you are interacting with an API that needs to be passed i cursor.
+     *
+     * @return the underlying cursor.
+     */
+    public Cursor getCursor() {
+        return cursor;
+    }
+
     @Override
     public void close() {
         if (cursor != null) {

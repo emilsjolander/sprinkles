@@ -1,5 +1,6 @@
 package se.emilsjolander.sprinkles.models;
 
+import se.emilsjolander.sprinkles.annotations.Column;
 import se.emilsjolander.sprinkles.annotations.Table;
 import se.emilsjolander.sprinkles.annotations.Unique;
 
@@ -7,6 +8,7 @@ import se.emilsjolander.sprinkles.annotations.Unique;
 public class UniqueTestModel extends AbsTestModel {
 
 	@Unique
+    @Column("name")
 	private String name;
 
 	public String getName() {

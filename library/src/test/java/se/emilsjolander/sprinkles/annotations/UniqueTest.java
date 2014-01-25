@@ -15,7 +15,7 @@ import static junit.framework.Assert.*;
 public class UniqueTest {
 
     @Test
-	public void uniqueEnforced() {
+	public void enforced() {
 		Sprinkles sprinkles = Sprinkles.getInstance(Robolectric.application);
 		sprinkles.addMigration(new Migration().createTable(UniqueTestModel.class));
 

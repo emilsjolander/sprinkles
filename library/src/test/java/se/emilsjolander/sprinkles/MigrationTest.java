@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import se.emilsjolander.sprinkles.models.TestModel;
+import se.emilsjolander.sprinkles.models.UniqueTestModel;
 
 import static junit.framework.Assert.*;
 
@@ -16,6 +17,15 @@ public class MigrationTest {
         m.createTable(TestModel.class);
         assertEquals(m.mStatements.get(m.mStatements.size() - 1),
                 "CREATE TABLE Tests(title TEXT, id INTEGER PRIMARY KEY AUTOINCREMENT);"
+        );
+    }
+
+    @Test
+    public void createTableWithUniqueColumn() {
+        Migration m = new Migration();
+        m.createTable(UniqueTestModel.class);
+        assertEquals(m.mStatements.get(m.mStatements.size() - 1),
+                "CREATE TABLE UniqueTestModel(name TEXT UNIQUE, id INTEGER PRIMARY KEY AUTOINCREMENT);"
         );
     }
 

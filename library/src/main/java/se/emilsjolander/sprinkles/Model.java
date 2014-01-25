@@ -97,15 +97,20 @@ public abstract class Model implements QueryResult {
 			return false;
 		}
 
-		beforeSave();
-		if (exists()) {
-			t.update(Utils.getTableName(getClass()),
-					Utils.getContentValues(this), Utils.getWhereStatement(this));
-		} else {
-			beforeCreate();
-			long id = t.insert(Utils.getTableName(getClass()), Utils.getContentValues(this));
+        beforeSave();
+        if (exists()) {
+            if (t.update(Utils.getTableName(getClass()),
+                    Utils.getContentValues(this), Utils.getWhereStatement(this)) == 0) {
+                return false;
+            }
+        } else {
+            beforeCreate();
+            long id = t.insert(Utils.getTableName(getClass()), Utils.getContentValues(this));
+            if (id == -1) {
+                return false;
+            }
 
-			// set the @AutoIncrement column if one exists
+            // set the @AutoIncrement column if one exists
             final ModelInfo info = ModelInfo.from(getClass());
             if (info.autoIncrementColumn != null) {
                 info.autoIncrementColumn.field.setAccessible(true);
@@ -115,7 +120,7 @@ public abstract class Model implements QueryResult {
                     throw new RuntimeException(e);
                 }
             }
-		}
+        }
 
 		t.addOnTransactionCommittedListener(new OnTransactionCommittedListener() {
 

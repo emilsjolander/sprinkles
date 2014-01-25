@@ -1,5 +1,8 @@
 package se.emilsjolander.sprinkles;
 
+import android.content.ContentValues;
+import android.database.MatrixCursor;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -7,6 +10,8 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 
 import se.emilsjolander.sprinkles.exceptions.NoTableAnnotationException;
+import se.emilsjolander.sprinkles.models.AbsTestModel;
+import se.emilsjolander.sprinkles.models.TestModel;
 
 import static junit.framework.Assert.*;
 
@@ -14,34 +19,64 @@ import static junit.framework.Assert.*;
 public class UtilsTest {
 
     @Test
+    public void getResultFromCursor() {
+        MatrixCursor c = new MatrixCursor(new String[]{"title", "id"});
+        c.addRow(new Object[]{"title1", 1});
+        c.addRow(new Object[]{"title2", 2});
+        c.addRow(new Object[]{"title3", 3});
+        c.moveToPosition(2);
+        TestModel m = Utils.getResultFromCursor(TestModel.class, c);
+        assertEquals(m.getId(), 3);
+        assertEquals(m.getTitle(), "title3");
+    }
+
+    @Test
+    public void getWhereStatement() {
+        TestModel m = new TestModel();
+        m.setId(4);
+        String where = Utils.getWhereStatement(m);
+        assertEquals(where, "id=4");
+    }
+
+    @Test
+    public void getContentValues() {
+        TestModel m = new TestModel();
+        m.setId(1);
+        m.setTitle("tjena");
+        ContentValues cv = Utils.getContentValues(m);
+        assertFalse(cv.containsKey("id"));
+        assertEquals(cv.getAsString("title"), "tjena");
+    }
+
+    @Test
     public void getNotificationUri() {
-        String result = Utils.getNotificationUri(ImprovedTestModel.class).toString();
+        String result = Utils.getNotificationUri(TestModel.class).toString();
         assertTrue(result.contains("Tests"));
     }
 
     @Test
     public void getTableName() {
-        assertTrue(Utils.getTableName(ImprovedTestModel.class).equals("Tests"));
+        assertEquals(Utils.getTableName(TestModel.class), "Tests");
     }
 
     @Test(expected = NoTableAnnotationException.class)
     public void getTableNameNoAnnotation() {
-        Utils.getTableName(TestModel.class);
+        Utils.getTableName(AbsTestModel.class);
     }
 
     @Test
     public void insertSqlArgs() {
         String result = Utils.insertSqlArgs("? ?", new Object[]{1, "hej"});
-        assertTrue(result.equals("1 'hej'"));
+        assertEquals(result, "1 'hej'");
     }
 
     @Test
     public void getAllDeclaredFields() {
-        Field[] fields = Utils.getAllDeclaredFields(ImprovedTestModel.class, Model.class);
+        Field[] fields = Utils.getAllDeclaredFields(TestModel.class, Model.class);
         System.out.println(fields[0].getName());
-        assertTrue(fields.length == 2);
-        assertTrue(fields[0].getName().equals("title"));
-        assertTrue(fields[1].getName().equals("id"));
+        assertEquals(fields.length, 2);
+        assertEquals(fields[0].getName(), "title");
+        assertEquals(fields[1].getName(), "id");
     }
 
     @Test

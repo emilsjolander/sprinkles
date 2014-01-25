@@ -8,12 +8,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 
+import se.emilsjolander.sprinkles.models.TestModel;
+
 import static org.junit.Assert.*;
 
 @RunWith(RobolectricGradleTestRunner.class)
 public class CursorIteratorTest {
 
-    private CursorIterator<ImprovedTestModel> iterator;
+    private CursorIterator<TestModel> iterator;
 
     @Before
     public void initSprinkles() {
@@ -26,7 +28,7 @@ public class CursorIteratorTest {
         c.addRow(new Object[]{"title1", 1});
         c.addRow(new Object[]{"title2", 2});
         c.addRow(new Object[]{"title3", 3});
-        iterator = new CursorIterator<ImprovedTestModel>(c, ImprovedTestModel.class);
+        iterator = new CursorIterator<TestModel>(c, TestModel.class);
     }
 
     @Test
@@ -41,7 +43,7 @@ public class CursorIteratorTest {
     @Test
     public void next() {
         iterator.next();
-        ImprovedTestModel model = iterator.next();
+        TestModel model = iterator.next();
         assertTrue(model.getTitle().equals("title2"));
     }
 

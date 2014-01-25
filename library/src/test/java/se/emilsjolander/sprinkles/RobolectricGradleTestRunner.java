@@ -7,6 +7,7 @@ import org.robolectric.annotation.Config;
 import org.robolectric.res.Fs;
 
 public class RobolectricGradleTestRunner extends RobolectricTestRunner {
+
     public RobolectricGradleTestRunner(Class<?> testClass) throws InitializationError {
         super(testClass);
     }

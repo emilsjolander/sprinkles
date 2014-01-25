@@ -16,7 +16,7 @@ import se.emilsjolander.sprinkles.exceptions.NoSuchColumnFoundException;
  */
 public class Migration {
 
-	private List<String> mStatements = new ArrayList<String>();
+	List<String> mStatements = new ArrayList<String>();
 
 	void execute(SQLiteDatabase db) {
 		for (String sql : mStatements) {
@@ -39,8 +39,10 @@ public class Migration {
 		createStatement.append(info.tableName);
 		createStatement.append("(");
 
-        final boolean hasPrimaryKeys = !info.primaryKeys.isEmpty();
-        final boolean hasForeignKeys = !info.foreignKeys.isEmpty();
+        // only list primary keys in the end if they exists and there is not only one that is autoincrement.
+        final boolean appendPrimaryKeys =
+                !(info.primaryKeys.isEmpty() || info.primaryKeys.size() == 1 && info.autoIncrementColumn != null);
+        final boolean appendForeignKeys = !info.foreignKeys.isEmpty();
 
 		for (int i = 0; i < info.staticColumns.size(); i++) {
 			final ModelInfo.StaticColumnField column = info.staticColumns.get(i);
@@ -65,16 +67,22 @@ public class Migration {
             }
 
 			// add a comma separator between columns if it is not the last column
-			if (i < info.staticColumns.size() - 1 || hasPrimaryKeys || hasForeignKeys) {
+			if (i < info.staticColumns.size() - 1 || appendPrimaryKeys || appendForeignKeys) {
 				createStatement.append(", ");
 			}
 		}
 
-		if (!info.primaryKeys.isEmpty()) {
+		if (appendPrimaryKeys) {
 			createStatement.append("PRIMARY KEY(");
 
 			for (int i = 0; i < info.primaryKeys.size(); i++) {
 				final ModelInfo.StaticColumnField column = info.primaryKeys.get(i);
+
+                // autoincrement primary key constraint cannot be listed in the back of the query.
+                if (info.autoIncrementColumn == column) {
+                    continue;
+                }
+
 				createStatement.append(column.name);
 
 				// add a comma separator between keys if it is not the last primary key
@@ -86,7 +94,7 @@ public class Migration {
 			createStatement.append(")");
 
 			// add a comma separator if there are foreign keys to add
-			if (hasForeignKeys) {
+			if (appendForeignKeys) {
 				createStatement.append(", ");
 			}
 		}
@@ -160,7 +168,7 @@ public class Migration {
 		}
 
 		mStatements.add(String.format("ALTER TABLE %s ADD COLUMN %s %s;",
-                info.tableName, newColumn, newColumn.sqlType));
+                info.tableName, newColumn.name, newColumn.sqlType));
 		return this;
 	}
 

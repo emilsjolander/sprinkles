@@ -9,12 +9,14 @@ import org.junit.runner.RunWith;
 
 import java.util.List;
 
+import se.emilsjolander.sprinkles.models.TestModel;
+
 import static org.junit.Assert.*;
 
 @RunWith(RobolectricGradleTestRunner.class)
 public class CursorListTest {
 
-    private CursorList<ImprovedTestModel> list;
+    private CursorList<TestModel> list;
 
     @Before
     public void initList() {
@@ -22,7 +24,7 @@ public class CursorListTest {
         c.addRow(new Object[]{"title1", 1});
         c.addRow(new Object[]{"title2", 2});
         c.addRow(new Object[]{"title3", 3});
-        list = new CursorList<ImprovedTestModel>(c, ImprovedTestModel.class);
+        list = new CursorList<TestModel>(c, TestModel.class);
     }
 
     @After
@@ -42,7 +44,7 @@ public class CursorListTest {
 
     @Test
     public void asList() {
-        List<ImprovedTestModel> list = this.list.asList();
+        List<TestModel> list = this.list.asList();
         assertTrue(list.get(1).getTitle().equals(this.list.get(1).getTitle()));
     }
 

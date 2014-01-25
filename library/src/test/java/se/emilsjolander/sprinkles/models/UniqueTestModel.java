@@ -1,11 +1,10 @@
 package se.emilsjolander.sprinkles.models;
 
-import se.emilsjolander.sprinkles.TestModel;
 import se.emilsjolander.sprinkles.annotations.Table;
 import se.emilsjolander.sprinkles.annotations.Unique;
 
 @Table("UniqueTestModel")
-public class UniqueTestModel extends TestModel {
+public class UniqueTestModel extends AbsTestModel {
 
 	@Unique
 	private String name;

@@ -33,7 +33,7 @@ class DbOpenHelper extends SQLiteOpenHelper {
 		}
 	}
 	
-	private static SQLiteDatabase sInstance;
+	static SQLiteDatabase sInstance;
 	
 	static synchronized SQLiteDatabase getInstance() {
 		if (sInstance == null) {

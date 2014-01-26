@@ -4,7 +4,7 @@ import se.emilsjolander.sprinkles.annotations.Column;
 import se.emilsjolander.sprinkles.annotations.Table;
 import se.emilsjolander.sprinkles.annotations.Unique;
 
-@Table("UniqueTestModel")
+@Table("UniqueTests")
 public class UniqueTestModel extends AbsTestModel {
 
 	@Unique

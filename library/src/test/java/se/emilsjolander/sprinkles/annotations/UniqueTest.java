@@ -16,6 +16,7 @@ public class UniqueTest {
 
     @Test
 	public void enforced() {
+        Sprinkles.dropInstances();
 		Sprinkles sprinkles = Sprinkles.getInstance(Robolectric.application);
 		sprinkles.addMigration(new Migration().createTable(UniqueTestModel.class));
 

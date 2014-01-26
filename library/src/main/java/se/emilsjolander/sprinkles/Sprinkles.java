@@ -64,6 +64,15 @@ public class Sprinkles {
 	}
 
     /**
+     * Used by unit tests to reset sprinkles instances between tests. This method can change at any time and should
+     * never be called outside of a unit test.
+     */
+    public static void dropInstances() {
+        sInstance = null;
+        DbOpenHelper.sInstance = null;
+    }
+
+    /**
      * Add migrations to the underlying database. Every migration increments the database version.
      *
      * @param migration

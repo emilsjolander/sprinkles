@@ -25,7 +25,7 @@ public class MigrationTest {
         Migration m = new Migration();
         m.createTable(UniqueTestModel.class);
         assertEquals(m.mStatements.get(m.mStatements.size() - 1),
-                "CREATE TABLE UniqueTestModel(name TEXT UNIQUE, id INTEGER PRIMARY KEY AUTOINCREMENT);"
+                "CREATE TABLE UniqueTests(name TEXT UNIQUE, id INTEGER PRIMARY KEY AUTOINCREMENT);"
         );
     }
 

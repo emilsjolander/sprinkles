@@ -10,9 +10,9 @@ import static junit.framework.Assert.assertTrue;
 @RunWith(RobolectricGradleTestRunner.class)
 public class CascadeDeleteTest {
 
-        @Test
-        public void enforced() {
-            assertTrue(false);
-        }
+    @Test
+    public void enforced() {
+        assertTrue(false);
+    }
 
 }

@@ -7,7 +7,9 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import se.emilsjolander.sprinkles.models.CallbackTestModel;
+import se.emilsjolander.sprinkles.annotations.AutoIncrementPrimaryKey;
+import se.emilsjolander.sprinkles.annotations.Column;
+import se.emilsjolander.sprinkles.annotations.Table;
 
 import static junit.framework.Assert.*;
 
@@ -15,16 +17,72 @@ import static junit.framework.Assert.*;
 @RunWith(RobolectricTestRunner.class)
 public class ModelTest {
 
+    @Table("Tests")
+    public static class TestModel extends Model {
+
+        @AutoIncrementPrimaryKey
+        @Column("id") private long id;
+
+        @Column("title")
+        private String title;
+
+        public long getId() {
+            return id;
+        }
+
+        public void setId(long id) {
+            this.id = id;
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        private boolean valid = true;
+        public boolean created;
+        public boolean saved;
+        public boolean deleted;
+
+        public void setValid(boolean valid) {
+            this.valid = valid;
+        }
+
+        @Override
+        public boolean isValid() {
+            return valid;
+        }
+
+        @Override
+        public void beforeCreate() {
+            created = true;
+        }
+
+        @Override
+        public void beforeSave() {
+            saved = true;
+        }
+
+        @Override
+        public void afterDelete() {
+            deleted = true;
+        }
+
+    }
+
     @Before
     public void initTables() {
         Sprinkles.dropInstances();
         Sprinkles sprinkles = Sprinkles.getInstance(Robolectric.application);
-        sprinkles.addMigration(new Migration().createTable(CallbackTestModel.class));
+        sprinkles.addMigration(new Migration().createTable(TestModel.class));
     }
 
     @Test
     public void isValid() {
-        CallbackTestModel m = new CallbackTestModel();
+        TestModel m = new TestModel();
         m.setTitle("hej");
 
         m.setValid(false);
@@ -36,33 +94,33 @@ public class ModelTest {
 
     @Test
     public void beforeCreate() {
-        CallbackTestModel m = new CallbackTestModel();
+        TestModel m = new TestModel();
         m.setTitle("hej");
 
         m.save();
         assertTrue(m.created);
 
-        m = new CallbackTestModel();
+        m = new TestModel();
         m.save();
         assertFalse(m.created);
     }
 
     @Test
     public void beforeSave() {
-        CallbackTestModel m = new CallbackTestModel();
+        TestModel m = new TestModel();
         m.setTitle("hej");
 
         m.save();
         assertTrue(m.saved);
 
-        m = new CallbackTestModel();
+        m = new TestModel();
         m.save();
         assertTrue(m.saved);
     }
 
     @Test
     public void afterDelete() {
-        CallbackTestModel m = new CallbackTestModel();
+        TestModel m = new TestModel();
         m.setTitle("hej");
 
         m.save();
@@ -74,7 +132,7 @@ public class ModelTest {
 
     @Test
     public void exists() {
-        CallbackTestModel m = new CallbackTestModel();
+        TestModel m = new TestModel();
         m.setTitle("hej");
 
         assertFalse(m.exists());
@@ -84,7 +142,7 @@ public class ModelTest {
 
     @Test
     public void save() {
-        CallbackTestModel m = new CallbackTestModel();
+        TestModel m = new TestModel();
         m.setTitle("hej");
 
         m.save();
@@ -93,12 +151,12 @@ public class ModelTest {
 
     @Test
     public void saveWithNullField() {
-        CallbackTestModel m = new CallbackTestModel();
+        TestModel m = new TestModel();
         m.setTitle("hej");
         assertTrue(m.save());
         m.setTitle(null);
         assertTrue(m.save());
-        assertEquals(Query.one(CallbackTestModel.class, "select * from CallbackTests").get().getTitle(), "hej");
+        assertEquals(Query.one(TestModel.class, "select * from Tests").get().getTitle(), "hej");
     }
 
     @Test
@@ -108,7 +166,7 @@ public class ModelTest {
 
     @Test
     public void delete() {
-        CallbackTestModel m = new CallbackTestModel();
+        TestModel m = new TestModel();
         m.setTitle("hej");
 
         m.save();

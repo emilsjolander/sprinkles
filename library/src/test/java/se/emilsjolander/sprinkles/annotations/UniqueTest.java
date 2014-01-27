@@ -7,8 +7,8 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import se.emilsjolander.sprinkles.Migration;
+import se.emilsjolander.sprinkles.Model;
 import se.emilsjolander.sprinkles.Sprinkles;
-import se.emilsjolander.sprinkles.models.UniqueTestModel;
 
 import static junit.framework.Assert.*;
 
@@ -16,15 +16,41 @@ import static junit.framework.Assert.*;
 @RunWith(RobolectricTestRunner.class)
 public class UniqueTest {
 
+    @Table("Tests")
+    public static class TestModel extends Model {
+
+        @AutoIncrementPrimaryKey
+        @Column("id") private long id;
+
+        @Unique
+        @Column("title")
+        private String title;
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+    }
+
     @Test
 	public void enforced() {
         Sprinkles.dropInstances();
 		Sprinkles sprinkles = Sprinkles.getInstance(Robolectric.application);
-		sprinkles.addMigration(new Migration().createTable(UniqueTestModel.class));
+		sprinkles.addMigration(new Migration().createTable(TestModel.class));
 
-		assertTrue(new UniqueTestModel().setName("testName").save());
-		assertTrue(new UniqueTestModel().setName("testName2").save());
-		assertFalse(new UniqueTestModel().setName("testName").save());
+        TestModel t1 = new TestModel();
+        t1.setTitle("title1");
+        TestModel t2 = new TestModel();
+        t2.setTitle("title2");
+        TestModel t3 = new TestModel();
+        t3.setTitle("title1");
+
+		assertTrue(t1.save());
+		assertTrue(t2.save());
+		assertFalse(t3.save());
 	}
 
 }

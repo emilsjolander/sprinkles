@@ -5,8 +5,10 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import se.emilsjolander.sprinkles.models.TestModel;
-import se.emilsjolander.sprinkles.models.UniqueTestModel;
+import se.emilsjolander.sprinkles.annotations.AutoIncrementPrimaryKey;
+import se.emilsjolander.sprinkles.annotations.Column;
+import se.emilsjolander.sprinkles.annotations.Table;
+import se.emilsjolander.sprinkles.annotations.Unique;
 
 import static junit.framework.Assert.*;
 
@@ -14,12 +16,49 @@ import static junit.framework.Assert.*;
 @RunWith(RobolectricTestRunner.class)
 public class MigrationTest {
 
+    @Table("Tests")
+    public static class TestModel extends Model {
+
+        @AutoIncrementPrimaryKey
+        @Column("id") private long id;
+
+        @Column("title")
+        private String title;
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+    }
+
+    @Table("UniqueTests")
+    public static class UniqueTestModel extends Model {
+
+        @AutoIncrementPrimaryKey
+        @Column("id") private long id;
+
+        @Unique
+        @Column("title")
+        private String title;
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+    }
+
     @Test
     public void createTable() {
         Migration m = new Migration();
         m.createTable(TestModel.class);
         assertEquals(m.mStatements.get(m.mStatements.size() - 1),
-                "CREATE TABLE Tests(title TEXT, id INTEGER PRIMARY KEY AUTOINCREMENT);"
+                "CREATE TABLE Tests(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT);"
         );
     }
 
@@ -28,7 +67,7 @@ public class MigrationTest {
         Migration m = new Migration();
         m.createTable(UniqueTestModel.class);
         assertEquals(m.mStatements.get(m.mStatements.size() - 1),
-                "CREATE TABLE UniqueTests(name TEXT UNIQUE, id INTEGER PRIMARY KEY AUTOINCREMENT);"
+                "CREATE TABLE UniqueTests(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT UNIQUE);"
         );
     }
 

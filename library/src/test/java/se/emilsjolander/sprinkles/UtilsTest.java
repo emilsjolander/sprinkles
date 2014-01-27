@@ -13,15 +13,46 @@ import org.robolectric.annotation.Config;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
+import se.emilsjolander.sprinkles.annotations.AutoIncrementPrimaryKey;
+import se.emilsjolander.sprinkles.annotations.Column;
+import se.emilsjolander.sprinkles.annotations.Table;
 import se.emilsjolander.sprinkles.exceptions.NoTableAnnotationException;
-import se.emilsjolander.sprinkles.models.AbsTestModel;
-import se.emilsjolander.sprinkles.models.TestModel;
 
 import static junit.framework.Assert.*;
 
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
 public class UtilsTest {
+
+    public static class AbsTestModel extends Model {
+
+        @AutoIncrementPrimaryKey
+        @Column("id") private long id;
+
+        public long getId() {
+            return id;
+        }
+
+        public void setId(long id) {
+            this.id = id;
+        }
+
+    }
+
+    @Table("Tests")
+    public static class TestModel extends AbsTestModel {
+
+        @Column("title")
+        private String title;
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+    }
 
     @Before
     public void initSprinkles() {

@@ -4,12 +4,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import se.emilsjolander.sprinkles.models.CallbackTestModel;
 
 import static junit.framework.Assert.*;
 
-@RunWith(RobolectricGradleTestRunner.class)
+@Config(emulateSdk = 18)
+@RunWith(RobolectricTestRunner.class)
 public class ModelTest {
 
     @Before
@@ -22,6 +25,7 @@ public class ModelTest {
     @Test
     public void isValid() {
         CallbackTestModel m = new CallbackTestModel();
+        m.setTitle("hej");
 
         m.setValid(false);
         assertFalse(m.save());
@@ -33,6 +37,8 @@ public class ModelTest {
     @Test
     public void beforeCreate() {
         CallbackTestModel m = new CallbackTestModel();
+        m.setTitle("hej");
+
         m.save();
         assertTrue(m.created);
 
@@ -44,6 +50,8 @@ public class ModelTest {
     @Test
     public void beforeSave() {
         CallbackTestModel m = new CallbackTestModel();
+        m.setTitle("hej");
+
         m.save();
         assertTrue(m.saved);
 
@@ -55,6 +63,8 @@ public class ModelTest {
     @Test
     public void afterDelete() {
         CallbackTestModel m = new CallbackTestModel();
+        m.setTitle("hej");
+
         m.save();
         assertFalse(m.deleted);
 
@@ -65,6 +75,8 @@ public class ModelTest {
     @Test
     public void exists() {
         CallbackTestModel m = new CallbackTestModel();
+        m.setTitle("hej");
+
         assertFalse(m.exists());
         m.save();
         assertTrue(m.exists());
@@ -73,8 +85,20 @@ public class ModelTest {
     @Test
     public void save() {
         CallbackTestModel m = new CallbackTestModel();
+        m.setTitle("hej");
+
         m.save();
         assertTrue(m.exists());
+    }
+
+    @Test
+    public void saveWithNullField() {
+        CallbackTestModel m = new CallbackTestModel();
+        m.setTitle("hej");
+        assertTrue(m.save());
+        m.setTitle(null);
+        assertTrue(m.save());
+        assertEquals(Query.one(CallbackTestModel.class, "select * from CallbackTests").get().getTitle(), "hej");
     }
 
     @Test
@@ -85,6 +109,8 @@ public class ModelTest {
     @Test
     public void delete() {
         CallbackTestModel m = new CallbackTestModel();
+        m.setTitle("hej");
+
         m.save();
         m.delete();
         assertFalse(m.exists());

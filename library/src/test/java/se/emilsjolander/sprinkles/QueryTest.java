@@ -4,12 +4,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import se.emilsjolander.sprinkles.models.TestModel;
 
 import static junit.framework.Assert.*;
 
-@RunWith(RobolectricGradleTestRunner.class)
+@Config(emulateSdk = 18)
+@RunWith(RobolectricTestRunner.class)
 public class QueryTest {
 
     @Before

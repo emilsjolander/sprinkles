@@ -2,13 +2,16 @@ package se.emilsjolander.sprinkles;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import se.emilsjolander.sprinkles.models.TestModel;
 import se.emilsjolander.sprinkles.models.UniqueTestModel;
 
 import static junit.framework.Assert.*;
 
-@RunWith(RobolectricGradleTestRunner.class)
+@Config(emulateSdk = 18)
+@RunWith(RobolectricTestRunner.class)
 public class MigrationTest {
 
     @Test

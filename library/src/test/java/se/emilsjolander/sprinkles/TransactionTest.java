@@ -4,12 +4,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import se.emilsjolander.sprinkles.models.TestModel;
 
 import static junit.framework.Assert.*;
 
-@RunWith(RobolectricGradleTestRunner.class)
+@Config(emulateSdk = 18)
+@RunWith(RobolectricTestRunner.class)
 public class TransactionTest {
 
     @Before
@@ -23,6 +26,7 @@ public class TransactionTest {
     public void commit() throws InterruptedException {
         Transaction t = new Transaction();
         TestModel m = new TestModel();
+        m.setTitle("hej");
         m.save(t);
         t.setSuccessful(true);
         t.finish();
@@ -33,6 +37,7 @@ public class TransactionTest {
     public void rollback() {
         Transaction t = new Transaction();
         TestModel m = new TestModel();
+        m.setTitle("hej");
         m.save(t);
         t.setSuccessful(false);
         t.finish();
@@ -50,6 +55,7 @@ public class TransactionTest {
             }
         });
         TestModel m = new TestModel();
+        m.setTitle("hej");
         m.save(t);
         t.setSuccessful(true);
         t.finish();
@@ -67,6 +73,7 @@ public class TransactionTest {
             }
         });
         TestModel m = new TestModel();
+        m.setTitle("hej");
         m.save(t);
         t.setSuccessful(false);
         t.finish();

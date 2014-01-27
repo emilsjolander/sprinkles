@@ -2,12 +2,13 @@ package se.emilsjolander.sprinkles.annotations;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import se.emilsjolander.sprinkles.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import static junit.framework.Assert.assertTrue;
 
-@RunWith(RobolectricGradleTestRunner.class)
+@Config(emulateSdk = 18)
+@RunWith(RobolectricTestRunner.class)
 public class CascadeDeleteTest {
 
     @Test

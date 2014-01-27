@@ -3,7 +3,7 @@ package se.emilsjolander.sprinkles.models;
 import se.emilsjolander.sprinkles.annotations.Table;
 
 @Table("CallbackTests")
-public class CallbackTestModel extends AbsTestModel {
+public class CallbackTestModel extends TestModel {
 
     private boolean valid = true;
     public boolean created;

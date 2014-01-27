@@ -3,15 +3,17 @@ package se.emilsjolander.sprinkles.annotations;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import se.emilsjolander.sprinkles.Migration;
-import se.emilsjolander.sprinkles.RobolectricGradleTestRunner;
 import se.emilsjolander.sprinkles.Sprinkles;
 import se.emilsjolander.sprinkles.models.UniqueTestModel;
 
 import static junit.framework.Assert.*;
 
-@RunWith(RobolectricGradleTestRunner.class)
+@Config(emulateSdk = 18)
+@RunWith(RobolectricTestRunner.class)
 public class UniqueTest {
 
     @Test

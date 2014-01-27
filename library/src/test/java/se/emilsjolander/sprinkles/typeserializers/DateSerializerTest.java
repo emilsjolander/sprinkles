@@ -5,14 +5,15 @@ import android.database.MatrixCursor;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import java.util.Date;
 
-import se.emilsjolander.sprinkles.RobolectricGradleTestRunner;
-
 import static junit.framework.Assert.assertTrue;
 
-@RunWith(RobolectricGradleTestRunner.class)
+@Config(emulateSdk = 18)
+@RunWith(RobolectricTestRunner.class)
 public class DateSerializerTest {
 
     @Test

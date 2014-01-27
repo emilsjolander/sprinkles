@@ -26,6 +26,11 @@ public class ModelTest {
         @Column("title")
         private String title;
 
+        private boolean valid = true;
+        public boolean created;
+        public boolean saved;
+        public boolean deleted;
+
         public long getId() {
             return id;
         }
@@ -41,11 +46,6 @@ public class ModelTest {
         public String getTitle() {
             return title;
         }
-
-        private boolean valid = true;
-        public boolean created;
-        public boolean saved;
-        public boolean deleted;
 
         public void setValid(boolean valid) {
             this.valid = valid;
@@ -176,6 +176,16 @@ public class ModelTest {
 
     @Test
     public void deleteAsync() {
+        assertTrue(false);
+    }
+
+    @Test
+    public void notifyContentChangeOnSave() {
+        assertTrue(false);
+    }
+
+    @Test
+    public void notifyContentChangeOnDelete() {
         assertTrue(false);
     }
 

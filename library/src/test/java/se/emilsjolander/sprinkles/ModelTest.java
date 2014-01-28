@@ -1,5 +1,8 @@
 package se.emilsjolander.sprinkles;
 
+import android.database.ContentObserver;
+import android.os.Handler;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -181,12 +184,36 @@ public class ModelTest {
 
     @Test
     public void notifyContentChangeOnSave() {
-        assertTrue(false);
+        TestModel m = new TestModel();
+        m.setTitle("hej");
+        final boolean[] notified = new boolean[1];
+        Sprinkles.sInstance.mContext.getContentResolver().
+                registerContentObserver(Utils.getNotificationUri(TestModel.class), false, new ContentObserver(new Handler()) {
+                    @Override
+                    public void onChange(boolean selfChange) {
+                        notified[0] = true;
+                    }
+                });
+        m.save();
+        assertTrue(notified[0]);
     }
 
     @Test
     public void notifyContentChangeOnDelete() {
-        assertTrue(false);
+        TestModel m = new TestModel();
+        m.setTitle("hej");
+        m.save();
+        final boolean[] notified = new boolean[1];
+        Sprinkles.sInstance.mContext.getContentResolver().
+                registerContentObserver(Utils.getNotificationUri(TestModel.class), false, new ContentObserver(new Handler()) {
+                    @Override
+                    public void onChange(boolean selfChange) {
+                        notified[0] = true;
+                    }
+                });
+        assertFalse(notified[0]);
+        m.delete();
+        assertTrue(notified[0]);
     }
 
 }

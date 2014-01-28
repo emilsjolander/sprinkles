@@ -1,5 +1,7 @@
 package se.emilsjolander.sprinkles;
 
+import android.app.Activity;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,14 +11,16 @@ import org.robolectric.annotation.Config;
 
 import se.emilsjolander.sprinkles.annotations.AutoIncrementPrimaryKey;
 import se.emilsjolander.sprinkles.annotations.Column;
+import se.emilsjolander.sprinkles.annotations.DynamicColumn;
 import se.emilsjolander.sprinkles.annotations.Table;
-import se.emilsjolander.sprinkles.annotations.Unique;
 
 import static junit.framework.Assert.*;
 
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
 public class QueryTest {
+
+    public static class TestActivity extends Activity{}
 
     @Table("Tests")
     public static class TestModel extends Model {
@@ -26,6 +30,9 @@ public class QueryTest {
 
         @Column("title")
         private String title;
+
+        @DynamicColumn("count")
+        private int count;
 
         public void setTitle(String title) {
             this.title = title;
@@ -76,7 +83,27 @@ public class QueryTest {
     }
 
     @Test
-    public void async() {
+    public void async() throws InterruptedException {
+        /*
+        for (int i = 0 ; i<10 ; i++) {
+            TestModel t = new TestModel();
+            t.setTitle("title"+i);
+            t.save();
+        }
+
+        final CountDownLatch latch = new CountDownLatch(1);
+        Activity activity = Robolectric.buildActivity(TestActivity.class).create().get();
+        Query.all(TestModel.class).getAsync(activity.getLoaderManager(), new ManyQuery.ResultHandler<TestModel>() {
+            @Override
+            public boolean handleResult(CursorList<TestModel> result) {
+                assertEquals(result.size(), 10);
+                latch.countDown();
+                return false;
+            }
+        });
+
+        assertTrue(latch.await(30, TimeUnit.SECONDS));
+        */
         assertTrue(false);
     }
 
@@ -92,7 +119,14 @@ public class QueryTest {
 
     @Test
     public void dynamicColumnResult() {
-        assertTrue(false);
+        for (int i = 0 ; i<10 ; i++) {
+            TestModel t = new TestModel();
+            t.setTitle("title"+i);
+            t.save();
+        }
+
+        TestModel m = Query.one(TestModel.class, "select *, count(*) AS count from Tests limit 1").get();
+        assertEquals(m.count, 10);
     }
 
 }

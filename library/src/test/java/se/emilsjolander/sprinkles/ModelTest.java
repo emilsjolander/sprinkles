@@ -10,6 +10,9 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 import se.emilsjolander.sprinkles.annotations.AutoIncrementPrimaryKey;
 import se.emilsjolander.sprinkles.annotations.Column;
 import se.emilsjolander.sprinkles.annotations.Table;
@@ -102,8 +105,9 @@ public class ModelTest {
 
         m.save();
         assertTrue(m.created);
+        m.created = false;
 
-        m = new TestModel();
+        m.setTitle("tjena");
         m.save();
         assertFalse(m.created);
     }
@@ -115,8 +119,9 @@ public class ModelTest {
 
         m.save();
         assertTrue(m.saved);
+        m.saved = false;
 
-        m = new TestModel();
+        m.setTitle("tjena");
         m.save();
         assertTrue(m.saved);
     }
@@ -153,6 +158,14 @@ public class ModelTest {
     }
 
     @Test
+    public void setAutoIncrementKeyOnCreate() {
+        TestModel m = new TestModel();
+        m.setTitle("hej");
+        m.save();
+        assertFalse(m.id == 0);
+    }
+
+    @Test
     public void saveWithNullField() {
         TestModel m = new TestModel();
         m.setTitle("hej");
@@ -163,8 +176,19 @@ public class ModelTest {
     }
 
     @Test
-    public void saveAsync() {
-        assertTrue(false);
+    public void saveAsync() throws InterruptedException {
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        TestModel m = new TestModel();
+        m.setTitle("hej");
+        m.saveAsync(new Model.OnSavedCallback() {
+            @Override
+            public void onSaved() {
+                latch.countDown();
+            }
+        });
+
+        assertTrue(latch.await(30, TimeUnit.SECONDS));
     }
 
     @Test
@@ -178,8 +202,20 @@ public class ModelTest {
     }
 
     @Test
-    public void deleteAsync() {
-        assertTrue(false);
+    public void deleteAsync() throws InterruptedException {
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        TestModel m = new TestModel();
+        m.setTitle("hej");
+        m.save();
+        m.deleteAsync(new Model.OnDeletedCallback() {
+            @Override
+            public void onDeleted() {
+                latch.countDown();
+            }
+        });
+
+        assertTrue(latch.await(30, TimeUnit.SECONDS));
     }
 
     @Test

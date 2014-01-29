@@ -62,7 +62,7 @@ public class CursorList<T extends QueryResult> implements Iterable<T>, Closeable
 
     @Override
     public Iterator<T> iterator() {
-        return new CursorIterator(cursor, type);
+        return new CursorIterator<T>(cursor, type);
     }
 
     /**

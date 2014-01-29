@@ -4,7 +4,7 @@ import android.database.Cursor;
 
 import java.util.Iterator;
 
-class CursorIterator<T extends Model> implements Iterator<T> {
+class CursorIterator<T extends QueryResult> implements Iterator<T> {
 
     private Cursor cursor;
     private Class<T> type;

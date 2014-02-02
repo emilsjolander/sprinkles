@@ -94,7 +94,7 @@ class ModelInfo {
         for (Field field : fields) {
             if (field.isAnnotationPresent(DynamicColumn.class)) {
                 DynamicColumnField column = new DynamicColumnField();
-                column.name = field.getAnnotation(DynamicColumn.class).value();
+                column.name = getDynamicColumnName(field);
                 column.sqlType = Sprinkles.sInstance.typeSerializers.get(field.getType()).getSqlType().name();
                 column.field = field;
                 info.dynamicColumns.add(column);
@@ -104,7 +104,7 @@ class ModelInfo {
 
             } else if (field.isAnnotationPresent(Column.class)) {
                 StaticColumnField column = new StaticColumnField();
-                column.name = field.getAnnotation(Column.class).value();
+                column.name = getColumnName(field);
 
                 column.isAutoIncrement = field.isAnnotationPresent(AutoIncrementPrimaryKey.class);
                 column.isForeignKey = field.isAnnotationPresent(ForeignKey.class);
@@ -176,5 +176,15 @@ class ModelInfo {
 
         String name = clazz.getAnnotation(Table.class).value().trim();
         return name.isEmpty() ? clazz.getSimpleName() : name;
+    }
+
+    private static String getColumnName(Field field) {
+        String name = field.getAnnotation(Column.class).value().trim();
+        return name.isEmpty() ? field.getName() : name;
+    }
+
+    private static String getDynamicColumnName(Field field) {
+        String name = field.getAnnotation(DynamicColumn.class).value().trim();
+        return name.isEmpty() ? field.getName() : name;
     }
 }

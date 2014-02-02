@@ -7,6 +7,7 @@ import org.robolectric.annotation.Config;
 
 import se.emilsjolander.sprinkles.annotations.AutoIncrementPrimaryKey;
 import se.emilsjolander.sprinkles.annotations.Column;
+import se.emilsjolander.sprinkles.annotations.DynamicColumn;
 import se.emilsjolander.sprinkles.annotations.Table;
 import se.emilsjolander.sprinkles.exceptions.NoTableAnnotationException;
 
@@ -24,7 +25,13 @@ public class ModelInfoTest {
     }
 
     @Table
-    public static class DefaultTableNameTestModel extends AbsTestModel {
+    public static class DefaultNamesTestModel extends AbsTestModel {
+
+        @Column
+        private String title;
+
+        @DynamicColumn
+        private int count;
     }
 
     @Table("Tests")
@@ -77,9 +84,14 @@ public class ModelInfoTest {
     }
 
     @Test
-    public void getDefaultTableName() {
-        ModelInfo info = ModelInfo.from(DefaultTableNameTestModel.class);
-        assertEquals(info.tableName, "DefaultTableNameTestModel");
+    public void defaultNames() {
+        ModelInfo info = ModelInfo.from(DefaultNamesTestModel.class);
+        assertEquals(info.tableName, "DefaultNamesTestModel");
+        assertEquals(info.columns.size(), 3);
+        assertEquals(info.staticColumns.size(), 2);
+        assertEquals(info.staticColumns.get(0).name, "title");
+        assertEquals(info.dynamicColumns.size(), 1);
+        assertEquals(info.dynamicColumns.get(0).name, "count");
     }
 
     @Test

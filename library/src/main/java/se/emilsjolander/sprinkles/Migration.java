@@ -36,7 +36,7 @@ public class Migration {
 		final StringBuilder createStatement = new StringBuilder();
 
 		createStatement.append("CREATE TABLE ");
-		createStatement.append(info.tableName);
+        createStatement.append(info.tableName);
 		createStatement.append("(");
 
         // only list primary keys in the end if they exists and there is not only one that is autoincrement.
@@ -46,8 +46,9 @@ public class Migration {
 
 		for (int i = 0; i < info.staticColumns.size(); i++) {
 			final ModelInfo.StaticColumnField column = info.staticColumns.get(i);
-			createStatement.append(column.name + " ");
-			createStatement.append(column.sqlType);
+			createStatement.append(column.name);
+            createStatement.append(" ");
+            createStatement.append(column.sqlType);
 
 			if (column.isAutoIncrement && column.isPrimaryKey) {
 				createStatement.append(" PRIMARY KEY AUTOINCREMENT");
@@ -63,7 +64,9 @@ public class Migration {
                 createStatement.append(" NOT NULL");
             }
             if (column.hasCheck) {
-                createStatement.append(" CHECK("+column.checkClause+")");
+                createStatement.append(" CHECK(");
+                createStatement.append(column.checkClause);
+                createStatement.append(")");
             }
 
 			// add a comma separator between columns if it is not the last column
@@ -128,7 +131,7 @@ public class Migration {
 	 * @return this Migration instance
 	 */
 	public Migration dropTable(Class<? extends Model> clazz) {
-		final String tableName = Utils.getTableName(clazz);
+		final String tableName = ModelInfo.from(clazz).tableName;
 		mStatements.add(String.format("DROP TABLE IF EXISTS %s;", tableName));
 		return this;
 	}

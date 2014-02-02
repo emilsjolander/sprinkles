@@ -8,7 +8,7 @@ import org.robolectric.annotation.Config;
 import se.emilsjolander.sprinkles.annotations.AutoIncrementPrimaryKey;
 import se.emilsjolander.sprinkles.annotations.Column;
 import se.emilsjolander.sprinkles.annotations.Table;
-import se.emilsjolander.sprinkles.annotations.Unique;
+import se.emilsjolander.sprinkles.exceptions.NoTableAnnotationException;
 
 import static junit.framework.Assert.*;
 import static se.emilsjolander.sprinkles.ModelInfo.ColumnField;
@@ -17,11 +17,14 @@ import static se.emilsjolander.sprinkles.ModelInfo.ColumnField;
 @RunWith(RobolectricTestRunner.class)
 public class ModelInfoTest {
 
-    @Table("Tests")
-    public static class TestModel extends Model {
+    public static class AbsTestModel extends Model {
 
         @AutoIncrementPrimaryKey
         @Column("id") private long id;
+    }
+
+    @Table("Tests")
+    public static class TestModel extends AbsTestModel {
 
         @Column("title")
         private String title;
@@ -62,6 +65,11 @@ public class ModelInfoTest {
         assertEquals(info.dynamicColumns.size(), 0);
         assertEquals(info.primaryKeys.size(), 1);
         assertEquals(info.foreignKeys.size(), 0);
+    }
+
+    @Test(expected = NoTableAnnotationException.class)
+    public void getTableNameNoAnnotation() {
+        ModelInfo.from(AbsTestModel.class);
     }
 
     @Test

@@ -17,12 +17,14 @@ import se.emilsjolander.sprinkles.annotations.DynamicColumn;
 import se.emilsjolander.sprinkles.annotations.ForeignKey;
 import se.emilsjolander.sprinkles.annotations.NotNull;
 import se.emilsjolander.sprinkles.annotations.PrimaryKey;
+import se.emilsjolander.sprinkles.annotations.Table;
 import se.emilsjolander.sprinkles.annotations.Unique;
 import se.emilsjolander.sprinkles.exceptions.AutoIncrementMustBeIntegerException;
 import se.emilsjolander.sprinkles.exceptions.CannotCascadeDeleteNonForeignKey;
 import se.emilsjolander.sprinkles.exceptions.DuplicateColumnException;
 import se.emilsjolander.sprinkles.exceptions.EmptyTableException;
 import se.emilsjolander.sprinkles.exceptions.NoPrimaryKeysException;
+import se.emilsjolander.sprinkles.exceptions.NoTableAnnotationException;
 import se.emilsjolander.sprinkles.typeserializers.SqlType;
 
 class ModelInfo {
@@ -154,7 +156,7 @@ class ModelInfo {
             throw new EmptyTableException(clazz.getName());
         }
         if (Model.class.isAssignableFrom(clazz)) {
-            info.tableName = Utils.getTableName((Class<? extends Model>) clazz);
+            info.tableName = getTableName((Class<? extends Model>) clazz);
             if (info.primaryKeys.size() == 0) {
                 throw new NoPrimaryKeysException();
             }
@@ -167,4 +169,10 @@ class ModelInfo {
         return info;
     }
 
+    private static <T extends Model> String getTableName(Class<T> clazz) {
+        if (clazz.isAnnotationPresent(Table.class)) {
+            return clazz.getAnnotation(Table.class).value();
+        }
+        throw new NoTableAnnotationException();
+    }
 }

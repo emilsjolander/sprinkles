@@ -23,6 +23,10 @@ public class ModelInfoTest {
         @Column("id") private long id;
     }
 
+    @Table
+    public static class DefaultTableNameTestModel extends AbsTestModel {
+    }
+
     @Table("Tests")
     public static class TestModel extends AbsTestModel {
 
@@ -70,6 +74,12 @@ public class ModelInfoTest {
     @Test(expected = NoTableAnnotationException.class)
     public void getTableNameNoAnnotation() {
         ModelInfo.from(AbsTestModel.class);
+    }
+
+    @Test
+    public void getDefaultTableName() {
+        ModelInfo info = ModelInfo.from(DefaultTableNameTestModel.class);
+        assertEquals(info.tableName, "DefaultTableNameTestModel");
     }
 
     @Test

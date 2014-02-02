@@ -170,9 +170,11 @@ class ModelInfo {
     }
 
     private static <T extends Model> String getTableName(Class<T> clazz) {
-        if (clazz.isAnnotationPresent(Table.class)) {
-            return clazz.getAnnotation(Table.class).value();
+        if (!clazz.isAnnotationPresent(Table.class)) {
+            throw new NoTableAnnotationException();
         }
-        throw new NoTableAnnotationException();
+
+        String name = clazz.getAnnotation(Table.class).value().trim();
+        return name.isEmpty() ? clazz.getSimpleName() : name;
     }
 }

@@ -14,7 +14,6 @@ import java.util.List;
 import se.emilsjolander.sprinkles.annotations.AutoIncrementPrimaryKey;
 import se.emilsjolander.sprinkles.annotations.Column;
 import se.emilsjolander.sprinkles.annotations.Table;
-import se.emilsjolander.sprinkles.annotations.Unique;
 
 import static org.junit.Assert.*;
 
@@ -58,18 +57,18 @@ public class CursorListTest {
 
     @Test
     public void size() {
-        assertTrue(list.size() == 3);
+        assertEquals(list.size(), 3);
     }
 
     @Test
     public void get() {
-        assertTrue(list.get(1).getTitle().equals("title2"));
+        assertEquals(list.get(1).getTitle(), "title2");
     }
 
     @Test
     public void asList() {
         List<TestModel> list = this.list.asList();
-        assertTrue(list.get(1).getTitle().equals(this.list.get(1).getTitle()));
+        assertEquals(list.get(1).getTitle(), this.list.get(1).getTitle());
     }
 
     @Test

@@ -67,7 +67,7 @@ public class CursorIteratorTest {
     public void next() {
         iterator.next();
         TestModel model = iterator.next();
-        assertTrue(model.getTitle().equals("title2"));
+        assertEquals(model.getTitle(), "title2");
     }
 
     @Test(expected = UnsupportedOperationException.class)

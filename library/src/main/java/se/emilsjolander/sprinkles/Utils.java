@@ -10,11 +10,8 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
-import se.emilsjolander.sprinkles.annotations.Table;
-import se.emilsjolander.sprinkles.exceptions.NoTableAnnotationException;
-
 class Utils {
-	
+
 	static <T extends QueryResult> T getResultFromCursor(Class<T> resultClass, Cursor c) {
 		try {
             final ModelInfo info = ModelInfo.from(resultClass);
@@ -34,7 +31,7 @@ class Utils {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	static String getWhereStatement(Model m) {
         final ModelInfo info = ModelInfo.from(m.getClass());
 		final StringBuilder where = new StringBuilder();
@@ -64,7 +61,7 @@ class Utils {
 	static ContentValues getContentValues(Model model) {
 		final ModelInfo info = ModelInfo.from(model.getClass());
 		final ContentValues values = new ContentValues();
-		
+
 		for (ModelInfo.StaticColumnField column : info.staticColumns) {
 			if (column.isAutoIncrement) {
 				continue;
@@ -80,19 +77,12 @@ class Utils {
                 Sprinkles.sInstance.typeSerializers.get(value.getClass()).pack(value, values, column.name);
 			}
 		}
-		
+
 		return values;
 	}
 
     static <T extends Model> Uri getNotificationUri(Class<T> clazz) {
-        return Uri.parse("sprinkles://"+getTableName(clazz));
-    }
-
-    static String getTableName(Class<? extends Model> clazz) {
-        if (clazz.isAnnotationPresent(Table.class)) {
-            return clazz.getAnnotation(Table.class).value();
-        }
-        throw new NoTableAnnotationException();
+        return Uri.parse("sprinkles://" + ModelInfo.from(clazz).tableName);
     }
 
     static String insertSqlArgs(String sql, Object[] args) {

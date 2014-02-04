@@ -38,7 +38,7 @@ public class Note extends Model {
 	public long getId() {
 		return id;
 	}
-	
+
 }
 ```
 Ok, a lot of important stuff in this short class. First of all, a model must subclass `se.emilsjolander.sprinkles.Model` and it also must have a `@Table` annotations specifying the table name that the model corresponds to. After the class declaration we have declared three members: `id`, `title` and `body`. Notice how all of them have a `@Column` annotation to mark that they are not only a member of this class but also a column of the table that this class represents. We have one last annotation in the above example. The `@AutoIncrementPrimaryKey`, this annotation tells sprinkles that the field is both an autoincrement field and a primary key field. A field with this annotation will automatically be set upon the creation of its corresponding row in the table.
@@ -46,13 +46,13 @@ Ok, a lot of important stuff in this short class. First of all, a model must sub
 Before using this class you must migrate it into the database. I recommend doing this in the `onCreate()` method of an `Application` subclass like this:
 ```java
 public class MyApplication extends Application {
-	
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		
+
 		Sprinkles sprinkles = Sprinkles.getInstance(getApplicationContext());
-		
+
 		Migration initialMigration = new Migration();
 		initialMigration.createTable(Note.class);
 		sprinkles.addMigration(initialMigration);
@@ -83,10 +83,10 @@ There is a lot more you can do with sprinkles so please read the next section wh
 API
 ---
 ###Annotations
-- `@Table` Used to associate a model class with a SQL table.
+- `@Table` Used to associate a model class with a SQL table. It receives the table name as an optional argument. If no table name is explicitly set, the class name will be used.
 - `@AutoIncrementPrimaryKey` Used to mark a field as an auto-incrementing primary key. The field must be an `int` or a `long` and cannot be in the same class as any other primary key.
-- `@Column` Used to associate a class field with a SQL column.
-- `@DynamicColumn` Used to associate a class field with a dynamic SQL column such as an alias in a query.
+- `@Column` Used to associate a class field with a SQL column. It receives the column name as an optional argument. If no column name is explicitly set, the field name will be used.
+- `@DynamicColumn` Used to associate a class field with a dynamic SQL column such as an alias in a query. It receives the column name as an optional argument. If no column name is explicitly set, the field name will be used.
 - `@PrimaryKey` Used to mark a field as a primary key. Multiple primary keys in a class are allowed and will result in a composite primary key.
 - `@ForeignKey` Used to mark a field as a foreign key. The argument given to this annotation should be in the form of `"foreignKeyTable(foreignKeyColumn)"`.
 - `@CascadeDelete` Used to mark a field which is also marked as a foreign key as a cascade deleting field.
@@ -140,7 +140,7 @@ All Queries return a `CursorList` subclass. This is a `Iterable` subclass which 
 public int size();
 public T get(int pos);
 public List<T> asList();
-``` 
+```
 Remember to always call `close()` on a `CursorList` instance! This will close the underlying cursor.
 
 ###Transactions
@@ -200,13 +200,13 @@ protected void afterDelete() {
 Migrations are the way you add things to your database. I suggest putting all your migrations in the `onCreate()` method of a `Application` subclass. Here is a quick example of how that would look:
 ```java
 public class MyApplication extends Application {
-	
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		
+
 		Sprinkles sprinkles = Sprinkles.getInstance(getApplicationContext());
-		
+
 		Migration initialMigration = new Migration();
 		initialMigration.createTable(Note.class);
 		sprinkles.addMigration(initialMigration);
@@ -229,4 +229,3 @@ Through an instance of `Sprinkles` you can register your own `TypeSerializer` in
 
 ###Relationships
 Sprinkles does nothing to handle relationships for you; this is by design. You will have to use the regular ways to handle relationships in SQL. Sprinkles gives you all the tools needed for this and it works very well.
-

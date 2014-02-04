@@ -16,7 +16,6 @@ import java.util.Arrays;
 import se.emilsjolander.sprinkles.annotations.AutoIncrementPrimaryKey;
 import se.emilsjolander.sprinkles.annotations.Column;
 import se.emilsjolander.sprinkles.annotations.Table;
-import se.emilsjolander.sprinkles.exceptions.NoTableAnnotationException;
 
 import static junit.framework.Assert.*;
 
@@ -36,7 +35,6 @@ public class UtilsTest {
         public void setId(long id) {
             this.id = id;
         }
-
     }
 
     @Table("Tests")
@@ -93,16 +91,6 @@ public class UtilsTest {
     public void getNotificationUri() {
         String result = Utils.getNotificationUri(TestModel.class).toString();
         assertTrue(result.contains("Tests"));
-    }
-
-    @Test
-    public void getTableName() {
-        assertEquals(Utils.getTableName(TestModel.class), "Tests");
-    }
-
-    @Test(expected = NoTableAnnotationException.class)
-    public void getTableNameNoAnnotation() {
-        Utils.getTableName(AbsTestModel.class);
     }
 
     @Test

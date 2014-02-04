@@ -17,12 +17,14 @@ import se.emilsjolander.sprinkles.annotations.DynamicColumn;
 import se.emilsjolander.sprinkles.annotations.ForeignKey;
 import se.emilsjolander.sprinkles.annotations.NotNull;
 import se.emilsjolander.sprinkles.annotations.PrimaryKey;
+import se.emilsjolander.sprinkles.annotations.Table;
 import se.emilsjolander.sprinkles.annotations.Unique;
 import se.emilsjolander.sprinkles.exceptions.AutoIncrementMustBeIntegerException;
 import se.emilsjolander.sprinkles.exceptions.CannotCascadeDeleteNonForeignKey;
 import se.emilsjolander.sprinkles.exceptions.DuplicateColumnException;
 import se.emilsjolander.sprinkles.exceptions.EmptyTableException;
 import se.emilsjolander.sprinkles.exceptions.NoPrimaryKeysException;
+import se.emilsjolander.sprinkles.exceptions.NoTableAnnotationException;
 import se.emilsjolander.sprinkles.typeserializers.SqlType;
 
 class ModelInfo {
@@ -92,7 +94,7 @@ class ModelInfo {
         for (Field field : fields) {
             if (field.isAnnotationPresent(DynamicColumn.class)) {
                 DynamicColumnField column = new DynamicColumnField();
-                column.name = field.getAnnotation(DynamicColumn.class).value();
+                column.name = getDynamicColumnName(field);
                 column.sqlType = Sprinkles.sInstance.typeSerializers.get(field.getType()).getSqlType().name();
                 column.field = field;
                 info.dynamicColumns.add(column);
@@ -102,7 +104,7 @@ class ModelInfo {
 
             } else if (field.isAnnotationPresent(Column.class)) {
                 StaticColumnField column = new StaticColumnField();
-                column.name = field.getAnnotation(Column.class).value();
+                column.name = getColumnName(field);
 
                 column.isAutoIncrement = field.isAnnotationPresent(AutoIncrementPrimaryKey.class);
                 column.isForeignKey = field.isAnnotationPresent(ForeignKey.class);
@@ -154,7 +156,7 @@ class ModelInfo {
             throw new EmptyTableException(clazz.getName());
         }
         if (Model.class.isAssignableFrom(clazz)) {
-            info.tableName = Utils.getTableName((Class<? extends Model>) clazz);
+            info.tableName = getTableName((Class<? extends Model>) clazz);
             if (info.primaryKeys.size() == 0) {
                 throw new NoPrimaryKeysException();
             }
@@ -167,4 +169,22 @@ class ModelInfo {
         return info;
     }
 
+    private static <T extends Model> String getTableName(Class<T> clazz) {
+        if (!clazz.isAnnotationPresent(Table.class)) {
+            throw new NoTableAnnotationException();
+        }
+
+        String name = clazz.getAnnotation(Table.class).value().trim();
+        return name.isEmpty() ? clazz.getSimpleName() : name;
+    }
+
+    private static String getColumnName(Field field) {
+        String name = field.getAnnotation(Column.class).value().trim();
+        return name.isEmpty() ? field.getName() : name;
+    }
+
+    private static String getDynamicColumnName(Field field) {
+        String name = field.getAnnotation(DynamicColumn.class).value().trim();
+        return name.isEmpty() ? field.getName() : name;
+    }
 }

@@ -60,7 +60,7 @@ public abstract class Model implements QueryResult {
 		final Model m = Query.one(
 				getClass(),
 				String.format("SELECT * FROM %s WHERE %s LIMIT 1",
-						Utils.getTableName(getClass()),
+                        ModelInfo.from(getClass()).tableName,
 						Utils.getWhereStatement(this))).get();
 		return m != null;
 	}
@@ -97,21 +97,22 @@ public abstract class Model implements QueryResult {
 			return false;
 		}
 
+        final ModelInfo info = ModelInfo.from(getClass());
+
         beforeSave();
         if (exists()) {
-            if (t.update(Utils.getTableName(getClass()),
+            if (t.update(info.tableName,
                     Utils.getContentValues(this), Utils.getWhereStatement(this)) == 0) {
                 return false;
             }
         } else {
             beforeCreate();
-            long id = t.insert(Utils.getTableName(getClass()), Utils.getContentValues(this));
+            long id = t.insert(info.tableName, Utils.getContentValues(this));
             if (id == -1) {
                 return false;
             }
 
             // set the @AutoIncrement column if one exists
-            final ModelInfo info = ModelInfo.from(getClass());
             if (info.autoIncrementColumn != null) {
                 info.autoIncrementColumn.field.setAccessible(true);
                 try {
@@ -183,7 +184,7 @@ public abstract class Model implements QueryResult {
      *      The transaction to delete this model in
      */
 	final public void delete(Transaction t) {
-		t.delete(Utils.getTableName(getClass()), Utils.getWhereStatement(this));
+		t.delete(ModelInfo.from(getClass()).tableName, Utils.getWhereStatement(this));
         t.addOnTransactionCommittedListener(new OnTransactionCommittedListener() {
 
             @Override

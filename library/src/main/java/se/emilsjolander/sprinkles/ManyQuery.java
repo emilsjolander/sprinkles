@@ -67,14 +67,13 @@ public final class ManyQuery<T extends QueryResult> {
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public void getAsync(LoaderManager lm,
 			ResultHandler<T> handler,
-			Class<?>... respondsToUpdatedOf) {
+			Class<? extends Model>... respondsToUpdatedOf) {
         if (Model.class.isAssignableFrom(resultClass)) {
             respondsToUpdatedOf = Utils.concatArrays(respondsToUpdatedOf, new Class[]{resultClass});
         }
 		final int loaderId = sqlQuery.hashCode();
 		lm.initLoader(loaderId, null,
-				getLoaderCallbacks(sqlQuery, resultClass, handler,
-						(Class<? extends Model>[]) respondsToUpdatedOf));
+				getLoaderCallbacks(sqlQuery, resultClass, handler, respondsToUpdatedOf));
 	}
 
 
@@ -93,14 +92,13 @@ public final class ManyQuery<T extends QueryResult> {
     @SuppressWarnings("unchecked")
 	public void getAsync(android.support.v4.app.LoaderManager lm,
 			ResultHandler<T> handler,
-			Class<?>... respondsToUpdatedOf) {
+			Class<? extends Model>... respondsToUpdatedOf) {
         if (Model.class.isAssignableFrom(resultClass)) {
             respondsToUpdatedOf = Utils.concatArrays(respondsToUpdatedOf, new Class[]{resultClass});
         }
 		final int loaderId = sqlQuery.hashCode();
 		lm.initLoader(loaderId, null,
-				getSupportLoaderCallbacks(sqlQuery, resultClass, handler,
-                        (Class<? extends Model>[]) respondsToUpdatedOf));
+				getSupportLoaderCallbacks(sqlQuery, resultClass, handler, respondsToUpdatedOf));
 	}
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)

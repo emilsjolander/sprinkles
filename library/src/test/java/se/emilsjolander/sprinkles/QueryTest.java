@@ -83,41 +83,6 @@ public class QueryTest {
     }
 
     @Test
-    public void async() throws InterruptedException {
-        /*
-        for (int i = 0 ; i<10 ; i++) {
-            TestModel t = new TestModel();
-            t.setTitle("title"+i);
-            t.save();
-        }
-
-        final CountDownLatch latch = new CountDownLatch(1);
-        Activity activity = Robolectric.buildActivity(TestActivity.class).create().get();
-        Query.all(TestModel.class).getAsync(activity.getLoaderManager(), new ManyQuery.ResultHandler<TestModel>() {
-            @Override
-            public boolean handleResult(CursorList<TestModel> result) {
-                assertEquals(result.size(), 10);
-                latch.countDown();
-                return false;
-            }
-        });
-
-        assertTrue(latch.await(30, TimeUnit.SECONDS));
-        */
-        assertTrue(false);
-    }
-
-    @Test
-    public void updates() {
-        assertTrue(false);
-    }
-
-    @Test
-    public void noUpdates() {
-        assertTrue(false);
-    }
-
-    @Test
     public void dynamicColumnResult() {
         for (int i = 0 ; i<10 ; i++) {
             TestModel t = new TestModel();

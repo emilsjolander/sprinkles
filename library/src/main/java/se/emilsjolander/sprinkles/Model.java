@@ -1,8 +1,10 @@
 package se.emilsjolander.sprinkles;
 
+import android.content.ContentValues;
 import android.os.AsyncTask;
 
 import se.emilsjolander.sprinkles.Transaction.OnTransactionCommittedListener;
+import se.emilsjolander.sprinkles.exceptions.ContentValuesEmptyException;
 
 public abstract class Model implements QueryResult {
 
@@ -98,14 +100,18 @@ public abstract class Model implements QueryResult {
 		}
 
         beforeSave();
+        final ContentValues cv = Utils.getContentValues(this);
+        if (cv.size() == 0) {
+            throw new ContentValuesEmptyException();
+        }
+        final String tableName = Utils.getTableName(getClass());
         if (exists()) {
-            if (t.update(Utils.getTableName(getClass()),
-                    Utils.getContentValues(this), Utils.getWhereStatement(this)) == 0) {
+            if (t.update(tableName, cv, Utils.getWhereStatement(this)) == 0) {
                 return false;
             }
         } else {
             beforeCreate();
-            long id = t.insert(Utils.getTableName(getClass()), Utils.getContentValues(this));
+            long id = t.insert(tableName, cv);
             if (id == -1) {
                 return false;
             }

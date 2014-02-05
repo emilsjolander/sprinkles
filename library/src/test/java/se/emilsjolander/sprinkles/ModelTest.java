@@ -170,9 +170,10 @@ public class ModelTest {
         TestModel m = new TestModel();
         m.setTitle("hej");
         assertTrue(m.save());
+        assertEquals(Query.one(TestModel.class, "select * from Tests").get().getTitle(), "hej");
         m.setTitle(null);
         assertTrue(m.save());
-        assertEquals(Query.one(TestModel.class, "select * from Tests").get().getTitle(), "hej");
+        assertEquals(Query.one(TestModel.class, "select * from Tests").get().getTitle(), null);
     }
 
     @Test

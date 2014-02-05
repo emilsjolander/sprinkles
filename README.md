@@ -8,15 +8,15 @@ A intro into sprinkles can be found in this blog post http://emilsjolander.githu
 
 Download
 --------
-I prefer cloning my libraries and adding them as a dependency manually. This way, I can easily fix a bug in the library as part of my workflow and commit it upstream (please do!).
-
-However I know a lot of people like using gradle so here is the dependency to add to your `build.gradle`. Just replace `x.x.x` with the correct version of the library (found under the releases tab).
+Using gradle, add the following to your `build.gradle`. Just replace `x.x.x` with the correct version of the library (found under the releases tab).
 
 ```Groovy
 dependencies {
     compile 'se.emilsjolander:sprinkles:x.x.x'
 }
 ```
+
+If you are not using gradle for whatever reason i suggest you clone the repository and check out the latest tag.
 
 Getting started
 ---------------

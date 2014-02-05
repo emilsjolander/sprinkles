@@ -76,9 +76,7 @@ class Utils {
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
-			if (value != null) {
-                Sprinkles.sInstance.getTypeSerializer(value.getClass()).pack(value, values, column.name);
-			}
+            Sprinkles.sInstance.getTypeSerializer(column.field.getType()).pack(value, values, column.name);
 		}
 		
 		return values;

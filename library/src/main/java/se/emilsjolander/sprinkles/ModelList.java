@@ -18,7 +18,7 @@ public class ModelList<E extends Model> extends ArrayList<E> {
     }
 
     public static <E extends Model> ModelList<E> from(CursorList<E> cursorList) {
-        return (ModelList<E>) cursorList.asList();
+        return new ModelList<E>(cursorList.asList());
     }
 
     public ModelList() {

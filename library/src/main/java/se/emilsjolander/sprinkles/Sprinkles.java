@@ -51,17 +51,27 @@ public class Sprinkles {
 
     /**
      *
+     * Initialize sprinkles so queries and migrations can be performed
+     *
      * @param context
      *      A context which is used for database operations. This context is not saved, however it's application context is.
      *
      * @return The singleton Sprinkles instance. Use this to add migrations.
      */
+    public static Sprinkles init(Context context) {
+        if (sInstance == null) {
+            sInstance = new Sprinkles();
+        }
+        sInstance.mContext = context.getApplicationContext();
+        return sInstance;
+    }
+
+    /**
+     * Use init() instead.
+     */
+    @Deprecated
 	public static Sprinkles getInstance(Context context) {
-		if (sInstance == null) {
-			sInstance = new Sprinkles();
-		}
-		sInstance.mContext = context.getApplicationContext();
-		return sInstance;
+		return init(context);
 	}
 
     /**

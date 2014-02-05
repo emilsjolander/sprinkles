@@ -42,7 +42,7 @@ public class CursorIteratorTest {
 
     @Before
     public void initSprinkles() {
-        Sprinkles.getInstance(Robolectric.application);
+        Sprinkles.init(Robolectric.application);
     }
 
     @Before

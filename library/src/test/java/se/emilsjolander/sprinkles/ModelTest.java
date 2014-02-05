@@ -82,7 +82,7 @@ public class ModelTest {
     @Before
     public void initTables() {
         Sprinkles.dropInstances();
-        Sprinkles sprinkles = Sprinkles.getInstance(Robolectric.application);
+        Sprinkles sprinkles = Sprinkles.init(Robolectric.application);
         sprinkles.addMigration(new Migration().createTable(TestModel.class));
     }
 

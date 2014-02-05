@@ -51,7 +51,7 @@ public class MyApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 
-		Sprinkles sprinkles = Sprinkles.getInstance(getApplicationContext());
+		Sprinkles sprinkles = Sprinkles.init(getApplicationContext());
 
 		Migration initialMigration = new Migration();
 		initialMigration.createTable(Note.class);
@@ -221,7 +221,7 @@ public class MyApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 
-		Sprinkles sprinkles = Sprinkles.getInstance(getApplicationContext());
+		Sprinkles sprinkles = Sprinkles.init(getApplicationContext());
 
 		Migration initialMigration = new Migration();
 		initialMigration.createTable(Note.class);

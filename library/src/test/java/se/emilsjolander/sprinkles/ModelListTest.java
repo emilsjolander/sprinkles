@@ -1,13 +1,13 @@
 package se.emilsjolander.sprinkles;
 
+import android.database.MatrixCursor;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-
-import android.database.MatrixCursor;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -16,9 +16,7 @@ import se.emilsjolander.sprinkles.annotations.AutoIncrementPrimaryKey;
 import se.emilsjolander.sprinkles.annotations.Column;
 import se.emilsjolander.sprinkles.annotations.Table;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.*;
 
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
@@ -48,7 +46,7 @@ public class ModelListTest {
     @Before
     public void initTables() {
         Sprinkles.dropInstances();
-        Sprinkles sprinkles = Sprinkles.getInstance(Robolectric.application);
+        Sprinkles sprinkles = Sprinkles.init(Robolectric.application);
         sprinkles.addMigration(new Migration().createTable(TestModel.class));
     }
 

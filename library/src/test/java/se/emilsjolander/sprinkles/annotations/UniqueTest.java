@@ -38,7 +38,7 @@ public class UniqueTest {
     @Test
 	public void enforced() {
         Sprinkles.dropInstances();
-		Sprinkles sprinkles = Sprinkles.getInstance(Robolectric.application);
+		Sprinkles sprinkles = Sprinkles.init(Robolectric.application);
 		sprinkles.addMigration(new Migration().createTable(TestModel.class));
 
         TestModel t1 = new TestModel();

@@ -56,7 +56,7 @@ public class UtilsTest {
 
     @Before
     public void initSprinkles() {
-        Sprinkles.getInstance(Robolectric.application);
+        Sprinkles.init(Robolectric.application);
     }
 
     @Test

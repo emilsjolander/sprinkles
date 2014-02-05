@@ -46,7 +46,7 @@ public class QueryTest {
     @Before
     public void initTables() {
         Sprinkles.dropInstances();
-        Sprinkles.getInstance(Robolectric.application).addMigration(new Migration().createTable(TestModel.class));
+        Sprinkles.init(Robolectric.application).addMigration(new Migration().createTable(TestModel.class));
     }
 
     @Test

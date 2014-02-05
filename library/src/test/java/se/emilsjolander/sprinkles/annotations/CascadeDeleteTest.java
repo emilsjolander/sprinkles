@@ -44,7 +44,7 @@ public class CascadeDeleteTest {
     @Before
     public void initTables() {
         Sprinkles.dropInstances();
-        Sprinkles.getInstance(Robolectric.application)
+        Sprinkles.init(Robolectric.application)
                 .addMigration(new Migration().createTable(ForeignModel.class).createTable(TestModel.class));
     }
 

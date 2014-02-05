@@ -5,14 +5,16 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import static junit.framework.Assert.assertTrue;
+import se.emilsjolander.sprinkles.exceptions.NoTypeSerializerFoundException;
+
+import static junit.framework.Assert.*;
 
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
 public class SprinklesTest {
 
     @Test
-    public void getInstance() {
+    public void init() {
         assertTrue(false);
     }
 
@@ -23,6 +25,16 @@ public class SprinklesTest {
 
     @Test
     public void registerType() {
+        assertTrue(false);
+    }
+
+    @Test
+    public void getExistingTypeSerializer() {
+        assertTrue(false);
+    }
+
+    @Test(expected = NoTypeSerializerFoundException.class)
+    public void getNonExistingTypeSerializer() {
         assertTrue(false);
     }
 

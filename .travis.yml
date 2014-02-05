@@ -1,44 +1,10 @@
-# First, declare language
-language:
-  - java
-# I'm using openjdk6, because Android Java code has 1.6 compatibility
-jdk:
-  - openjdk6
-env:
-  matrix:
-    - ANDROID_SDKS=android-19,sysimg-19  ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a
-# just to map the environment, and see the tool versions
+language: java
+
+jdk: oraclejdk7
+
 before_install:
-
-  # required libs for android build tools
-  - if [ `uname -m` = x86_64 ]; then sudo apt-get update; fi
-  - if [ `uname -m` = x86_64 ]; then sudo apt-get install -qq --force-yes libgd2-xpm ia32-libs ia32-libs-multiarch; fi
-  # for gradle output style
-  # only needed for Travis, not for standard xterm
   - export TERM=dumb
-
-  # Install base Android SDK
-  - wget http://dl.google.com/android/android-sdk_r22.3-linux.tgz
-  - tar xzf android-sdk_r22.3-linux.tgz
-  - export ANDROID_HOME=$PWD/android-sdk-linux
-  - export PATH=${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
-
-  # install android build tools
-  - wget https://dl-ssl.google.com/android/repository/build-tools_r19-linux.zip
-  - unzip build-tools_r19-linux.zip -d $ANDROID_HOME
-  - mkdir -p $ANDROID_HOME/build-tools/
-  - mv $ANDROID_HOME/android-4.4 $ANDROID_HOME/build-tools/19
-
-  # Install required components.
-  # For a full list, run `android list sdk -a --extended`
-  # Note that sysimg-18 downloads the ARM, x86 and MIPS images (we should optimize this).
-  # Other relevant API's
-  - echo yes | android update sdk --filter platform-tools --no-ui --force > /dev/null
-  - echo yes | android update sdk --filter android-18 --no-ui --force > /dev/null
-  - echo yes | android update sdk --filter android-19 --no-ui --force > /dev/null
-  - echo yes | android update sdk --filter sysimg-19 --no-ui --force > /dev/null
-  - echo yes | android update sdk --filter extra-android-support --no-ui --force > /dev/null
-  - echo yes | android update sdk --filter extra-android-m2repository --no-ui --force > /dev/null
-
-  # manually set sdk.dir variable, according to local paths
-  - echo "sdk.dir=$ANDROID_HOME" > local.properties
+  - sudo apt-get install -qq libstdc++6:i386 lib32z1
+  - export COMPONENTS=build-tools-19.0.1,android-17
+  - curl -L https://raw.github.com/embarkmobile/android-sdk-installer/version-1/android-sdk-installer | bash /dev/stdin --install=$COMPONENTS
+  - source ~/.android-sdk-installer/env

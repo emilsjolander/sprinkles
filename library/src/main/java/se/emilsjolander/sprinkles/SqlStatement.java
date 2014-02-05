@@ -1,8 +1,5 @@
 package se.emilsjolander.sprinkles;
 
-/**
- * Created by emilsjolander on 06/02/14.
- */
 public class SqlStatement {
 
     String sql;

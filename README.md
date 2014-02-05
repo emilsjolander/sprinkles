@@ -38,7 +38,7 @@ public class Note extends Model {
 	public long getId() {
 		return id;
 	}
-	
+
 }
 ```
 Ok, a lot of important stuff in this short class. First of all, a model must subclass `se.emilsjolander.sprinkles.Model` and it also must have a `@Table` annotations specifying the table name that the model corresponds to. After the class declaration we have declared three members: `id`, `title` and `body`. Notice how all of them have a `@Column` annotation to mark that they are not only a member of this class but also a column of the table that this class represents. We have one last annotation in the above example. The `@AutoIncrementPrimaryKey`, this annotation tells sprinkles that the field is both an autoincrement field and a primary key field. A field with this annotation will automatically be set upon the creation of its corresponding row in the table.
@@ -46,13 +46,13 @@ Ok, a lot of important stuff in this short class. First of all, a model must sub
 Before using this class you must migrate it into the database. I recommend doing this in the `onCreate()` method of an `Application` subclass like this:
 ```java
 public class MyApplication extends Application {
-	
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		
+
 		Sprinkles sprinkles = Sprinkles.getInstance(getApplicationContext());
-		
+
 		Migration initialMigration = new Migration();
 		initialMigration.createTable(Note.class);
 		sprinkles.addMigration(initialMigration);
@@ -140,8 +140,24 @@ All Queries return a `CursorList` subclass. This is a `Iterable` subclass which 
 public int size();
 public T get(int pos);
 public List<T> asList();
-``` 
+```
 Remember to always call `close()` on a `CursorList` instance! This will close the underlying cursor.
+
+###ModelList
+For mass saving/deletion of models you can use the `ModelList` class. It extends `ArrayList` and has the following additional methods:
+```java
+public static <E extends Model> ModelList<E> from(CursorList<E> cursorList);
+public boolean saveAll();
+public boolean saveAll(Transaction t);
+public void saveAllAsync();
+public void saveAllAsync(OnAllSavedCallback callback);
+public void deleteAll();
+public void deleteAll(Transaction t);
+public void deleteAllAsync();
+public void deleteAllAsync(OnAllDeletedCallback callback);
+```
+
+`from(CursorList<E extends Model> cursorList)` is a helper method which creates a `ModelList` from a `CursorList`, so you can e.g. delete all models from a previous query in one batch. Be aware, that the cursor is not closed for you when calling this method and you have to do it yourself!
 
 ###Transactions
 Both `save()` and `delete()` methods exist which take in a `Transaction`. Here is a quick example on how to use them. If any exception is thrown while saving a model or if any model fails to save the transaction will be rolled back.
@@ -200,13 +216,13 @@ protected void afterDelete() {
 Migrations are the way you add things to your database. I suggest putting all your migrations in the `onCreate()` method of a `Application` subclass. Here is a quick example of how that would look:
 ```java
 public class MyApplication extends Application {
-	
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		
+
 		Sprinkles sprinkles = Sprinkles.getInstance(getApplicationContext());
-		
+
 		Migration initialMigration = new Migration();
 		initialMigration.createTable(Note.class);
 		sprinkles.addMigration(initialMigration);

@@ -93,7 +93,7 @@ class ModelInfo {
             if (field.isAnnotationPresent(DynamicColumn.class)) {
                 DynamicColumnField column = new DynamicColumnField();
                 column.name = field.getAnnotation(DynamicColumn.class).value();
-                column.sqlType = Sprinkles.sInstance.typeSerializers.get(field.getType()).getSqlType().name();
+                column.sqlType = Sprinkles.sInstance.getTypeSerializer(field.getType()).getSqlType().name();
                 column.field = field;
                 info.dynamicColumns.add(column);
                 if (!info.columns.add(column)) {
@@ -118,7 +118,7 @@ class ModelInfo {
                     throw new CannotCascadeDeleteNonForeignKey();
                 }
 
-                column.sqlType = Sprinkles.sInstance.typeSerializers.get(field.getType()).getSqlType().name();
+                column.sqlType = Sprinkles.sInstance.getTypeSerializer(field.getType()).getSqlType().name();
                 column.field = field;
 
                 if (column.isAutoIncrement && !column.sqlType.equals(SqlType.INTEGER.name())) {

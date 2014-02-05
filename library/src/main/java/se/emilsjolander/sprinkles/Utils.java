@@ -26,7 +26,7 @@ class Utils {
                 }
 				column.field.setAccessible(true);
 				final Class<?> type = column.field.getType();
-                Object o = Sprinkles.sInstance.typeSerializers.get(type).unpack(c, column.name);
+                Object o = Sprinkles.sInstance.getTypeSerializer(type).unpack(c, column.name);
                 column.field.set(result, o);
 			}
 			return result;
@@ -77,7 +77,7 @@ class Utils {
 				throw new RuntimeException(e);
 			}
 			if (value != null) {
-                Sprinkles.sInstance.typeSerializers.get(value.getClass()).pack(value, values, column.name);
+                Sprinkles.sInstance.getTypeSerializer(value.getClass()).pack(value, values, column.name);
 			}
 		}
 		

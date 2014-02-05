@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import se.emilsjolander.sprinkles.exceptions.NoTypeSerializerFoundException;
 import se.emilsjolander.sprinkles.typeserializers.BooleanSerializer;
 import se.emilsjolander.sprinkles.typeserializers.DateSerializer;
 import se.emilsjolander.sprinkles.typeserializers.DoubleSerializer;
@@ -22,7 +23,7 @@ public class Sprinkles {
 	static Sprinkles sInstance;
 	Context mContext;
 	List<Migration> mMigrations = new ArrayList<Migration>();
-    Map<Class, TypeSerializer> typeSerializers = new ConcurrentHashMap<Class, TypeSerializer>();
+    private Map<Class, TypeSerializer> typeSerializers = new ConcurrentHashMap<Class, TypeSerializer>();
 
 	private Sprinkles() {
 		addStandardTypeSerializers();
@@ -84,6 +85,13 @@ public class Sprinkles {
 
     public <T> void registerType(Class<T> clazz, TypeSerializer<T> serializer) {
         typeSerializers.put(clazz, serializer);
+    }
+
+    TypeSerializer getTypeSerializer(Class<?> type) {
+        if (!typeSerializers.containsKey(type)) {
+            throw new NoTypeSerializerFoundException(type);
+        }
+        return typeSerializers.get(type);
     }
 
 }

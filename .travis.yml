@@ -1,12 +1,17 @@
 language: java
 jdk: oraclejdk7
+
 before_install:
-    # Install base Android SDK and components
-    - sudo apt-get update -qq
-    - sudo apt-get install -qq libstdc++6:i386 lib32z1
-    - export COMPONENTS=platform-tools,build-tools-19.0.0,android-18,extra-android-support,extra-android-m2repository
-    - curl -L https://raw.github.com/embarkmobile/android-sdk-installer/version-1/android-sdk-installer | bash /dev/stdin --install=$COMPONENTS
-    - source ~/.android-sdk-installer/env
+  # Install base Android SDK
+  - sudo apt-get update -qq
+  - if [ `uname -m` = x86_64 ]; then sudo apt-get install -qq --force-yes libgd2-xpm ia32-libs ia32-libs-multiarch > /dev/null; fi
+  - wget http://dl.google.com/android/android-sdk_r22.3-linux.tgz
+  - tar xzf android-sdk_r22.3-linux.tgz
+  - export ANDROID_HOME=$PWD/android-sdk-linux
+  - export PATH=${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
+
+  # Install required components.
+  - echo yes | android update sdk -a -t platform-tools,build-tools-18.0.0,android-18,extra-android-support,extra-android-m2repository --no-ui --force > /dev/null
 
 install:
     - ./gradlew assemble -s

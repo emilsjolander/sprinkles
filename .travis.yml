@@ -9,7 +9,7 @@ before_install:
     - source ~/.android-sdk-installer/env
 
 install:
-    - ./gradlew assemble
+    - ./gradlew assemble -v
 
 script:
-    - ./gradlew clean check
+    - ./gradlew clean check -v

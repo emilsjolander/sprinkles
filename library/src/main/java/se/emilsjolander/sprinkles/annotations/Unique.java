@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  *
  * @Unique(ConflictClause.ROLLBACK) private String name;
  * }. If no {@code ConflictClause} is specified, the default behavior will be used.
- * @see http://www.sqlite.org/syntaxdiagrams.html#conflict-clause
+ * @see <a href="http://www.sqlite.org/syntaxdiagrams.html#conflict-clause">http://www.sqlite.org/syntaxdiagrams.html#conflict-clause</a>
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)

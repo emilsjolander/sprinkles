@@ -12,7 +12,7 @@ import se.emilsjolander.sprinkles.exceptions.NoSuchColumnFoundException;
  * A class representing database migration. Multiple statements can be made within one migration.
  * Once a production app has shipped with a migration it should never be altered or removed.
  * Sprinkles will make sure that the correct migrations are performed when a user upgrades to the
- * lastest version of your app.
+ * latest version of your app.
  */
 public class Migration {
 

@@ -3,7 +3,7 @@ package se.emilsjolander.sprinkles.annotations;
 /**
  * Specifies how Sprinkle should handle conflicts using SQLite ON CONFLICT clauses.
  *
- * @see http://www.sqlite.org/lang_conflict.html
+ * @see <a href="http://www.sqlite.org/lang_conflict.html">http://www.sqlite.org/lang_conflict.html</a>
  */
 public enum ConflictClause {
 	/**

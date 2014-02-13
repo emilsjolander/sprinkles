@@ -1,5 +1,6 @@
 package se.emilsjolander.sprinkles;
 
+import android.content.ContentValues;
 import android.database.ContentObserver;
 import android.os.Handler;
 
@@ -10,6 +11,7 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -18,6 +20,7 @@ import se.emilsjolander.sprinkles.annotations.Column;
 import se.emilsjolander.sprinkles.annotations.Table;
 
 import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertEquals;
 
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
@@ -31,6 +34,9 @@ public class ModelTest {
 
         @Column("title")
         private String title;
+
+        @Column("created_at")
+        private Date createdAt;
 
         private boolean valid = true;
         public boolean created;
@@ -64,6 +70,7 @@ public class ModelTest {
 
         @Override
         public void beforeCreate() {
+            createdAt = new Date();
             created = true;
         }
 
@@ -102,8 +109,12 @@ public class ModelTest {
     public void beforeCreate() {
         TestModel m = new TestModel();
         m.setTitle("hej");
-
         m.save();
+
+        ContentValues contentValues = Utils.getContentValues(m);
+        assertEquals(2, contentValues.size());
+        assertNotNull(m.createdAt);
+
         assertTrue(m.created);
         m.created = false;
 

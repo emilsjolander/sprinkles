@@ -101,7 +101,7 @@ public abstract class Model implements QueryResult {
 
         boolean doesExist = exists();
         if (!doesExist) {
-            beforeCreate()
+            beforeCreate();
         }
 
         beforeSave();

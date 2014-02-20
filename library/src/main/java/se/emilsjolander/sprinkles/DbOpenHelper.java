@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-class DbOpenHelper extends SQLiteOpenHelper {
+public class DbOpenHelper extends SQLiteOpenHelper {
 
 	private DbOpenHelper(Context context, String dbName) {
 
@@ -36,7 +36,7 @@ class DbOpenHelper extends SQLiteOpenHelper {
 		}
 	}
 
-	static SQLiteDatabase sInstance;
+	public static SQLiteDatabase sInstance;
 
 	static synchronized SQLiteDatabase getInstance() {
 		if (sInstance == null) {

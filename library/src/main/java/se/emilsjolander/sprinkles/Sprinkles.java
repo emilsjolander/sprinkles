@@ -1,6 +1,7 @@
 package se.emilsjolander.sprinkles;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,7 +23,6 @@ public class Sprinkles {
 
 	static Sprinkles sInstance;
 	Context mContext;
-    String dbName;
 	List<Migration> mMigrations = new ArrayList<Migration>();
     private Map<Class, TypeSerializer> typeSerializers = new ConcurrentHashMap<Class, TypeSerializer>();
 
@@ -52,7 +52,7 @@ public class Sprinkles {
 
     /**
      *
-     * Initialize sprinkles so queries and migrations can be performed. The name of the DB will be "sprinkles.db"
+     * Initialize sprinkles so queries and migrations can be performed
      *
      * @param context
      *      A context which is used for database operations. This context is not saved, however it's application context is.
@@ -60,27 +60,30 @@ public class Sprinkles {
      * @return The singleton Sprinkles instance. Use this to add migrations.
      */
     public static Sprinkles init(Context context) {
-        return init(context, "sprinkles.db");
+        return init(context, null);
     }
 
     /**
      *
-     * Initialize sprinkles so queries and migrations can be performed
+     * Initialize sprinkles so queries can be performed
      *
      * @param context
      *      A context which is used for database operations. This context is not saved, however it's application context is.
      *
-     * @param dbName
-     *      The name of the database.
+     * @param db
+     *     A existing database. If provided, Sprinkles will not execute the migrations on the DB.
+     *     This is useful if you use a database provided in your assets folder (with https://github.com/jgilfelt/android-sqlite-asset-helper for example)
      *
-     * @return The singleton Sprinkles instance. Use this to add migrations.
+     * @return The singleton Sprinkles instance.
      */
-    public static Sprinkles init(Context context, String dbName) {
+    public static Sprinkles init(Context context, SQLiteDatabase db) {
         if (sInstance == null) {
             sInstance = new Sprinkles();
         }
         sInstance.mContext = context.getApplicationContext();
-        sInstance.dbName= dbName;
+
+        // Hijacks the DbOpenHelper db creation process.
+        DbOpenHelper.sInstance = db;
         return sInstance;
     }
 

@@ -4,13 +4,13 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class DbOpenHelper extends SQLiteOpenHelper {
+class DbOpenHelper extends SQLiteOpenHelper {
 
-	private DbOpenHelper(Context context, String dbName) {
+	private DbOpenHelper(Context context) {
 
         // +1 because version number for databases starts at 1, not 0
         // This is needed when opening an existing database.
-		super(context, dbName, null,
+		super(context, "sprinkles.db", null,
 				Sprinkles.sInstance.mMigrations.size() + 1);
 	}
 
@@ -36,11 +36,11 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 		}
 	}
 
-	public static SQLiteDatabase sInstance;
+	static SQLiteDatabase sInstance;
 
 	static synchronized SQLiteDatabase getInstance() {
 		if (sInstance == null) {
-			sInstance = new DbOpenHelper(Sprinkles.sInstance.mContext, Sprinkles.sInstance.dbName).getWritableDatabase();
+			sInstance = new DbOpenHelper(Sprinkles.sInstance.mContext).getWritableDatabase();
 		}
 		return sInstance;
 	}

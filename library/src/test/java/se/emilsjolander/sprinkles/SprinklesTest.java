@@ -57,25 +57,6 @@ public class SprinklesTest {
     }
 
     @Test
-    public void initWithDefaultDatabaseName() {
-        assertNull(Sprinkles.sInstance);
-        Sprinkles.init(Robolectric.application);
-        SQLiteDatabase database = DbOpenHelper.getInstance();
-        File databaseFile = new File(database.getPath());
-        assertEquals("sprinkles.db", databaseFile.getName());
-    }
-
-    @Test
-    public void initWithDatabaseName() {
-        String dbName = "robolectric-db.sqlite";
-        assertNull(Sprinkles.sInstance);
-        Sprinkles.init(Robolectric.application, dbName);
-        SQLiteDatabase database = DbOpenHelper.getInstance();
-        File databaseFile = new File(database.getPath());
-        assertEquals(dbName, databaseFile.getName());
-    }
-
-    @Test
     public void addMigration() {
         Sprinkles s = Sprinkles.init(Robolectric.application);
         assertEquals(s.mMigrations.size(), 0);

@@ -2,6 +2,7 @@ package se.emilsjolander.sprinkles;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -9,6 +10,8 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+
+import java.io.File;
 
 import se.emilsjolander.sprinkles.exceptions.NoTypeSerializerFoundException;
 import se.emilsjolander.sprinkles.typeserializers.SqlType;
@@ -51,6 +54,25 @@ public class SprinklesTest {
         assertNotNull(Sprinkles.sInstance);
         Sprinkles s2 = Sprinkles.init(Robolectric.application);
         assertEquals(s1, s2);
+    }
+
+    @Test
+    public void initWithDefaultDatabaseName() {
+        assertNull(Sprinkles.sInstance);
+        Sprinkles.init(Robolectric.application);
+        SQLiteDatabase database = DbOpenHelper.getInstance();
+        File databaseFile = new File(database.getPath());
+        assertEquals("sprinkles.db", databaseFile.getName());
+    }
+
+    @Test
+    public void initWithDatabaseName() {
+        String dbName = "robolectric-db.sqlite";
+        assertNull(Sprinkles.sInstance);
+        Sprinkles.init(Robolectric.application, dbName);
+        SQLiteDatabase database = DbOpenHelper.getInstance();
+        File databaseFile = new File(database.getPath());
+        assertEquals(dbName, databaseFile.getName());
     }
 
     @Test

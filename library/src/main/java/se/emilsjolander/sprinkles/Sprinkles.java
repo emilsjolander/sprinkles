@@ -22,6 +22,7 @@ public class Sprinkles {
 
 	static Sprinkles sInstance;
 	Context mContext;
+    String dbName;
 	List<Migration> mMigrations = new ArrayList<Migration>();
     private Map<Class, TypeSerializer> typeSerializers = new ConcurrentHashMap<Class, TypeSerializer>();
 
@@ -51,7 +52,7 @@ public class Sprinkles {
 
     /**
      *
-     * Initialize sprinkles so queries and migrations can be performed
+     * Initialize sprinkles so queries and migrations can be performed. The name of the DB will be "sprinkles.db"
      *
      * @param context
      *      A context which is used for database operations. This context is not saved, however it's application context is.
@@ -59,10 +60,27 @@ public class Sprinkles {
      * @return The singleton Sprinkles instance. Use this to add migrations.
      */
     public static Sprinkles init(Context context) {
+        return init(context, "sprinkles.db");
+    }
+
+    /**
+     *
+     * Initialize sprinkles so queries and migrations can be performed
+     *
+     * @param context
+     *      A context which is used for database operations. This context is not saved, however it's application context is.
+     *
+     * @param dbName
+     *      The name of the database.
+     *
+     * @return The singleton Sprinkles instance. Use this to add migrations.
+     */
+    public static Sprinkles init(Context context, String dbName) {
         if (sInstance == null) {
             sInstance = new Sprinkles();
         }
         sInstance.mContext = context.getApplicationContext();
+        sInstance.dbName= dbName;
         return sInstance;
     }
 

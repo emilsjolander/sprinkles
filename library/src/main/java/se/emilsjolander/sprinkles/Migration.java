@@ -12,7 +12,7 @@ import se.emilsjolander.sprinkles.exceptions.NoSuchColumnFoundException;
  * A class representing database migration. Multiple statements can be made within one migration.
  * Once a production app has shipped with a migration it should never be altered or removed.
  * Sprinkles will make sure that the correct migrations are performed when a user upgrades to the
- * lastest version of your app.
+ * latest version of your app.
  */
 public class Migration {
 
@@ -171,6 +171,34 @@ public class Migration {
                 info.tableName, newColumn.name, newColumn.sqlType));
 		return this;
 	}
+
+    public Migration createIndex(String indexName, boolean unique, Class<? extends Model> clazz, String... columnNames) {
+        StringBuilder statement = new StringBuilder();
+        statement.append("CREATE ");
+        if (unique) {
+            statement.append("UNIQUE ");
+        }
+        statement.append("INDEX ");
+        statement.append(indexName);
+        statement.append(" ");
+        statement.append("ON ");
+        statement.append(Utils.getTableName(clazz));
+        statement.append("(");
+        for (String col : columnNames) {
+            statement.append(col);
+            if (!col.equals(columnNames[columnNames.length-1])) {
+                statement.append(",");
+            }
+        }
+        statement.append(");");
+        mStatements.add(statement.toString());
+        return this;
+    }
+
+    public Migration dropIndex(String indexName) {
+        mStatements.add(String.format("DROP INDEX IF EXISTS %s;", indexName));
+        return this;
+    }
 
 	/**
 	 * Add a raw sql statement to be executed within a migration.

@@ -99,6 +99,24 @@ public class MigrationTest {
     }
 
     @Test
+    public void addIndex() {
+        Migration m = new Migration();
+        m.createIndex("TitleIndex", true, TestModel.class, "title");
+        assertEquals(m.mStatements.get(m.mStatements.size() - 1),
+                "CREATE UNIQUE INDEX TitleIndex ON Tests(title);"
+        );
+    }
+
+    @Test
+    public void dropIndex() {
+        Migration m = new Migration();
+        m.dropIndex("TitleIndex");
+        assertEquals(m.mStatements.get(m.mStatements.size() - 1),
+                "DROP INDEX IF EXISTS TitleIndex;"
+        );
+    }
+
+    @Test
     public void addRawStatement() {
         Migration m = new Migration();
         m.addRawStatement("my little pony, this should not be changed.");

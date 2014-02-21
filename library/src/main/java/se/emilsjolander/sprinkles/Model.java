@@ -99,18 +99,22 @@ public abstract class Model implements QueryResult {
 			return false;
 		}
 
+        boolean doesExist = exists();
+        if (!doesExist) {
+            beforeCreate();
+        }
+
         beforeSave();
         final ContentValues cv = Utils.getContentValues(this);
         if (cv.size() == 0) {
             throw new ContentValuesEmptyException();
         }
         final String tableName = Utils.getTableName(getClass());
-        if (exists()) {
+        if (doesExist) {
             if (t.update(tableName, cv, Utils.getWhereStatement(this)) == 0) {
                 return false;
             }
         } else {
-            beforeCreate();
             long id = t.insert(tableName, cv);
             if (id == -1) {
                 return false;

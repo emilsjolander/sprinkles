@@ -2,7 +2,6 @@ package se.emilsjolander.sprinkles;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.net.Uri;
 
 import java.lang.reflect.Array;
@@ -12,6 +11,7 @@ import java.util.List;
 
 import se.emilsjolander.sprinkles.annotations.Table;
 import se.emilsjolander.sprinkles.exceptions.NoTableAnnotationException;
+import se.emilsjolander.sprinkles.typeserializers.TypeSerializer;
 
 class Utils {
 	
@@ -98,12 +98,9 @@ class Utils {
             return sql;
         }
         for (Object o : args) {
-            if (o instanceof Number) {
-                sql = sql.replaceFirst("\\?", o.toString());
-            } else {
-                String escapedString = DatabaseUtils.sqlEscapeString(o.toString());
-                sql = sql.replaceFirst("\\?", escapedString);
-            }
+            TypeSerializer typeSerializer = Sprinkles.sInstance.getTypeSerializer(o.getClass());
+            String sqlObject = typeSerializer.toSql(o);
+            sql = sql.replaceFirst("\\?", sqlObject);
         }
         return sql;
     }

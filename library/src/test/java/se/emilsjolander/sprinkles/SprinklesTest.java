@@ -34,6 +34,11 @@ public class SprinklesTest {
         }
 
         @Override
+        public String toSql(MyObject object) {
+            return null;
+        }
+
+        @Override
         public SqlType getSqlType() {
             return null;
         }

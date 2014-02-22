@@ -5,9 +5,6 @@ import android.database.Cursor;
 
 import java.util.Date;
 
-/**
- * Created by emilsjolander on 27/12/13.
- */
 public class DateSerializer implements TypeSerializer<Date> {
 
     @Override
@@ -18,6 +15,11 @@ public class DateSerializer implements TypeSerializer<Date> {
     @Override
     public void pack(Date object, ContentValues cv, String name) {
         cv.put(name, object.getTime());
+    }
+
+    @Override
+    public String toSql(Date object) {
+        return ""+object.getTime();
     }
 
     @Override

@@ -3,9 +3,6 @@ package se.emilsjolander.sprinkles.typeserializers;
 import android.content.ContentValues;
 import android.database.Cursor;
 
-/**
- * Created by emilsjolander on 27/12/13.
- */
 public class DoubleSerializer implements TypeSerializer<Double> {
 
     @Override
@@ -16,6 +13,11 @@ public class DoubleSerializer implements TypeSerializer<Double> {
     @Override
     public void pack(Double object, ContentValues cv, String name) {
         cv.put(name, object);
+    }
+
+    @Override
+    public String toSql(Double object) {
+        return ""+object;
     }
 
     @Override

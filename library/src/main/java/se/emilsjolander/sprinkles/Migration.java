@@ -43,6 +43,7 @@ public class Migration {
         final boolean appendPrimaryKeys =
                 !(info.primaryKeys.isEmpty() || info.primaryKeys.size() == 1 && info.autoIncrementColumn != null);
         final boolean appendForeignKeys = !info.foreignKeys.isEmpty();
+        final boolean appendUniqueCombos = !info.uniqueCombos.isEmpty();
 
 		for (int i = 0; i < info.staticColumns.size(); i++) {
 			final ModelInfo.StaticColumnField column = info.staticColumns.get(i);
@@ -114,6 +115,21 @@ public class Migration {
 				createStatement.append(", ");
 			}
 		}
+
+        if (appendUniqueCombos) {
+            createStatement.append(", UNIQUE(");
+            for (int i = 0; i < info.uniqueCombos.size(); i++) {
+                final ModelInfo.StaticColumnField column = info.uniqueCombos.get(i);
+                createStatement.append(column.name);
+
+                // add a comma separator if there are still foreign keys to add
+                if (i < info.uniqueCombos.size() - 1) {
+                    createStatement.append(", ");
+                }
+            }
+            createStatement.append(") ON CONFLICT ");
+            createStatement.append(info.uniqueComboConflictClause);
+        }
 
 		createStatement.append(");");
 

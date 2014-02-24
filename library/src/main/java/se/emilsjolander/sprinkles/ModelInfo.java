@@ -18,6 +18,8 @@ import se.emilsjolander.sprinkles.annotations.ForeignKey;
 import se.emilsjolander.sprinkles.annotations.NotNull;
 import se.emilsjolander.sprinkles.annotations.PrimaryKey;
 import se.emilsjolander.sprinkles.annotations.Unique;
+import se.emilsjolander.sprinkles.annotations.UniqueCombo;
+import se.emilsjolander.sprinkles.annotations.UniqueComboConflictClause;
 import se.emilsjolander.sprinkles.exceptions.AutoIncrementMustBeIntegerException;
 import se.emilsjolander.sprinkles.exceptions.CannotCascadeDeleteNonForeignKey;
 import se.emilsjolander.sprinkles.exceptions.DuplicateColumnException;
@@ -59,6 +61,8 @@ class ModelInfo {
         boolean isUnique;
         ConflictClause uniqueConflictClause;
 
+        boolean isUniqueCombo;
+
         boolean hasCheck;
         String checkClause;
     }
@@ -70,11 +74,13 @@ class ModelInfo {
     private static Map<Class<? extends QueryResult>, ModelInfo> cache = new HashMap<Class<? extends QueryResult>, ModelInfo>();
 
     String tableName;
+    ConflictClause uniqueComboConflictClause;
     Set<ColumnField> columns = new HashSet<ColumnField>();
     List<DynamicColumnField> dynamicColumns = new ArrayList<DynamicColumnField>();
     List<StaticColumnField> staticColumns = new ArrayList<StaticColumnField>();
     List<StaticColumnField> foreignKeys = new ArrayList<StaticColumnField>();
     List<StaticColumnField> primaryKeys = new ArrayList<StaticColumnField>();
+    List<StaticColumnField> uniqueCombos = new ArrayList<StaticColumnField>();
     StaticColumnField autoIncrementColumn;
 
 
@@ -103,12 +109,16 @@ class ModelInfo {
             } else if (field.isAnnotationPresent(Column.class)) {
                 StaticColumnField column = new StaticColumnField();
                 column.name = field.getAnnotation(Column.class).value();
+                if("" == column.name) {
+                    column.name = field.getName().toLowerCase();
+                }
 
                 column.isAutoIncrement = field.isAnnotationPresent(AutoIncrementPrimaryKey.class);
                 column.isForeignKey = field.isAnnotationPresent(ForeignKey.class);
                 column.isPrimaryKey = field.isAnnotationPresent(PrimaryKey.class) || column.isAutoIncrement;
                 column.isCascadeDelete = field.isAnnotationPresent(CascadeDelete.class);
                 column.isUnique = field.isAnnotationPresent(Unique.class);
+                column.isUniqueCombo = field.isAnnotationPresent(UniqueCombo.class);
                 column.isNotNull = field.isAnnotationPresent(NotNull.class);
                 column.hasCheck = field.isAnnotationPresent(Check.class);
 
@@ -139,6 +149,9 @@ class ModelInfo {
                 if (column.isUnique) {
                     column.uniqueConflictClause = field.getAnnotation(Unique.class).value();
                 }
+                if (column.isUniqueCombo) {
+                    info.uniqueCombos.add(column);
+                }
                 if (column.hasCheck) {
                     column.checkClause = field.getAnnotation(Check.class).value();
                 }
@@ -155,6 +168,13 @@ class ModelInfo {
         }
         if (Model.class.isAssignableFrom(clazz)) {
             info.tableName = Utils.getTableName((Class<? extends Model>) clazz);
+            if(info.uniqueCombos.size() > 0) {
+                if(clazz.isAnnotationPresent(UniqueComboConflictClause.class)) {
+                    info.uniqueComboConflictClause = clazz.getAnnotation(UniqueComboConflictClause.class).value();
+                } else {
+                    info.uniqueComboConflictClause = ConflictClause.ABORT;
+                }
+            }
             if (info.primaryKeys.size() == 0) {
                 throw new NoPrimaryKeysException();
             }

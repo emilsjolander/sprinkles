@@ -17,7 +17,7 @@ public class IntSerializer implements TypeSerializer<Integer> {
 
     @Override
     public String toSql(Integer object) {
-        return ""+object;
+        return String.valueOf(object);
     }
 
     @Override

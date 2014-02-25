@@ -17,7 +17,7 @@ public class FloatSerializer implements TypeSerializer<Float> {
 
     @Override
     public String toSql(Float object) {
-        return ""+object;
+        return String.valueOf(object);
     }
 
     @Override

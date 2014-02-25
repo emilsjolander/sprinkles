@@ -17,7 +17,7 @@ public class LongSerializer implements TypeSerializer<Long> {
 
     @Override
     public String toSql(Long object) {
-        return ""+object;
+        return String.valueOf(object);
     }
 
     @Override

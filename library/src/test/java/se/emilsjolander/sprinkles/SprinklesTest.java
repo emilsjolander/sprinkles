@@ -2,14 +2,15 @@ package se.emilsjolander.sprinkles;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-
+import se.emilsjolander.sprinkles.annotations.AutoIncrementPrimaryKey;
+import se.emilsjolander.sprinkles.annotations.Column;
+import se.emilsjolander.sprinkles.annotations.Table;
 import se.emilsjolander.sprinkles.exceptions.NoTypeSerializerFoundException;
 import se.emilsjolander.sprinkles.typeserializers.SqlType;
 import se.emilsjolander.sprinkles.typeserializers.TypeSerializer;
@@ -39,6 +40,14 @@ public class SprinklesTest {
         }
     }
 
+    @Table("Tests")
+    public static class TestModel extends Model {
+
+        @AutoIncrementPrimaryKey
+        @Column("id") private long id;
+
+    }
+
     @Before
     public void reset() {
         Sprinkles.dropInstances();
@@ -60,6 +69,25 @@ public class SprinklesTest {
         Migration m = new Migration();
         s.addMigration(m);
         assertEquals(s.mMigrations.get(0), m);
+    }
+
+    @Test
+    public void addObserver() {
+        Sprinkles s = Sprinkles.init(Robolectric.application);
+        assertEquals(0, s.observers.size());
+        s.addContentObserver(TestModel.class, null, "");
+        assertEquals(1, s.observers.size());
+    }
+
+
+    @Test
+    public void removeObserver() {
+        Sprinkles s = Sprinkles.init(Robolectric.application);
+        assertEquals(0, s.observers.size());
+        s.addContentObserver(TestModel.class, null, "");
+        assertEquals(1, s.observers.size());
+        s.removeContentObserver(TestModel.class);
+        assertEquals(0, s.observers.size());
     }
 
     @Test

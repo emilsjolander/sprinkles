@@ -249,17 +249,19 @@ Sprinkles does nothing to handle relationships for you; this is by design. You w
 ###SyncAdapters
 Sprinkles supports notifying SyncAdapters that the content has changed. By registering your models for notifications you can ensure your SyncAdapter will be notified.
 ```java
-ContentObserver observer;
+SprinklesContentObserver observer;
 
 this.observer = new SprinklesContentObserver(account, authority);
 
 @Override
 public void onResume() {
+    super.onResume();
     this.observer.register(Note.class, true); // true/false for notify descendants
 }
 
 @Override
 public void onPause() {
+    super.onPause();
     this.observer.unregister();
 }
 ```

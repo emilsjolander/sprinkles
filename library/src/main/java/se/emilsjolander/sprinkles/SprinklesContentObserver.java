@@ -14,8 +14,8 @@ import android.util.Log;
  */
 public class SprinklesContentObserver extends ContentObserver {
 
-    private Account mAccount;
-    private String mAuthority;
+    Account mAccount;
+    String mAuthority;
 
     public SprinklesContentObserver(Account account, String authority) {
         super(null);

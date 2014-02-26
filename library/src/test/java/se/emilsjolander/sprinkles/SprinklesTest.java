@@ -1,7 +1,6 @@
 package se.emilsjolander.sprinkles;
 
 import android.content.ContentValues;
-import android.database.ContentObserver;
 import android.database.Cursor;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,9 +8,6 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-import se.emilsjolander.sprinkles.annotations.AutoIncrementPrimaryKey;
-import se.emilsjolander.sprinkles.annotations.Column;
-import se.emilsjolander.sprinkles.annotations.Table;
 import se.emilsjolander.sprinkles.exceptions.NoTypeSerializerFoundException;
 import se.emilsjolander.sprinkles.typeserializers.SqlType;
 import se.emilsjolander.sprinkles.typeserializers.TypeSerializer;
@@ -41,13 +37,6 @@ public class SprinklesTest {
         }
     }
 
-    @Table("Tests")
-    public static class TestModel extends Model {
-
-        @AutoIncrementPrimaryKey
-        @Column("id") private long id;
-
-    }
 
     @Before
     public void reset() {
@@ -70,19 +59,6 @@ public class SprinklesTest {
         Migration m = new Migration();
         s.addMigration(m);
         assertEquals(s.mMigrations.get(0), m);
-    }
-
-    @Test
-    public void getContentResolver() {
-        Sprinkles s = Sprinkles.init(Robolectric.application);
-        assertNotNull(s.getContentResolver());
-    }
-
-    @Test
-    public void addObserver() {
-        Sprinkles s = Sprinkles.init(Robolectric.application);
-        ContentObserver contentObserver = s.getContentObserver(null, "");
-        assertNotNull(contentObserver);
     }
 
     @Test

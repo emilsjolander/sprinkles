@@ -49,4 +49,12 @@ public class SprinklesContentObserver extends ContentObserver {
             Log.e("Sprinkles", "ContentObserver has a null account");
         }
     }
+
+    public void register(Class<? extends Model> clazz, boolean notifyDescendants) {
+        Sprinkles.sInstance.mContext.getContentResolver().registerContentObserver(Utils.getNotificationUri(clazz), notifyDescendants, this);
+    }
+
+    public void unregister() {
+        Sprinkles.sInstance.mContext.getContentResolver().unregisterContentObserver(this);
+    }
 }

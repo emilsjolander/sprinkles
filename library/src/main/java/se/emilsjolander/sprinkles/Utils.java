@@ -12,7 +12,7 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
-public class Utils {
+class Utils {
 	
 	static <T extends QueryResult> T getResultFromCursor(Class<T> resultClass, Cursor c) {
 		try {
@@ -81,7 +81,7 @@ public class Utils {
 		return values;
 	}
 
-    public static <T extends Model> Uri getNotificationUri(Class<T> clazz) {
+    static <T extends Model> Uri getNotificationUri(Class<T> clazz) {
         return Uri.parse("sprinkles://"+getTableName(clazz));
     }
 

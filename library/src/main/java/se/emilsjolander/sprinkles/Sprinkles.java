@@ -1,9 +1,6 @@
 package se.emilsjolander.sprinkles;
 
-import android.accounts.Account;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.database.ContentObserver;
 import se.emilsjolander.sprinkles.exceptions.NoTypeSerializerFoundException;
 import se.emilsjolander.sprinkles.typeserializers.*;
 
@@ -99,13 +96,5 @@ public class Sprinkles {
             throw new NoTypeSerializerFoundException(type);
         }
         return typeSerializers.get(type);
-    }
-
-    public ContentResolver getContentResolver() {
-        return sInstance.mContext.getContentResolver();
-    }
-
-    public static ContentObserver getContentObserver(Account account, String authority) {
-        return new SprinklesContentObserver(account, authority);
     }
 }

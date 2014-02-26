@@ -1,6 +1,10 @@
 package se.emilsjolander.sprinkles;
 
+import android.accounts.Account;
 import android.content.Context;
+import android.database.ContentObserver;
+import se.emilsjolander.sprinkles.exceptions.NoTypeSerializerFoundException;
+import se.emilsjolander.sprinkles.typeserializers.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -8,21 +12,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import se.emilsjolander.sprinkles.exceptions.NoTypeSerializerFoundException;
-import se.emilsjolander.sprinkles.typeserializers.BooleanSerializer;
-import se.emilsjolander.sprinkles.typeserializers.DateSerializer;
-import se.emilsjolander.sprinkles.typeserializers.DoubleSerializer;
-import se.emilsjolander.sprinkles.typeserializers.FloatSerializer;
-import se.emilsjolander.sprinkles.typeserializers.IntSerializer;
-import se.emilsjolander.sprinkles.typeserializers.LongSerializer;
-import se.emilsjolander.sprinkles.typeserializers.StringSerializer;
-import se.emilsjolander.sprinkles.typeserializers.TypeSerializer;
-
 public class Sprinkles {
 
 	static Sprinkles sInstance;
-	Context mContext;
-	List<Migration> mMigrations = new ArrayList<Migration>();
+
+    Context mContext;
+    List<Migration> mMigrations = new ArrayList<Migration>();
+    Map<Class, ContentObserver> observers = new ConcurrentHashMap<Class, ContentObserver>();
+
     private Map<Class, TypeSerializer> typeSerializers = new ConcurrentHashMap<Class, TypeSerializer>();
 
 	private Sprinkles() {
@@ -104,4 +101,17 @@ public class Sprinkles {
         return typeSerializers.get(type);
     }
 
+    public void addContentObserver(Class<? extends Model> clazz, Account account, String authority) {
+        ContentObserver observer = SprinklesContentObserver.observer(account, authority);
+        mContext.getContentResolver().registerContentObserver(Utils.getNotificationUri(clazz), true, observer);
+        observers.put(clazz, observer);
+    }
+
+    public void removeContentObserver(Class<? extends Model> clazz) {
+        ContentObserver observer = observers.get(clazz);
+        if (observer != null) {
+            mContext.getContentResolver().unregisterContentObserver(observer);
+            observers.remove(clazz);
+        }
+    }
 }

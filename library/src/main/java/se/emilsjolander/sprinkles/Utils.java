@@ -4,16 +4,15 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.net.Uri;
+import se.emilsjolander.sprinkles.annotations.Table;
+import se.emilsjolander.sprinkles.exceptions.NoTableAnnotationException;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
-import se.emilsjolander.sprinkles.annotations.Table;
-import se.emilsjolander.sprinkles.exceptions.NoTableAnnotationException;
-
-class Utils {
+public class Utils {
 	
 	static <T extends QueryResult> T getResultFromCursor(Class<T> resultClass, Cursor c) {
 		try {
@@ -82,7 +81,7 @@ class Utils {
 		return values;
 	}
 
-    static <T extends Model> Uri getNotificationUri(Class<T> clazz) {
+    public static <T extends Model> Uri getNotificationUri(Class<T> clazz) {
         return Uri.parse("sprinkles://"+getTableName(clazz));
     }
 

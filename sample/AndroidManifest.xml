@@ -26,33 +26,6 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
 
-        <!--Defines a stub authenticator service for the SyncAdapter-->
-        <service android:name=".auth.AuthService">
-            <intent-filter>
-                <action android:name="android.accounts.AccountAuthenticator"/>
-            </intent-filter>
-            <meta-data
-                    android:name="android.accounts.AccountAuthenticator"
-                    android:resource="@xml/authenticator"/>
-        </service>
-
-        <!--Defines a dummy content provider for the SyncAdapter-->
-        <!--We use Sprinkles for normal DB operations so this is never used-->
-        <provider android:name=".sync.DummySprinklesContentProvider"
-                  android:authorities="se.emilsjolander.sprinkles.content.authority"
-                  android:syncable="true"
-                  android:exported="false"
-                  android:label="Notes Sample Data" />
-
-        <!--Defines a SyncService for binding to the SyncAdapter -->
-        <service android:name=".sync.SyncService" android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter"/>
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter"
-                       android:resource="@xml/syncadapter" />
-        </service>
-
         <activity
             android:name=".NotesActivity"
             android:label="@string/app_name" >

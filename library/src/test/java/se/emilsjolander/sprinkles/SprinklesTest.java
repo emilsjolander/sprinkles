@@ -1,6 +1,7 @@
 package se.emilsjolander.sprinkles;
 
 import android.content.ContentValues;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import org.junit.Before;
 import org.junit.Test;
@@ -72,22 +73,16 @@ public class SprinklesTest {
     }
 
     @Test
-    public void addObserver() {
+    public void getContentResolver() {
         Sprinkles s = Sprinkles.init(Robolectric.application);
-        assertEquals(0, s.observers.size());
-        s.addContentObserver(TestModel.class, null, "");
-        assertEquals(1, s.observers.size());
+        assertNotNull(s.getContentResolver());
     }
 
-
     @Test
-    public void removeObserver() {
+    public void addObserver() {
         Sprinkles s = Sprinkles.init(Robolectric.application);
-        assertEquals(0, s.observers.size());
-        s.addContentObserver(TestModel.class, null, "");
-        assertEquals(1, s.observers.size());
-        s.removeContentObserver(TestModel.class);
-        assertEquals(0, s.observers.size());
+        ContentObserver contentObserver = s.getContentObserver(null, "");
+        assertNotNull(contentObserver);
     }
 
     @Test

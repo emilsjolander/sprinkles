@@ -136,8 +136,7 @@ public abstract class Model implements QueryResult {
 			@Override
 			public void onTransactionCommitted() {
 				Sprinkles.sInstance.mContext.getContentResolver().notifyChange(
-						Utils.getNotificationUri(Model.this.getClass()),
-                        Sprinkles.sInstance.observers.get(Model.this.getClass()), true);
+						Utils.getNotificationUri(Model.this.getClass()), null, true);
 			}
 		});
 

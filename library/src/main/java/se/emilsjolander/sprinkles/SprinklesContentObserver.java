@@ -12,43 +12,41 @@ import android.util.Log;
 /**
  * Created by zsiegel on 2/25/14.
  */
-public class SprinklesContentObserver {
+public class SprinklesContentObserver extends ContentObserver {
 
-    /**
-     * Returns a new content observer
-     * @param account the account to be bound to
-     * @param authority the authority of the ContentProvider
-     * @return a ContentObserver
-     */
-    public static ContentObserver observer(final Account account, final String authority) {
-        return new ContentObserver(null) {
+    private Account mAccount;
+    private String mAuthority;
 
-            @Override
-            public boolean deliverSelfNotifications() {
-                return true;
-            }
+    public SprinklesContentObserver(Account account, String authority) {
+        super(null);
+        this.mAccount = account;
+        this.mAuthority = authority;
+    }
 
-            @Override
-            public void onChange(boolean selfChange) {
-                super.onChange(selfChange);
-                sync();
-            }
+    @Override
+    public boolean deliverSelfNotifications() {
+        return true;
+    }
 
-            @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-            @Override
-            public void onChange(boolean selfChange, Uri uri) {
-                super.onChange(selfChange, uri);
-            }
+    @Override
+    public void onChange(boolean selfChange) {
+        super.onChange(selfChange);
+        sync();
+    }
 
-            private void sync() {
-                if (account != null) {
-                    Bundle extras = new Bundle();
-                    extras.putBoolean(ContentResolver.SYNC_EXTRAS_UPLOAD, true);
-                    ContentResolver.requestSync(account, authority, extras);
-                } else {
-                    Log.e("Sprinkles", "ContentObserver has a null account");
-                }
-            }
-        };
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    @Override
+    public void onChange(boolean selfChange, Uri uri) {
+        super.onChange(selfChange, uri);
+    }
+
+    private void sync() {
+        if (mAccount != null) {
+            Bundle extras = new Bundle();
+            extras.putBoolean(ContentResolver.SYNC_EXTRAS_UPLOAD, true);
+            ContentResolver.requestSync(mAccount, mAuthority, extras);
+        } else {
+            Log.e("Sprinkles", "ContentObserver has a null account");
+        }
     }
 }

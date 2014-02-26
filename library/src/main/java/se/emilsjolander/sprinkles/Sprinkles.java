@@ -1,6 +1,7 @@
 package se.emilsjolander.sprinkles;
 
 import android.accounts.Account;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.database.ContentObserver;
 import se.emilsjolander.sprinkles.exceptions.NoTypeSerializerFoundException;
@@ -18,7 +19,6 @@ public class Sprinkles {
 
     Context mContext;
     List<Migration> mMigrations = new ArrayList<Migration>();
-    Map<Class, ContentObserver> observers = new ConcurrentHashMap<Class, ContentObserver>();
 
     private Map<Class, TypeSerializer> typeSerializers = new ConcurrentHashMap<Class, TypeSerializer>();
 
@@ -101,17 +101,11 @@ public class Sprinkles {
         return typeSerializers.get(type);
     }
 
-    public void addContentObserver(Class<? extends Model> clazz, Account account, String authority) {
-        ContentObserver observer = SprinklesContentObserver.observer(account, authority);
-        mContext.getContentResolver().registerContentObserver(Utils.getNotificationUri(clazz), true, observer);
-        observers.put(clazz, observer);
+    public ContentResolver getContentResolver() {
+        return sInstance.mContext.getContentResolver();
     }
 
-    public void removeContentObserver(Class<? extends Model> clazz) {
-        ContentObserver observer = observers.get(clazz);
-        if (observer != null) {
-            mContext.getContentResolver().unregisterContentObserver(observer);
-            observers.remove(clazz);
-        }
+    public static ContentObserver getContentObserver(Account account, String authority) {
+        return new SprinklesContentObserver(account, authority);
     }
 }

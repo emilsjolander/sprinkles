@@ -12,25 +12,25 @@ public class SprinklesContentObserver extends ContentObserver {
 
     ContentObserver observer;
 
-    public SprinklesContentObserver(ContentObserver contentObserver) {
+    public SprinklesContentObserver(ContentObserver observer) {
         super(null);
-        this.observer = contentObserver;
+        if (observer == null) {
+            throw new NullPointerException("ContentObserver may not be null");
+        }
+        this.observer = observer;
     }
 
     @Override
     public void onChange(boolean selfChange) {
         super.onChange(selfChange);
-        if (observer != null) {
-            observer.onChange(selfChange);
-        }
+        observer.onChange(selfChange);
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void onChange(boolean selfChange, Uri uri) {
-        if (observer != null) {
-            observer.onChange(selfChange, uri);
-        }
+        super.onChange(selfChange, uri);
+        observer.onChange(selfChange, uri);
     }
 
     public void register(Class<? extends Model> clazz, boolean notifyDescendants) {
@@ -40,4 +40,5 @@ public class SprinklesContentObserver extends ContentObserver {
     public void unregister() {
         Sprinkles.sInstance.mContext.getContentResolver().unregisterContentObserver(this);
     }
+    
 }

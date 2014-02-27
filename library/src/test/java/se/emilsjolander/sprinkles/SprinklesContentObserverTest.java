@@ -19,32 +19,9 @@ import static org.mockito.Mockito.*;
 @RunWith(RobolectricTestRunner.class)
 public class SprinklesContentObserverTest {
 
-    Account account;
-
-    @Table("Tests")
-    public static class TestModel extends Model {
-
-        @AutoIncrementPrimaryKey
-        @Column("id") private long id;
-
-    }
-
-    @Before
-    public void init() {
-        account = new Account("name", "type");
-    }
-
     @Test
-    public void testCreateContentObserver() {
-        ContentObserver observer = mock(ContentObserver.class);
-        SprinklesContentObserver sprinklesContentObserver = new SprinklesContentObserver(observer);
-        assertEquals(sprinklesContentObserver.observer, observer);
-        sprinklesContentObserver.onChange(true);
-        verify(observer).onChange(true);
-    }
-
-    @Test
-    public void testOnChangeWithCustomObserver() {
+    public void delegateToWrappedObserver() {
+        Account account = new Account("name", "type");
         ContentObserver observer = mock(ContentObserver.class);
         SprinklesContentObserver sprinklesContentObserver = new SprinklesContentObserver(observer);
 
@@ -53,10 +30,11 @@ public class SprinklesContentObserverTest {
 
         reset(observer);
         sprinklesContentObserver.onChange(true, Uri.EMPTY);
-        verify(observer).onChange(true);
+        verify(observer).onChange(true, Uri.EMPTY);
 
         reset(observer);
         sprinklesContentObserver.onChange(false, Uri.EMPTY);
-        verify(observer).onChange(false);
+        verify(observer).onChange(false, Uri.EMPTY);
     }
+    
 }

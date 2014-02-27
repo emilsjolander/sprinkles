@@ -16,21 +16,31 @@ public class SprinklesContentObserver extends ContentObserver {
 
     Account mAccount;
     String mAuthority;
+    ContentObserver observer;
 
     public SprinklesContentObserver(Account account, String authority) {
         super(null);
         this.mAccount = account;
         this.mAuthority = authority;
+        this.observer = null;
+    }
+
+    public SprinklesContentObserver(Account account, String authority, ContentObserver observer) {
+        this(account, authority);
+        this.observer = observer;
     }
 
     @Override
     public boolean deliverSelfNotifications() {
-        return true;
+        return false;
     }
 
     @Override
     public void onChange(boolean selfChange) {
         super.onChange(selfChange);
+        if (observer != null) {
+            observer.onChange(selfChange);
+        }
         sync();
     }
 
@@ -40,7 +50,7 @@ public class SprinklesContentObserver extends ContentObserver {
         super.onChange(selfChange, uri);
     }
 
-    private void sync() {
+    void sync() {
         if (mAccount != null) {
             Bundle extras = new Bundle();
             extras.putBoolean(ContentResolver.SYNC_EXTRAS_UPLOAD, true);

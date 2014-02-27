@@ -12,16 +12,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Sprinkles {
 
-	static Sprinkles sInstance;
+    static Sprinkles sInstance;
 
     Context mContext;
     List<Migration> mMigrations = new ArrayList<Migration>();
 
     private Map<Class, TypeSerializer> typeSerializers = new ConcurrentHashMap<Class, TypeSerializer>();
 
-	private Sprinkles() {
-		addStandardTypeSerializers();
-	}
+    private Sprinkles() {
+        addStandardTypeSerializers();
+    }
 
     private void addStandardTypeSerializers() {
         typeSerializers.put(int.class, new IntSerializer());
@@ -44,12 +44,9 @@ public class Sprinkles {
     }
 
     /**
-     *
      * Initialize sprinkles so queries and migrations can be performed
      *
-     * @param context
-     *      A context which is used for database operations. This context is not saved, however it's application context is.
-     *
+     * @param context A context which is used for database operations. This context is not saved, however it's application context is.
      * @return The singleton Sprinkles instance. Use this to add migrations.
      */
     public static Sprinkles init(Context context) {
@@ -64,9 +61,9 @@ public class Sprinkles {
      * Use init() instead.
      */
     @Deprecated
-	public static Sprinkles getInstance(Context context) {
-		return init(context);
-	}
+    public static Sprinkles getInstance(Context context) {
+        return init(context);
+    }
 
     /**
      * Used by unit tests to reset sprinkles instances between tests. This method can change at any time and should
@@ -80,12 +77,11 @@ public class Sprinkles {
     /**
      * Add migrations to the underlying database. Every migration increments the database version.
      *
-     * @param migration
-     *      The migration that should be performed.
+     * @param migration The migration that should be performed.
      */
-	public void addMigration(Migration migration) {
-		mMigrations.add(migration);
-	}
+    public void addMigration(Migration migration) {
+        mMigrations.add(migration);
+    }
 
     public <T> void registerType(Class<T> clazz, TypeSerializer<T> serializer) {
         typeSerializers.put(clazz, serializer);

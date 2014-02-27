@@ -8,17 +8,6 @@
         android:minSdkVersion="14"
         android:targetSdkVersion="19" />
 
-    <!--Permissions used by the SyncAdapter-->
-    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
-    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
-    <uses-permission android:name="android.permission.READ_SYNC_STATS"/>
-
-    <!--Permissions used by the AccountAuthenticator-->
-    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
-    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
-    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
-
     <application
         android:name=".MyApplication"
         android:allowBackup="true"

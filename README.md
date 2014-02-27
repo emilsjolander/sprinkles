@@ -243,9 +243,6 @@ Any number of calls to any of the above migrations are allowed, if for example `
 ###Type serializers
 Through an instance of `Sprinkles` you can register your own `TypeSerializer` instances via `registerType()` for serializing an object in your model into a column in the database. Sprinkles uses a `TypeSerializer` implementation internally for all the different data types that it supports. So check out the `se.emilsjolander.sprinkles.typeserializers` package for example implementations. These serializers will be used both when saving a model and when querying rows from the database.
 
-###Relationships
-Sprinkles does nothing to handle relationships for you; this is by design. You will have to use the regular ways to handle relationships in SQL. Sprinkles gives you all the tools needed for this and it works very well.
-
 ###ContentObservers
 Sprinkles supports ContentObservers for change notifications. By registering your models for observation you can ensure your ContentObserver will be notified of changes.
 ```java
@@ -266,3 +263,6 @@ public void onPause() {
     this.observer.unregister();
 }
 ```
+
+###Relationships
+Sprinkles does nothing to handle relationships for you; this is by design. You will have to use the regular ways to handle relationships in SQL. Sprinkles gives you all the tools needed for this and it works very well.

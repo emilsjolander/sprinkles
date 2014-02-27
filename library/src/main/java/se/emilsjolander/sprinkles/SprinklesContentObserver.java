@@ -50,7 +50,7 @@ public class SprinklesContentObserver extends ContentObserver {
         super.onChange(selfChange, uri);
     }
 
-    void sync() {
+    private void sync() {
         if (mAccount != null) {
             Bundle extras = new Bundle();
             extras.putBoolean(ContentResolver.SYNC_EXTRAS_UPLOAD, true);

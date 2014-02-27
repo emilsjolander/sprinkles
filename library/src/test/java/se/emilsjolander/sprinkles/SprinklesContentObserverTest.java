@@ -19,8 +19,6 @@ import static org.mockito.Mockito.*;
 @RunWith(RobolectricTestRunner.class)
 public class SprinklesContentObserverTest {
 
-    public static final String AUTHORITY = "AUTHORITY";
-
     Account account;
 
     @Table("Tests")

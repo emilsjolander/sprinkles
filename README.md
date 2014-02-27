@@ -246,15 +246,13 @@ Through an instance of `Sprinkles` you can register your own `TypeSerializer` in
 ###Relationships
 Sprinkles does nothing to handle relationships for you; this is by design. You will have to use the regular ways to handle relationships in SQL. Sprinkles gives you all the tools needed for this and it works very well.
 
-###SyncAdapters
-Sprinkles supports notifying SyncAdapters that the content has changed. By registering your models for notifications you can ensure your SyncAdapter will be notified. You can also supply your own ContentObserver to supplement this functionality.
+###ContentObservers
+Sprinkles supports ContentObservers for change notifications. By registering your models for observation you can ensure your ContentObserver will be notified of changes.
 ```java
 SprinklesContentObserver observer;
 ContentObserver myCustomObserver = ...;
 
-this.observer = new SprinklesContentObserver(account, authority);
-//OR
-this.observer = new SprinklesContentObserver(account, authority, myCustomObserver);
+this.observer = new SprinklesContentObserver(myCustomObserver);
 
 @Override
 public void onResume() {

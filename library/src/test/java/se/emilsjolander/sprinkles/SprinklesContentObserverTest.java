@@ -38,34 +38,27 @@ public class SprinklesContentObserverTest {
 
     @Test
     public void testCreateContentObserver() {
-        SprinklesContentObserver observer = new SprinklesContentObserver(account, AUTHORITY);
-        assertEquals(account, observer.mAccount);
-        assertEquals(AUTHORITY, observer.mAuthority);
-    }
-
-    @Test
-    public void testCreateContentObserverWithCustomObserver() {
-        ContentObserver customObserver = new ContentObserver(null) {};
-        SprinklesContentObserver observer = new SprinklesContentObserver(account, AUTHORITY, customObserver);
-        assertEquals(account, observer.mAccount);
-        assertEquals(AUTHORITY, observer.mAuthority);
-        assertEquals(customObserver, observer.observer);
+        ContentObserver observer = mock(ContentObserver.class);
+        SprinklesContentObserver sprinklesContentObserver = new SprinklesContentObserver(observer);
+        assertEquals(sprinklesContentObserver.observer, observer);
+        sprinklesContentObserver.onChange(true);
+        verify(observer).onChange(true);
     }
 
     @Test
     public void testOnChangeWithCustomObserver() {
-        ContentObserver customObserver = mock(ContentObserver.class);
-        SprinklesContentObserver observer = new SprinklesContentObserver(account, AUTHORITY, customObserver);
+        ContentObserver observer = mock(ContentObserver.class);
+        SprinklesContentObserver sprinklesContentObserver = new SprinklesContentObserver(observer);
 
-        observer.onChange(true);
-        verify(customObserver).onChange(true);
+        sprinklesContentObserver.onChange(true);
+        verify(observer).onChange(true);
 
-        reset(customObserver);
-        observer.onChange(true, Uri.EMPTY);
-        verify(customObserver).onChange(true);
+        reset(observer);
+        sprinklesContentObserver.onChange(true, Uri.EMPTY);
+        verify(observer).onChange(true);
 
-        reset(customObserver);
-        observer.onChange(false, Uri.EMPTY);
-        verify(customObserver).onChange(false);
+        reset(observer);
+        sprinklesContentObserver.onChange(false, Uri.EMPTY);
+        verify(observer).onChange(false);
     }
 }

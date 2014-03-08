@@ -109,9 +109,6 @@ class ModelInfo {
             } else if (field.isAnnotationPresent(Column.class)) {
                 StaticColumnField column = new StaticColumnField();
                 column.name = field.getAnnotation(Column.class).value();
-                if("" == column.name) {
-                    column.name = field.getName().toLowerCase();
-                }
 
                 column.isAutoIncrement = field.isAnnotationPresent(AutoIncrementPrimaryKey.class);
                 column.isForeignKey = field.isAnnotationPresent(ForeignKey.class);

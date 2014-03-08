@@ -88,11 +88,7 @@ class Utils {
 
     static String getTableName(Class<? extends Model> clazz) {
         if (clazz.isAnnotationPresent(Table.class)) {
-            if(""!=clazz.getAnnotation(Table.class).value()) {
-                return clazz.getAnnotation(Table.class).value();
-            } else {
-                return clazz.getSimpleName();
-            }
+            return clazz.getAnnotation(Table.class).value();
         }
         throw new NoTableAnnotationException();
     }

@@ -3,9 +3,6 @@ package se.emilsjolander.sprinkles.typeserializers;
 import android.content.ContentValues;
 import android.database.Cursor;
 
-/**
- * Created by emilsjolander on 27/12/13.
- */
 public class BooleanSerializer implements TypeSerializer<Boolean> {
 
     @Override
@@ -16,6 +13,11 @@ public class BooleanSerializer implements TypeSerializer<Boolean> {
     @Override
     public void pack(Boolean object, ContentValues cv, String name) {
         cv.put(name, object ? 1 : 0);
+    }
+
+    @Override
+    public String toSql(Boolean object) {
+        return object ? "1" : "0";
     }
 
     @Override

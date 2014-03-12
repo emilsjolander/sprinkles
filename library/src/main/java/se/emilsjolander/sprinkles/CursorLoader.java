@@ -27,9 +27,9 @@ class CursorLoader extends AsyncTaskLoader<Cursor> {
 	/* Runs on a worker thread */
 	@Override
 	public Cursor loadInBackground() {
-		final SQLiteDatabase db = DbOpenHelper.getInstance();
+		final SQLiteDatabase db = Sprinkles.getDatabase();
 		Cursor cursor = db.rawQuery(mSql, null);
-		
+
 		if (cursor != null) {
 			// Ensure the cursor window is filled
 			cursor.getCount();
@@ -72,7 +72,7 @@ class CursorLoader extends AsyncTaskLoader<Cursor> {
 	 * ready the callbacks will be called on the UI thread. If a previous load
 	 * has been completed and is still valid the result may be passed to the
 	 * callbacks immediately.
-	 * 
+	 *
 	 * Must be called from the UI thread
 	 */
 	@Override
@@ -100,7 +100,7 @@ class CursorLoader extends AsyncTaskLoader<Cursor> {
 			cursor.close();
 		}
 	}
-	
+
 	@Override
 	protected void onAbandon() {
 		super.onAbandon();

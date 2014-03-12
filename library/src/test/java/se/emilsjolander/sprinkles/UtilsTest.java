@@ -12,6 +12,7 @@ import org.robolectric.annotation.Config;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Date;
 
 import se.emilsjolander.sprinkles.annotations.AutoIncrementPrimaryKey;
 import se.emilsjolander.sprinkles.annotations.Column;
@@ -109,6 +110,13 @@ public class UtilsTest {
     public void insertSqlArgs() {
         String result = Utils.insertSqlArgs("? ?", new Object[]{1, "hej"});
         assertEquals(result, "1 'hej'");
+    }
+
+    @Test
+    public void insertTypeSerializedSqlArgs() {
+        Date date = new Date();
+        String result = Utils.insertSqlArgs("?", new Object[]{date});
+        assertEquals(result, ""+date.getTime());
     }
 
     @Test

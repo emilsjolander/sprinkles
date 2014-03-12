@@ -2,14 +2,15 @@ package se.emilsjolander.sprinkles;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
+import android.database.sqlite.SQLiteDatabase;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+
 
 import java.io.File;
 
@@ -37,10 +38,16 @@ public class SprinklesTest {
         }
 
         @Override
+        public String toSql(MyObject object) {
+            return null;
+        }
+
+        @Override
         public SqlType getSqlType() {
             return null;
         }
     }
+
 
     @Before
     public void reset() {

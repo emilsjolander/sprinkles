@@ -5,43 +5,32 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 class DbOpenHelper extends SQLiteOpenHelper {
+    private int baseVersion;
 
-	private DbOpenHelper(Context context) {
+    protected DbOpenHelper(Context context, String databaseName, int baseVersion) {
+        super(context, databaseName, null, Sprinkles.sInstance.mMigrations.size() + baseVersion);
+        this.baseVersion = baseVersion;
+    }
 
-        // +1 because version number for databases starts at 1, not 0
-        // This is needed when opening an existing database.
-		super(context, "sprinkles.db", null,
-				Sprinkles.sInstance.mMigrations.size() + 1);
-	}
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        executeMigrations(db, baseVersion, Sprinkles.sInstance.mMigrations.size() + baseVersion);
+    }
 
-	@Override
-	public void onCreate(SQLiteDatabase db) {
-		executeMigrations(db, 1, Sprinkles.sInstance.mMigrations.size() + 1);
-	}
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        executeMigrations(db, oldVersion, newVersion);
+    }
 
-	@Override
-	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		executeMigrations(db, oldVersion, newVersion);
-	}
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        db.execSQL("PRAGMA foreign_keys=ON;");
+    }
 
-	@Override
-	public void onOpen(SQLiteDatabase db) {
-		super.onOpen(db);
-		db.execSQL("PRAGMA foreign_keys=ON;");
-	}
-
-	private void executeMigrations(SQLiteDatabase db, int oldVersion, int newVersion) {
-		for (int i = oldVersion; i < newVersion; i++) {
-			Sprinkles.sInstance.mMigrations.get(i - 1).execute(db);
-		}
-	}
-
-	static SQLiteDatabase sInstance;
-
-	static synchronized SQLiteDatabase getInstance() {
-		if (sInstance == null) {
-			sInstance = new DbOpenHelper(Sprinkles.sInstance.mContext).getWritableDatabase();
-		}
-		return sInstance;
-	}
+    private void executeMigrations(SQLiteDatabase db, int oldVersion, int newVersion) {
+        for (int i = oldVersion; i < newVersion; i++) {
+            Sprinkles.sInstance.mMigrations.get(i).execute(db);
+        }
+    }
 }

@@ -11,17 +11,17 @@ import java.util.List;
  * Transactions are past as parameters to certain methods in a model such as save() and delete().
  */
 public final class Transaction {
-	
+
 	interface OnTransactionCommittedListener {
 		void onTransactionCommitted();
 	}
-	
+
 	private SQLiteDatabase mDb;
 	private boolean mSuccessful;
 	private List<OnTransactionCommittedListener> mOnTransactionCommittedListeners = new ArrayList<OnTransactionCommittedListener>();
 
 	public Transaction() {
-		mDb = DbOpenHelper.getInstance();
+		mDb = Sprinkles.getDatabase();
 		mDb.beginTransaction();
 	}
 
@@ -52,14 +52,14 @@ public final class Transaction {
 			mDb.setTransactionSuccessful();
 		}
 		mDb.endTransaction();
-		
+
 		if (mSuccessful) {
 			for (OnTransactionCommittedListener listener : mOnTransactionCommittedListeners) {
 				listener.onTransactionCommitted();
 			}
 		}
 	}
-	
+
 	long insert(String table, ContentValues values) {
 		return mDb.insert(table, null, values);
 	}
@@ -67,11 +67,11 @@ public final class Transaction {
 	int update(String table, ContentValues values, String where) {
 		return mDb.update(table, values, where, null);
 	}
-	
+
 	int delete(String table, String where) {
 		return mDb.delete(table, where, null);
 	}
-	
+
 	void addOnTransactionCommittedListener(OnTransactionCommittedListener listener) {
 		mOnTransactionCommittedListeners.add(listener);
 	}

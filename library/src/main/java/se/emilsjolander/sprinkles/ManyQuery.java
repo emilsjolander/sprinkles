@@ -46,7 +46,7 @@ public final class ManyQuery<T extends QueryResult> {
      * @return the result of the query. Remember to close me!
      */
 	public CursorList<T> get() {
-		final SQLiteDatabase db = DbOpenHelper.getInstance();
+		final SQLiteDatabase db = Sprinkles.getDatabase();
 		final Cursor c = db.rawQuery(sqlQuery, null);
 		return new CursorList<T>(c, resultClass);
 	}

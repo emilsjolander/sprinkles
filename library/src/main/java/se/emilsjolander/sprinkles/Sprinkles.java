@@ -2,15 +2,23 @@ package se.emilsjolander.sprinkles;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import se.emilsjolander.sprinkles.exceptions.NoTypeSerializerFoundException;
-import se.emilsjolander.sprinkles.exceptions.SprinklesNotInitializedException;
-import se.emilsjolander.sprinkles.typeserializers.*;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import se.emilsjolander.sprinkles.exceptions.NoTypeSerializerFoundException;
+import se.emilsjolander.sprinkles.exceptions.SprinklesNotInitializedException;
+import se.emilsjolander.sprinkles.typeserializers.BooleanSerializer;
+import se.emilsjolander.sprinkles.typeserializers.DateSerializer;
+import se.emilsjolander.sprinkles.typeserializers.DoubleSerializer;
+import se.emilsjolander.sprinkles.typeserializers.FloatSerializer;
+import se.emilsjolander.sprinkles.typeserializers.IntSerializer;
+import se.emilsjolander.sprinkles.typeserializers.LongSerializer;
+import se.emilsjolander.sprinkles.typeserializers.StringSerializer;
+import se.emilsjolander.sprinkles.typeserializers.TypeSerializer;
 
 public class Sprinkles {
 
@@ -99,7 +107,7 @@ public class Sprinkles {
      * Throws SprinklesNotInitializedException if you try to access the database before initializing Sprinkles.
      * @return the SQL Database used by Sprinkles.
      */
-    public static SQLiteDatabase getDatabase() {
+    static SQLiteDatabase getDatabase() {
         if(sInstance == null) {
            throw new SprinklesNotInitializedException();
         }

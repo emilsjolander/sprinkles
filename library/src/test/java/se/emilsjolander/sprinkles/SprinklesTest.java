@@ -2,12 +2,18 @@ package se.emilsjolander.sprinkles;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+
+import android.database.sqlite.SQLiteDatabase;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+
+
+import java.io.File;
+
 import se.emilsjolander.sprinkles.exceptions.NoTypeSerializerFoundException;
 import se.emilsjolander.sprinkles.typeserializers.SqlType;
 import se.emilsjolander.sprinkles.typeserializers.TypeSerializer;

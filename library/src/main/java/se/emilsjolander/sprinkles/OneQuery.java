@@ -80,7 +80,7 @@ public final class OneQuery<T extends QueryResult> {
             respondsToUpdatedOf = Utils.concatArrays(respondsToUpdatedOf, new Class[]{resultClass});
         }
 		final int loaderId = sqlQuery.hashCode();
-		lm.restartLoader(loaderId, null,
+		lm.initLoader(loaderId, null,
 				getLoaderCallbacks(sqlQuery, resultClass, handler, respondsToUpdatedOf));
 	}
 
@@ -104,7 +104,7 @@ public final class OneQuery<T extends QueryResult> {
             respondsToUpdatedOf = Utils.concatArrays(respondsToUpdatedOf, new Class[]{resultClass});
         }
 		final int loaderId = sqlQuery.hashCode();
-		lm.restartLoader(loaderId, null,
+		lm.initLoader(loaderId, null,
 				getSupportLoaderCallbacks(sqlQuery, resultClass, handler, respondsToUpdatedOf));
 	}
 

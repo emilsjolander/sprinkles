@@ -61,7 +61,7 @@ target/
 
 .gradle/
 build/
-
+.gradletasknamecache
 
 ###IntelliJ###
  

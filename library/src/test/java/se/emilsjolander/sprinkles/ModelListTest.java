@@ -20,7 +20,7 @@ import static junit.framework.Assert.*;
 
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
-public class ModelListTest {
+public class    ModelListTest {
 
     @Table("Tests")
     public static class TestModel extends Model {

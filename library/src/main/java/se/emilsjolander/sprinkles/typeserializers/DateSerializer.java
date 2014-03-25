@@ -19,7 +19,7 @@ public class DateSerializer implements TypeSerializer<Date> {
 
     @Override
     public String toSql(Date object) {
-        return ""+object.getTime();
+        return String.valueOf(object.getTime());
     }
 
     @Override

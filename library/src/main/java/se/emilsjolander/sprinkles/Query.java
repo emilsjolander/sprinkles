@@ -30,6 +30,7 @@ public final class Query {
 			Object... sqlArgs) {
 		final OneQuery<T> query = new OneQuery<T>();
 		query.resultClass = clazz;
+        query.sql = sql;
 		query.sqlQuery = Utils.insertSqlArgs(sql, sqlArgs);
 		return query;
 	}
@@ -56,6 +57,7 @@ public final class Query {
 			Object... sqlArgs) {
 		final ManyQuery<T> query = new ManyQuery<T>();
 		query.resultClass = clazz;
+        query.sql = sql;
 		query.sqlQuery = Utils.insertSqlArgs(sql, sqlArgs);
 		return query;
 	}

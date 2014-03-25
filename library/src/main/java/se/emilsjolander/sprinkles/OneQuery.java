@@ -36,6 +36,7 @@ public final class OneQuery<T extends QueryResult> {
     }
 
 	Class<T> resultClass;
+    String sql;
 	String sqlQuery;
 
 	OneQuery() {
@@ -79,7 +80,7 @@ public final class OneQuery<T extends QueryResult> {
         if (Model.class.isAssignableFrom(resultClass)) {
             respondsToUpdatedOf = Utils.concatArrays(respondsToUpdatedOf, new Class[]{resultClass});
         }
-		final int loaderId = sqlQuery.hashCode();
+		final int loaderId = sql.hashCode();
 		lm.restartLoader(loaderId, null,
 				getLoaderCallbacks(sqlQuery, resultClass, handler, respondsToUpdatedOf));
 	}
@@ -103,7 +104,7 @@ public final class OneQuery<T extends QueryResult> {
         if (Model.class.isAssignableFrom(resultClass)) {
             respondsToUpdatedOf = Utils.concatArrays(respondsToUpdatedOf, new Class[]{resultClass});
         }
-		final int loaderId = sqlQuery.hashCode();
+		final int loaderId = sql.hashCode();
 		lm.restartLoader(loaderId, null,
 				getSupportLoaderCallbacks(sqlQuery, resultClass, handler, respondsToUpdatedOf));
 	}

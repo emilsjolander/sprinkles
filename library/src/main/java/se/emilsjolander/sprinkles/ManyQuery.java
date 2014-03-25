@@ -63,10 +63,12 @@ public final class ManyQuery<T extends QueryResult> {
      *
      * @param respondsToUpdatedOf
      *      A list of models excluding the queried model that should also trigger a update to the result if they change.
+     *
+     * @return the id of the loader.
      */
 	@SuppressWarnings("unchecked")
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public void getAsync(LoaderManager lm,
+    public int getAsync(LoaderManager lm,
 			ResultHandler<T> handler,
 			Class<? extends Model>... respondsToUpdatedOf) {
         if (Model.class.isAssignableFrom(resultClass)) {
@@ -75,6 +77,7 @@ public final class ManyQuery<T extends QueryResult> {
 		final int loaderId = sql.hashCode();
 		lm.restartLoader(loaderId, null,
 				getLoaderCallbacks(sqlQuery, resultClass, handler, respondsToUpdatedOf));
+        return loaderId;
 	}
 
 
@@ -89,9 +92,11 @@ public final class ManyQuery<T extends QueryResult> {
      *
      * @param respondsToUpdatedOf
      *      A list of models excluding the queried model that should also trigger a update to the result if they change.
+     *
+     * @return the id of the loader.
      */
     @SuppressWarnings("unchecked")
-	public void getAsync(android.support.v4.app.LoaderManager lm,
+	public int getAsync(android.support.v4.app.LoaderManager lm,
 			ResultHandler<T> handler,
 			Class<? extends Model>... respondsToUpdatedOf) {
         if (Model.class.isAssignableFrom(resultClass)) {
@@ -100,6 +105,7 @@ public final class ManyQuery<T extends QueryResult> {
 		final int loaderId = sql.hashCode();
 		lm.restartLoader(loaderId, null,
 				getSupportLoaderCallbacks(sqlQuery, resultClass, handler, respondsToUpdatedOf));
+        return loaderId;
 	}
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)

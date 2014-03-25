@@ -9,7 +9,7 @@ public class SqlStatement {
     }
 
     public void execute(Object... args) {
-        DbOpenHelper.getInstance().execSQL(Utils.insertSqlArgs(sql, args));
+        Sprinkles.getDatabase().execSQL(Utils.insertSqlArgs(sql, args));
     }
 
 }

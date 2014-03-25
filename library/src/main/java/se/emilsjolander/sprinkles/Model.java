@@ -2,7 +2,6 @@ package se.emilsjolander.sprinkles;
 
 import android.content.ContentValues;
 import android.os.AsyncTask;
-
 import se.emilsjolander.sprinkles.Transaction.OnTransactionCommittedListener;
 import se.emilsjolander.sprinkles.exceptions.ContentValuesEmptyException;
 
@@ -137,7 +136,7 @@ public abstract class Model implements QueryResult {
 			@Override
 			public void onTransactionCommitted() {
 				Sprinkles.sInstance.mContext.getContentResolver().notifyChange(
-						Utils.getNotificationUri(Model.this.getClass()), null);
+						Utils.getNotificationUri(Model.this.getClass()), null, true);
 			}
 		});
 

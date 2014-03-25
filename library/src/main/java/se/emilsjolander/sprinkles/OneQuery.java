@@ -47,7 +47,7 @@ public final class OneQuery<T extends QueryResult> {
      * @return the result of the query.
      */
 	public T get() {
-		final SQLiteDatabase db = DbOpenHelper.getInstance();
+		final SQLiteDatabase db = Sprinkles.getDatabase();
 		final Cursor c = db.rawQuery(sqlQuery, null);
 
 		T result = null;

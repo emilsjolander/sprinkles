@@ -17,7 +17,7 @@ public class DoubleSerializer implements TypeSerializer<Double> {
 
     @Override
     public String toSql(Double object) {
-        return ""+object;
+        return String.valueOf(object);
     }
 
     @Override

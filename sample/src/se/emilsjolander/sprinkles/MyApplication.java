@@ -1,13 +1,12 @@
 package se.emilsjolander.sprinkles;
 
 import android.app.Application;
-
 import se.emilsjolander.sprinkles.models.Note;
 import se.emilsjolander.sprinkles.models.NoteTagLink;
 import se.emilsjolander.sprinkles.models.Tag;
 
 public class MyApplication extends Application {
-	
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -19,6 +18,5 @@ public class MyApplication extends Application {
 		initialMigration.createTable(Tag.class);
 		initialMigration.createTable(NoteTagLink.class);
 		sprinkles.addMigration(initialMigration);
-	}
-
+    }
 }

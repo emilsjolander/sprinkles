@@ -5,41 +5,32 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 class DbOpenHelper extends SQLiteOpenHelper {
-	
-	private DbOpenHelper(Context context) {
-		super(context, "sprinkles.db", null,
-				Sprinkles.sInstance.mMigrations.size());
-	}
+    private int baseVersion;
 
-	@Override
-	public void onCreate(SQLiteDatabase db) {
-		executeMigrations(db, 0, Sprinkles.sInstance.mMigrations.size());
-	}
+    protected DbOpenHelper(Context context, String databaseName, int baseVersion) {
+        super(context, databaseName, null, Sprinkles.sInstance.mMigrations.size() + baseVersion);
+        this.baseVersion = baseVersion;
+    }
 
-	@Override
-	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		executeMigrations(db, oldVersion, newVersion);
-	}
-	
-	@Override
-	public void onOpen(SQLiteDatabase db) {
-		super.onOpen(db);
-		db.execSQL("PRAGMA foreign_keys=ON;");
-	}
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        executeMigrations(db, baseVersion, Sprinkles.sInstance.mMigrations.size() + baseVersion);
+    }
 
-	private void executeMigrations(SQLiteDatabase db, int oldVersion, int newVersion) {
-		for (int i = oldVersion; i < newVersion; i++) {
-			Sprinkles.sInstance.mMigrations.get(i).execute(db);
-		}
-	}
-	
-	static SQLiteDatabase sInstance;
-	
-	static synchronized SQLiteDatabase getInstance() {
-		if (sInstance == null) {
-			sInstance = new DbOpenHelper(Sprinkles.sInstance.mContext).getWritableDatabase();
-		}
-		return sInstance;
-	}
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        executeMigrations(db, oldVersion, newVersion);
+    }
 
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        db.execSQL("PRAGMA foreign_keys=ON;");
+    }
+
+    private void executeMigrations(SQLiteDatabase db, int oldVersion, int newVersion) {
+        for (int i = oldVersion; i < newVersion; i++) {
+            Sprinkles.sInstance.mMigrations.get(i).execute(db);
+        }
+    }
 }

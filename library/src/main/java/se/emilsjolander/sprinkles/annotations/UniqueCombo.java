@@ -6,16 +6,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Adds an UNIQUE modifier to the underlying database column. To specify a conflict-clause,
+ * Adds an UNIQUE table constraint for the group of unique database columns. To specify a conflict-clause,
  * include it as a {@link se.emilsjolander.sprinkles.annotations.ConflictClause} in the parentheses. For
  * example, {@code
  *
- * @Unique(ConflictClause.ROLLBACK) private String name;
+ * @UniqueCombo(ConflictClause.ROLLBACK) private String name;
  * }. If no {@code ConflictClause} is specified, the default behavior will be used.
  * @see <a href="http://www.sqlite.org/syntaxdiagrams.html#conflict-clause">http://www.sqlite.org/syntaxdiagrams.html#conflict-clause</a>
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface UniqueCombo {
-	ConflictClause value() default ConflictClause.DEFAULT;
+	ConflictClause value() default ConflictClause.ROLLBACK;
 }

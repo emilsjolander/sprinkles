@@ -35,6 +35,7 @@ public final class ManyQuery<T extends QueryResult> {
     }
 
 	Class<T> resultClass;
+    String sql;
 	String sqlQuery;
 
 	ManyQuery() {
@@ -71,8 +72,8 @@ public final class ManyQuery<T extends QueryResult> {
         if (Model.class.isAssignableFrom(resultClass)) {
             respondsToUpdatedOf = Utils.concatArrays(respondsToUpdatedOf, new Class[]{resultClass});
         }
-		final int loaderId = sqlQuery.hashCode();
-		lm.initLoader(loaderId, null,
+		final int loaderId = sql.hashCode();
+		lm.restartLoader(loaderId, null,
 				getLoaderCallbacks(sqlQuery, resultClass, handler, respondsToUpdatedOf));
 	}
 
@@ -96,8 +97,8 @@ public final class ManyQuery<T extends QueryResult> {
         if (Model.class.isAssignableFrom(resultClass)) {
             respondsToUpdatedOf = Utils.concatArrays(respondsToUpdatedOf, new Class[]{resultClass});
         }
-		final int loaderId = sqlQuery.hashCode();
-		lm.initLoader(loaderId, null,
+		final int loaderId = sql.hashCode();
+		lm.restartLoader(loaderId, null,
 				getSupportLoaderCallbacks(sqlQuery, resultClass, handler, respondsToUpdatedOf));
 	}
 

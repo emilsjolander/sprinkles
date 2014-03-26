@@ -1,4 +1,4 @@
-package se.emilsjolander.sprinkles;
+package se.emilsjolander.sprinkles.sample;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -7,7 +7,7 @@ import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import se.emilsjolander.sprinkles.models.Tag;
+import se.emilsjolander.sprinkles.sample.models.Tag;
 
 public class CreateTagActivity extends Activity {
 

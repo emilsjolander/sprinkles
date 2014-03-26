@@ -1,4 +1,4 @@
-package se.emilsjolander.sprinkles;
+package se.emilsjolander.sprinkles.sample;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,8 +10,11 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import se.emilsjolander.sprinkles.models.Note;
-import se.emilsjolander.sprinkles.models.NoteTagLink;
+import se.emilsjolander.sprinkles.CursorList;
+import se.emilsjolander.sprinkles.ManyQuery;
+import se.emilsjolander.sprinkles.Query;
+import se.emilsjolander.sprinkles.sample.models.Note;
+import se.emilsjolander.sprinkles.sample.models.NoteTagLink;
 
 public class NotesActivity extends FragmentActivity {
 
@@ -52,8 +55,9 @@ public class NotesActivity extends FragmentActivity {
 
 		Query.many(Note.class,
                 "select Notes.*, " +
-                "(select count(*) from NoteTagLinks where NoteTagLinks.note_id = Notes.id) as tag_count " +
-                "from Notes order by created_at desc")
+                        "(select count(*) from NoteTagLinks where NoteTagLinks.note_id = Notes.id) as tag_count " +
+                        "from Notes order by created_at desc"
+        )
 				.getAsync(getLoaderManager(), onNotesLoaded,
 						NoteTagLink.class);
 

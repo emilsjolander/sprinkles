@@ -36,8 +36,8 @@ public final class OneQuery<T extends QueryResult> {
     }
 
 	Class<T> resultClass;
-    String sql;
-	String sqlQuery;
+    String placeholderQuery;
+	String rawQuery;
 
 	OneQuery() {
 	}
@@ -49,7 +49,7 @@ public final class OneQuery<T extends QueryResult> {
      */
 	public T get() {
 		final SQLiteDatabase db = Sprinkles.getDatabase();
-		final Cursor c = db.rawQuery(sqlQuery, null);
+		final Cursor c = db.rawQuery(rawQuery, null);
 
 		T result = null;
 		if (c.moveToFirst()) {
@@ -82,9 +82,9 @@ public final class OneQuery<T extends QueryResult> {
         if (Model.class.isAssignableFrom(resultClass)) {
             respondsToUpdatedOf = Utils.concatArrays(respondsToUpdatedOf, new Class[]{resultClass});
         }
-		final int loaderId = sql.hashCode();
+		final int loaderId = placeholderQuery.hashCode();
 		lm.restartLoader(loaderId, null,
-				getLoaderCallbacks(sqlQuery, resultClass, handler, respondsToUpdatedOf));
+				getLoaderCallbacks(rawQuery, resultClass, handler, respondsToUpdatedOf));
         return loaderId;
 	}
 
@@ -109,9 +109,9 @@ public final class OneQuery<T extends QueryResult> {
         if (Model.class.isAssignableFrom(resultClass)) {
             respondsToUpdatedOf = Utils.concatArrays(respondsToUpdatedOf, new Class[]{resultClass});
         }
-		final int loaderId = sql.hashCode();
+		final int loaderId = placeholderQuery.hashCode();
 		lm.restartLoader(loaderId, null,
-				getSupportLoaderCallbacks(sqlQuery, resultClass, handler, respondsToUpdatedOf));
+				getSupportLoaderCallbacks(rawQuery, resultClass, handler, respondsToUpdatedOf));
         return loaderId;
 	}
 

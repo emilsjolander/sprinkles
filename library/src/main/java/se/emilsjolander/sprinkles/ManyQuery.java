@@ -35,8 +35,8 @@ public final class ManyQuery<T extends QueryResult> {
     }
 
 	Class<T> resultClass;
-    String sql;
-	String sqlQuery;
+    String placeholderQuery;
+	String rawQuery;
 
 	ManyQuery() {
 	}
@@ -48,7 +48,7 @@ public final class ManyQuery<T extends QueryResult> {
      */
 	public CursorList<T> get() {
 		final SQLiteDatabase db = Sprinkles.getDatabase();
-		final Cursor c = db.rawQuery(sqlQuery, null);
+		final Cursor c = db.rawQuery(rawQuery, null);
 		return new CursorList<T>(c, resultClass);
 	}
 
@@ -74,9 +74,9 @@ public final class ManyQuery<T extends QueryResult> {
         if (Model.class.isAssignableFrom(resultClass)) {
             respondsToUpdatedOf = Utils.concatArrays(respondsToUpdatedOf, new Class[]{resultClass});
         }
-		final int loaderId = sql.hashCode();
+		final int loaderId = placeholderQuery.hashCode();
 		lm.restartLoader(loaderId, null,
-				getLoaderCallbacks(sqlQuery, resultClass, handler, respondsToUpdatedOf));
+				getLoaderCallbacks(rawQuery, resultClass, handler, respondsToUpdatedOf));
         return loaderId;
 	}
 
@@ -102,9 +102,9 @@ public final class ManyQuery<T extends QueryResult> {
         if (Model.class.isAssignableFrom(resultClass)) {
             respondsToUpdatedOf = Utils.concatArrays(respondsToUpdatedOf, new Class[]{resultClass});
         }
-		final int loaderId = sql.hashCode();
+		final int loaderId = placeholderQuery.hashCode();
 		lm.restartLoader(loaderId, null,
-				getSupportLoaderCallbacks(sqlQuery, resultClass, handler, respondsToUpdatedOf));
+				getSupportLoaderCallbacks(rawQuery, resultClass, handler, respondsToUpdatedOf));
         return loaderId;
 	}
 

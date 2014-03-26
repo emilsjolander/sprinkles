@@ -1,4 +1,4 @@
-package se.emilsjolander.sprinkles;
+package se.emilsjolander.sprinkles.sample;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -13,7 +13,8 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-import se.emilsjolander.sprinkles.models.Note;
+import se.emilsjolander.sprinkles.Query;
+import se.emilsjolander.sprinkles.sample.models.Note;
 
 public class CreateNoteActivity extends Activity {
 

@@ -66,17 +66,13 @@ public final class ManyQuery<T extends QueryResult> {
      *
      * @return the id of the loader.
      */
-	@SuppressWarnings("unchecked")
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public int getAsync(LoaderManager lm,
-			ResultHandler<T> handler,
-			Class<? extends Model>... respondsToUpdatedOf) {
+    public int getAsync(LoaderManager lm, ResultHandler<T> handler, Class<? extends Model>... respondsToUpdatedOf) {
         if (Model.class.isAssignableFrom(resultClass)) {
             respondsToUpdatedOf = Utils.concatArrays(respondsToUpdatedOf, new Class[]{resultClass});
         }
 		final int loaderId = placeholderQuery.hashCode();
-		lm.restartLoader(loaderId, null,
-				getLoaderCallbacks(rawQuery, resultClass, handler, respondsToUpdatedOf));
+		lm.restartLoader(loaderId, null, getLoaderCallbacks(rawQuery, resultClass, handler, respondsToUpdatedOf));
         return loaderId;
 	}
 
@@ -95,24 +91,22 @@ public final class ManyQuery<T extends QueryResult> {
      *
      * @return the id of the loader.
      */
-    @SuppressWarnings("unchecked")
-	public int getAsync(android.support.v4.app.LoaderManager lm,
-			ResultHandler<T> handler,
-			Class<? extends Model>... respondsToUpdatedOf) {
+	public int getAsync(android.support.v4.app.LoaderManager lm, ResultHandler<T> handler, Class<? extends Model>... respondsToUpdatedOf) {
         if (Model.class.isAssignableFrom(resultClass)) {
             respondsToUpdatedOf = Utils.concatArrays(respondsToUpdatedOf, new Class[]{resultClass});
         }
 		final int loaderId = placeholderQuery.hashCode();
-		lm.restartLoader(loaderId, null,
-				getSupportLoaderCallbacks(rawQuery, resultClass, handler, respondsToUpdatedOf));
+		lm.restartLoader(loaderId, null, getSupportLoaderCallbacks(rawQuery, resultClass, handler, respondsToUpdatedOf));
         return loaderId;
 	}
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    private LoaderCallbacks<Cursor> getLoaderCallbacks(final String sqlQuery,
-                                                       final Class<T> resultClass,
-                                                       final ResultHandler<T> handler,
-                                                       final Class<? extends Model>[] respondsToUpdatedOf) {
+    private LoaderCallbacks<Cursor> getLoaderCallbacks(
+            final String sqlQuery,
+            final Class<T> resultClass,
+            final ResultHandler<T> handler,
+            final Class<? extends Model>[] respondsToUpdatedOf) {
+
         return new LoaderCallbacks<Cursor>() {
 
             @Override
@@ -140,6 +134,7 @@ public final class ManyQuery<T extends QueryResult> {
 			final String sqlQuery, final Class<T> resultClass,
 			final ResultHandler<T> handler,
 			final Class<? extends Model>[] respondsToUpdatedOf) {
+
 		return new android.support.v4.app.LoaderManager.LoaderCallbacks<Cursor>() {
 
 			@Override
@@ -161,8 +156,7 @@ public final class ManyQuery<T extends QueryResult> {
 			@Override
 			public android.support.v4.content.Loader<Cursor> onCreateLoader(
 					int id, Bundle args) {
-				return new SupportCursorLoader(Sprinkles.sInstance.mContext,
-						sqlQuery, respondsToUpdatedOf);
+				return new SupportCursorLoader(Sprinkles.sInstance.mContext, sqlQuery, respondsToUpdatedOf);
 			}
 		};
 	}

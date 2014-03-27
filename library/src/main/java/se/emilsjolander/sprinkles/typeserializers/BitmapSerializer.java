@@ -1,19 +1,24 @@
 package se.emilsjolander.sprinkles.typeserializers;
 
+import android.annotation.TargetApi;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 
 import java.io.ByteArrayOutputStream;
 
 public class BitmapSerializer implements TypeSerializer<Bitmap> {
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     public Bitmap unpack(Cursor c, String name) {
         byte[] bytes = c.getBlob(c.getColumnIndex(name));
         BitmapFactory.Options opts = new BitmapFactory.Options();
-        opts.inMutable = true;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            opts.inMutable = true;
+        }
         Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, opts);
         return bmp;
     }

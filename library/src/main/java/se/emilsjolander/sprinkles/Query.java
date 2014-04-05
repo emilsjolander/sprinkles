@@ -18,8 +18,8 @@ public final class Query {
      *      The raw sql statement that should be executed.
      *
      * @param sqlArgs
-     *      The array of arguments to insert instead of ? in the sql statement.
-     *      Strings are automatically sql escaped.
+     *      The array of arguments to insert instead of ? in the placeholderQuery statement.
+     *      Strings are automatically placeholderQuery escaped.
      *
      * @param <T>
      *      The type of the model you want returned
@@ -30,7 +30,8 @@ public final class Query {
 			Object... sqlArgs) {
 		final OneQuery<T> query = new OneQuery<T>();
 		query.resultClass = clazz;
-		query.sqlQuery = Utils.insertSqlArgs(sql, sqlArgs);
+        query.placeholderQuery = sql;
+		query.rawQuery = Utils.insertSqlArgs(sql, sqlArgs);
 		return query;
 	}
 
@@ -44,8 +45,8 @@ public final class Query {
      *      The raw sql statement that should be executed.
      *
      * @param sqlArgs
-     *      The array of arguments to insert instead of ? in the sql statement.
-     *      Strings are automatically sql escaped.
+     *      The array of arguments to insert instead of ? in the placeholderQuery statement.
+     *      Strings are automatically placeholderQuery escaped.
      *
      * @param <T>
      *      The type of the list you want returned
@@ -56,7 +57,8 @@ public final class Query {
 			Object... sqlArgs) {
 		final ManyQuery<T> query = new ManyQuery<T>();
 		query.resultClass = clazz;
-		query.sqlQuery = Utils.insertSqlArgs(sql, sqlArgs);
+        query.placeholderQuery = sql;
+		query.rawQuery = Utils.insertSqlArgs(sql, sqlArgs);
 		return query;
 	}
 

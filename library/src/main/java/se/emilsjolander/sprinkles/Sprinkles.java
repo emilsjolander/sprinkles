@@ -2,6 +2,7 @@ package se.emilsjolander.sprinkles;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import se.emilsjolander.sprinkles.exceptions.NoTypeSerializerFoundException;
 import se.emilsjolander.sprinkles.exceptions.SprinklesNotInitializedException;
+import se.emilsjolander.sprinkles.typeserializers.BitmapSerializer;
 import se.emilsjolander.sprinkles.typeserializers.BooleanSerializer;
 import se.emilsjolander.sprinkles.typeserializers.DateSerializer;
 import se.emilsjolander.sprinkles.typeserializers.DoubleSerializer;
@@ -55,6 +57,7 @@ public final class Sprinkles {
 
         typeSerializers.put(String.class, new StringSerializer());
         typeSerializers.put(Date.class, new DateSerializer());
+        typeSerializers.put(Bitmap.class, new BitmapSerializer());
     }
 
     /**

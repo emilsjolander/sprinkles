@@ -36,7 +36,8 @@ public final class OneQuery<T extends QueryResult> {
     }
 
 	Class<T> resultClass;
-	String sqlQuery;
+    String placeholderQuery;
+	String rawQuery;
 
 	OneQuery() {
 	}
@@ -48,7 +49,7 @@ public final class OneQuery<T extends QueryResult> {
      */
 	public T get() {
 		final SQLiteDatabase db = Sprinkles.getDatabase();
-		final Cursor c = db.rawQuery(sqlQuery, null);
+		final Cursor c = db.rawQuery(rawQuery, null);
 
 		T result = null;
 		if (c.moveToFirst()) {
@@ -70,18 +71,17 @@ public final class OneQuery<T extends QueryResult> {
      *
      * @param respondsToUpdatedOf
      *      A list of models excluding the queried model that should also trigger a update to the result if they change.
+     *
+     * @return the id of the loader.
      */
-    @SuppressWarnings("unchecked")
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	public void getAsync(LoaderManager lm,
-			ResultHandler<T> handler,
-            Class<? extends Model>... respondsToUpdatedOf) {
+	public int getAsync(LoaderManager lm, ResultHandler<T> handler, Class<? extends Model>... respondsToUpdatedOf) {
         if (Model.class.isAssignableFrom(resultClass)) {
             respondsToUpdatedOf = Utils.concatArrays(respondsToUpdatedOf, new Class[]{resultClass});
         }
-		final int loaderId = sqlQuery.hashCode();
-		lm.initLoader(loaderId, null,
-				getLoaderCallbacks(sqlQuery, resultClass, handler, respondsToUpdatedOf));
+		final int loaderId = placeholderQuery.hashCode();
+		lm.restartLoader(loaderId, null, getLoaderCallbacks(rawQuery, resultClass, handler, respondsToUpdatedOf));
+        return loaderId;
 	}
 
     /**
@@ -95,31 +95,30 @@ public final class OneQuery<T extends QueryResult> {
      *
      * @param respondsToUpdatedOf
      *      A list of models excluding the queried model that should also trigger a update to the result if they change.
+     *
+     * @return the id of the loader.
      */
-    @SuppressWarnings("unchecked")
-	public void getAsync(android.support.v4.app.LoaderManager lm,
-			ResultHandler<T> handler,
-            Class<? extends Model>... respondsToUpdatedOf) {
+	public int getAsync(android.support.v4.app.LoaderManager lm, ResultHandler<T> handler, Class<? extends Model>... respondsToUpdatedOf) {
         if (Model.class.isAssignableFrom(resultClass)) {
             respondsToUpdatedOf = Utils.concatArrays(respondsToUpdatedOf, new Class[]{resultClass});
         }
-		final int loaderId = sqlQuery.hashCode();
-		lm.initLoader(loaderId, null,
-				getSupportLoaderCallbacks(sqlQuery, resultClass, handler, respondsToUpdatedOf));
+		final int loaderId = placeholderQuery.hashCode();
+		lm.restartLoader(loaderId, null, getSupportLoaderCallbacks(rawQuery, resultClass, handler, respondsToUpdatedOf));
+        return loaderId;
 	}
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    private LoaderCallbacks<Cursor> getLoaderCallbacks(final String sqlQuery,
-                                                       final Class<T> resultClass,
-                                                       final ResultHandler<T> handler,
-                                                       final Class<? extends Model>[] respondsToUpdatedOf) {
+    private LoaderCallbacks<Cursor> getLoaderCallbacks(
+            final String sqlQuery,
+            final Class<T> resultClass,
+            final ResultHandler<T> handler,
+            final Class<? extends Model>[] respondsToUpdatedOf) {
+
         return new LoaderCallbacks<Cursor>() {
 
             @Override
             public void onLoaderReset(Loader<Cursor> loader) {
-                if (!loader.isAbandoned()) {
-                    handler.handleResult(null);
-                }
+                // do nothing
             }
 
             @Override
@@ -132,6 +131,7 @@ public final class OneQuery<T extends QueryResult> {
                 if (!handler.handleResult(result)) {
                     loader.abandon();
                 }
+                c.close();
             }
 
             @Override
@@ -146,14 +146,12 @@ public final class OneQuery<T extends QueryResult> {
             final Class<T> resultClass,
 			final ResultHandler<T> handler,
 			final Class<? extends Model>[] respondsToUpdatedOf) {
+
 		return new android.support.v4.app.LoaderManager.LoaderCallbacks<Cursor>() {
 
 			@Override
-			public void onLoaderReset(
-					android.support.v4.content.Loader<Cursor> loader) {
-                if (!loader.isAbandoned()) {
-                    handler.handleResult(null);
-                }
+			public void onLoaderReset(android.support.v4.content.Loader<Cursor> loader) {
+                // do nothing
 			}
 
 			@Override
@@ -167,6 +165,7 @@ public final class OneQuery<T extends QueryResult> {
 				if (!handler.handleResult(result)) {
 					loader.abandon();
 				}
+                c.close();
 			}
 
 			@Override

@@ -1,5 +1,5 @@
 apply plugin: 'android-library'
-//apply plugin: 'android-test'
+apply plugin: 'android-test'
 
 repositories {
     mavenCentral()
@@ -11,15 +11,15 @@ repositories {
 dependencies {
 	compile 'com.android.support:support-v4:19.0.+'
 
-//    testCompile 'junit:junit:4.10'
-//    testCompile 'org.mockito:mockito-all:1.9.5'
-//    testCompile 'org.robolectric:robolectric:2.3-SNAPSHOT'
-//    testCompile 'com.squareup:fest-android:1.0.+'
-//
-//    androidTestCompile 'junit:junit:4.10'
-//    androidTestCompile 'org.mockito:mockito-all:1.9.5'
-//    androidTestCompile 'org.robolectric:robolectric:2.3-SNAPSHOT'
-//    androidTestCompile 'com.squareup:fest-android:1.0.+'
+    testCompile 'junit:junit:4.10'
+    testCompile 'org.mockito:mockito-all:1.9.5'
+    testCompile 'org.robolectric:robolectric:2.3-SNAPSHOT'
+    testCompile 'com.squareup:fest-android:1.0.+'
+
+    androidTestCompile 'junit:junit:4.10'
+    androidTestCompile 'org.mockito:mockito-all:1.9.5'
+    androidTestCompile 'org.robolectric:robolectric:2.3-SNAPSHOT'
+    androidTestCompile 'com.squareup:fest-android:1.0.+'
 }
 
 android {

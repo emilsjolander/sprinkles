@@ -44,12 +44,48 @@ public class MigrationTest {
         @Column("title")
         private String title;
 
+        @Unique(group = "singleGroup")
+        @Column("singleGroup")
+        private String singleGroup;
+
+        @Unique(group = "comboGroup")
+        @Column("comboGroupA")
+        private String comboGroupA;
+
+        @Unique(group = "comboGroup")
+        @Column("comboGroupB")
+        private String comboGroupB;
+
         public void setTitle(String title) {
             this.title = title;
         }
 
         public String getTitle() {
             return title;
+        }
+
+        public String getSingleGroup() {
+            return singleGroup;
+        }
+
+        public void setSingleGroup(String singleGroup) {
+            this.singleGroup = singleGroup;
+        }
+
+        public String getComboGroupA() {
+            return comboGroupA;
+        }
+
+        public void setComboGroupA(String comboGroupA) {
+            this.comboGroupA = comboGroupA;
+        }
+
+        public String getComboGroupB() {
+            return comboGroupB;
+        }
+
+        public void setComboGroupB(String comboGroupB) {
+            this.comboGroupB = comboGroupB;
         }
     }
 
@@ -67,7 +103,7 @@ public class MigrationTest {
         Migration m = new Migration();
         m.createTable(UniqueTestModel.class);
         assertEquals(m.mStatements.get(m.mStatements.size() - 1),
-                "CREATE TABLE UniqueTests(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT UNIQUE);"
+                "CREATE TABLE UniqueTests(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT UNIQUE, singleGroup TEXT, comboGroupA TEXT, comboGroupB TEXT, UNIQUE(singleGroup), UNIQUE(comboGroupA, comboGroupB));"
         );
     }
 

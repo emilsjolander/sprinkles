@@ -18,8 +18,6 @@ import se.emilsjolander.sprinkles.annotations.ForeignKey;
 import se.emilsjolander.sprinkles.annotations.NotNull;
 import se.emilsjolander.sprinkles.annotations.PrimaryKey;
 import se.emilsjolander.sprinkles.annotations.Unique;
-import se.emilsjolander.sprinkles.annotations.UniqueCombo;
-import se.emilsjolander.sprinkles.annotations.UniqueComboConflictClause;
 import se.emilsjolander.sprinkles.exceptions.AutoIncrementMustBeIntegerException;
 import se.emilsjolander.sprinkles.exceptions.CannotCascadeDeleteNonForeignKey;
 import se.emilsjolander.sprinkles.exceptions.DuplicateColumnException;
@@ -61,8 +59,6 @@ class ModelInfo {
         boolean isUnique;
         ConflictClause uniqueConflictClause;
 
-        boolean isUniqueCombo;
-
         boolean hasCheck;
         String checkClause;
     }
@@ -74,13 +70,12 @@ class ModelInfo {
     private static Map<Class<? extends QueryResult>, ModelInfo> cache = new HashMap<Class<? extends QueryResult>, ModelInfo>();
 
     String tableName;
-    ConflictClause uniqueComboConflictClause;
     Set<ColumnField> columns = new HashSet<ColumnField>();
     List<DynamicColumnField> dynamicColumns = new ArrayList<DynamicColumnField>();
     List<StaticColumnField> staticColumns = new ArrayList<StaticColumnField>();
     List<StaticColumnField> foreignKeys = new ArrayList<StaticColumnField>();
     List<StaticColumnField> primaryKeys = new ArrayList<StaticColumnField>();
-    List<StaticColumnField> uniqueCombos = new ArrayList<StaticColumnField>();
+    Map<String,List<StaticColumnField>> uniqueTableConstraint = new HashMap<String, List<StaticColumnField>>();
     StaticColumnField autoIncrementColumn;
 
 
@@ -115,7 +110,6 @@ class ModelInfo {
                 column.isPrimaryKey = field.isAnnotationPresent(PrimaryKey.class) || column.isAutoIncrement;
                 column.isCascadeDelete = field.isAnnotationPresent(CascadeDelete.class);
                 column.isUnique = field.isAnnotationPresent(Unique.class);
-                column.isUniqueCombo = field.isAnnotationPresent(UniqueCombo.class);
                 column.isNotNull = field.isAnnotationPresent(NotNull.class);
                 column.hasCheck = field.isAnnotationPresent(Check.class);
 
@@ -145,9 +139,16 @@ class ModelInfo {
                 }
                 if (column.isUnique) {
                     column.uniqueConflictClause = field.getAnnotation(Unique.class).value();
-                }
-                if (column.isUniqueCombo) {
-                    info.uniqueCombos.add(column);
+                    String group = field.getAnnotation(Unique.class).group();
+                    if(null!=group && ""!=group) {
+                        List<StaticColumnField> uniqueColumnGroup = info.uniqueTableConstraint.get(group);
+                        if(null==uniqueColumnGroup) {
+                            uniqueColumnGroup = new ArrayList<StaticColumnField>();
+                            info.uniqueTableConstraint.put(group,uniqueColumnGroup);
+                        }
+                        uniqueColumnGroup.add(column);
+                        column.isUnique = false;
+                    }
                 }
                 if (column.hasCheck) {
                     column.checkClause = field.getAnnotation(Check.class).value();
@@ -160,18 +161,23 @@ class ModelInfo {
             }
         }
 
+        //this is technically unecessary, it puts it back to a unique column constraint instead of a unique table constraint on 1 column, they should act the same
+        List<String> singleUniqueGroupDeclared = new ArrayList<String>();
+        for(Map.Entry<String,List<ModelInfo.StaticColumnField>> group : info.uniqueTableConstraint.entrySet()) {
+            if(group.getValue().size()==1) {
+                singleUniqueGroupDeclared.add(group.getKey());
+                group.getValue().get(0).isUnique = true;
+            }
+        }
+        for(String group : singleUniqueGroupDeclared) {
+            info.uniqueTableConstraint.remove(group);
+        }
+
         if (info.columns.isEmpty()) {
             throw new EmptyTableException(clazz.getName());
         }
         if (Model.class.isAssignableFrom(clazz)) {
             info.tableName = Utils.getTableName((Class<? extends Model>) clazz);
-            if(info.uniqueCombos.size() > 0) {
-                if(clazz.isAnnotationPresent(UniqueComboConflictClause.class)) {
-                    info.uniqueComboConflictClause = clazz.getAnnotation(UniqueComboConflictClause.class).value();
-                } else {
-                    info.uniqueComboConflictClause = ConflictClause.ABORT;
-                }
-            }
             if (info.primaryKeys.size() == 0) {
                 throw new NoPrimaryKeysException();
             }

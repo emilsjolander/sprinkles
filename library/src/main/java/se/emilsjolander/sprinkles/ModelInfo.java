@@ -138,7 +138,7 @@ class ModelInfo {
                     info.primaryKeys.add(column);
                 }
                 if (column.isUnique) {
-                    column.uniqueConflictClause = field.getAnnotation(Unique.class).value();
+                    column.uniqueConflictClause = field.getAnnotation(Unique.class).onConflict();
                     String group = field.getAnnotation(Unique.class).group();
                     if(null!=group && ""!=group) {
                         List<StaticColumnField> uniqueColumnGroup = info.uniqueTableConstraint.get(group);

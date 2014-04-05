@@ -17,6 +17,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Unique {
-	ConflictClause value() default ConflictClause.DEFAULT;
+	ConflictClause onConflict() default ConflictClause.DEFAULT;
     String group() default "";
 }

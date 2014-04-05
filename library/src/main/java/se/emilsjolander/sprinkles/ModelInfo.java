@@ -75,6 +75,7 @@ class ModelInfo {
     List<StaticColumnField> staticColumns = new ArrayList<StaticColumnField>();
     List<StaticColumnField> foreignKeys = new ArrayList<StaticColumnField>();
     List<StaticColumnField> primaryKeys = new ArrayList<StaticColumnField>();
+    Map<String,List<StaticColumnField>> uniqueTableConstraint = new HashMap<String, List<StaticColumnField>>();
     StaticColumnField autoIncrementColumn;
 
 
@@ -138,6 +139,16 @@ class ModelInfo {
                 }
                 if (column.isUnique) {
                     column.uniqueConflictClause = field.getAnnotation(Unique.class).value();
+                    String group = field.getAnnotation(Unique.class).group();
+                    if(null!=group && ""!=group) {
+                        List<StaticColumnField> uniqueColumnGroup = info.uniqueTableConstraint.get(group);
+                        if(null==uniqueColumnGroup) {
+                            uniqueColumnGroup = new ArrayList<StaticColumnField>();
+                            info.uniqueTableConstraint.put(group,uniqueColumnGroup);
+                        }
+                        uniqueColumnGroup.add(column);
+                        column.isUnique = false;
+                    }
                 }
                 if (column.hasCheck) {
                     column.checkClause = field.getAnnotation(Check.class).value();
@@ -148,6 +159,18 @@ class ModelInfo {
                     throw new DuplicateColumnException(column.name);
                 }
             }
+        }
+
+        //this is technically unecessary, it puts it back to a unique column constraint instead of a unique table constraint on 1 column, they should act the same
+        List<String> singleUniqueGroupDeclared = new ArrayList<String>();
+        for(Map.Entry<String,List<ModelInfo.StaticColumnField>> group : info.uniqueTableConstraint.entrySet()) {
+            if(group.getValue().size()==1) {
+                singleUniqueGroupDeclared.add(group.getKey());
+                group.getValue().get(0).isUnique = true;
+            }
+        }
+        for(String group : singleUniqueGroupDeclared) {
+            info.uniqueTableConstraint.remove(group);
         }
 
         if (info.columns.isEmpty()) {

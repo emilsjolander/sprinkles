@@ -4,6 +4,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import se.emilsjolander.sprinkles.annotations.ConflictClause;
 import se.emilsjolander.sprinkles.exceptions.NoSuchColumnFoundException;
@@ -43,6 +44,7 @@ public class Migration {
         final boolean appendPrimaryKeys =
                 !(info.primaryKeys.isEmpty() || info.primaryKeys.size() == 1 && info.autoIncrementColumn != null);
         final boolean appendForeignKeys = !info.foreignKeys.isEmpty();
+        final boolean appendUniqueTableConstraint = !info.uniqueTableConstraint.isEmpty();
 
 		for (int i = 0; i < info.staticColumns.size(); i++) {
 			final ModelInfo.StaticColumnField column = info.staticColumns.get(i);
@@ -114,6 +116,32 @@ public class Migration {
 				createStatement.append(", ");
 			}
 		}
+
+        if (appendUniqueTableConstraint) {
+            for(Map.Entry<String,List<ModelInfo.StaticColumnField>> group : info.uniqueTableConstraint.entrySet()) {
+                createStatement.append(", UNIQUE(");
+                String conflictCause = null;
+                for (int i = 0; i < group.getValue().size(); i++) {
+                    final ModelInfo.StaticColumnField column = group.getValue().get(i);
+                    createStatement.append(column.name);
+
+                    if(column.uniqueConflictClause != ConflictClause.DEFAULT && (0==i || null==conflictCause)) {
+                        conflictCause = column.uniqueConflictClause.toString();
+                    }
+
+                    // add a comma separator if there are still foreign keys to add
+                    if (i < group.getValue().size() - 1) {
+                        createStatement.append(", ");
+                    }
+                }
+                if(null==conflictCause) {
+                    createStatement.append(")");
+                } else {
+                    createStatement.append(") ON CONFLICT ");
+                    createStatement.append(conflictCause);
+                }
+            }
+        }
 
 		createStatement.append(");");
 

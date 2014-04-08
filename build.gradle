@@ -8,7 +8,7 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:0.9.+'
-        classpath 'com.squareup.gradle:gradle-android-test-plugin:0.9.1-SNAPSHOT'
+        classpath 'org.robolectric.gradle:gradle-android-test-plugin:0.9.+'
     }
 }
 

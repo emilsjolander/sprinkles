@@ -24,7 +24,7 @@ public class MyApplication extends Application {
             protected void doMigration(SQLiteDatabase db) {
                 db.execSQL(
                         "CREATE TABLE Notes (" +
-                                "id INTEGER AUTOINCREMENT PRIMARY KEY,"+
+                                "id INTEGER PRIMARY KEY AUTOINCREMENT,"+
                                 "content TEXT,"+
                                 "created_at INTEGER,"+
                                 "updated_at INTEGER"+
@@ -32,7 +32,7 @@ public class MyApplication extends Application {
                 );
                 db.execSQL(
                         "CREATE TABLE Tags (" +
-                                "id INTEGER AUTOINCREMENT PRIMARY KEY,"+
+                                "id INTEGER PRIMARY KEY AUTOINCREMENT,"+
                                 "name TEXT"+
                         ")"
                 );

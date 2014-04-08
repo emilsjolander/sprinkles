@@ -12,42 +12,17 @@ import org.robolectric.annotation.Config;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import se.emilsjolander.sprinkles.annotations.AutoIncrementPrimaryKey;
-import se.emilsjolander.sprinkles.annotations.Column;
-import se.emilsjolander.sprinkles.annotations.Table;
-
 import static junit.framework.Assert.*;
 
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
-public class    ModelListTest {
-
-    @Table("Tests")
-    public static class TestModel extends Model {
-
-        @AutoIncrementPrimaryKey
-        @Column("id") private long id;
-
-        @Column("title") private String title;
-
-        public long getId() {
-            return id;
-        }
-
-        public void setTitle(String title) {
-            this.title = title;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-    }
+public class ModelListTest {
 
     @Before
     public void initTables() {
         Sprinkles.dropInstances();
         Sprinkles sprinkles = Sprinkles.init(Robolectric.application);
-        sprinkles.addMigration(new Migration().createTable(TestModel.class));
+        sprinkles.addMigration(TestModel.MIGRATION);
     }
 
     @Test
@@ -60,17 +35,17 @@ public class    ModelListTest {
 
         ModelList<TestModel> modelList = ModelList.from(cursorList);
         assertEquals(3, modelList.size());
-        assertEquals("title1", modelList.get(0).getTitle());
-        assertEquals("title2", modelList.get(1).getTitle());
-        assertEquals("title3", modelList.get(2).getTitle());
+        assertEquals("title1", modelList.get(0).title);
+        assertEquals("title2", modelList.get(1).title);
+        assertEquals("title3", modelList.get(2).title);
     }
 
     @Test
     public void saveAllModels() {
         TestModel m1 = new TestModel();
-        m1.setTitle("foo");
+        m1.title = "foo";
         TestModel m2 = new TestModel();
-        m2.setTitle("bar");
+        m2.title = "bar";
 
         ModelList<Model> modelList = new ModelList<Model>();
         modelList.add(m1);
@@ -86,9 +61,9 @@ public class    ModelListTest {
         final CountDownLatch latch = new CountDownLatch(1);
 
         TestModel m1 = new TestModel();
-        m1.setTitle("foo");
+        m1.title = "foo";
         TestModel m2 = new TestModel();
-        m2.setTitle("bar");
+        m2.title = "bar";
 
         ModelList<Model> modelList = new ModelList<Model>();
         modelList.add(m1);
@@ -108,9 +83,9 @@ public class    ModelListTest {
     @Test
     public void deleteAllModels() {
         TestModel m1 = new TestModel();
-        m1.setTitle("foo");
+        m1.title = "foo";
         TestModel m2 = new TestModel();
-        m2.setTitle("bar");
+        m2.title = "bar";
 
         ModelList<Model> modelList = new ModelList<Model>();
         modelList.add(m1);
@@ -128,9 +103,9 @@ public class    ModelListTest {
         final CountDownLatch latch = new CountDownLatch(1);
 
         TestModel m1 = new TestModel();
-        m1.setTitle("foo");
+        m1.title = "foo";
         TestModel m2 = new TestModel();
-        m2.setTitle("bar");
+        m2.title = "bar";
 
         ModelList<Model> modelList = new ModelList<Model>();
         modelList.add(m1);

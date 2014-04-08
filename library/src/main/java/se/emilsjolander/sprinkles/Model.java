@@ -68,7 +68,7 @@ public abstract class Model implements QueryResult {
 
     /**
      * Save this model to the database.
-     * If this model has an @AutoIncrementPrimaryKey annotation on a property
+     * If this model has an @AutoIncrement annotation on a property
      * than that property will be set when this method returns.
      *
      * @return whether or not the save was successful.
@@ -85,7 +85,7 @@ public abstract class Model implements QueryResult {
 
     /**
      * Save this model to the database within the given transaction.
-     * If this model has an @AutoIncrementPrimaryKey annotation on a property
+     * If this model has an @AutoIncrement annotation on a property
      * than that property will be set when this method returns.
      *
      * @param t

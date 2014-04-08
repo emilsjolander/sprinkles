@@ -1,18 +1,15 @@
 package se.emilsjolander.sprinkles;
 
-import android.accounts.Account;
+import android.annotation.TargetApi;
 import android.database.ContentObserver;
 import android.net.Uri;
-import org.junit.Before;
+import android.os.Build;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-import se.emilsjolander.sprinkles.annotations.AutoIncrementPrimaryKey;
-import se.emilsjolander.sprinkles.annotations.Column;
-import se.emilsjolander.sprinkles.annotations.Table;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 @Config(emulateSdk = 18)
@@ -20,8 +17,8 @@ import static org.mockito.Mockito.*;
 public class SprinklesContentObserverTest {
 
     @Test
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public void delegateToWrappedObserver() {
-        Account account = new Account("name", "type");
         ContentObserver observer = mock(ContentObserver.class);
         SprinklesContentObserver sprinklesContentObserver = new SprinklesContentObserver(observer);
 

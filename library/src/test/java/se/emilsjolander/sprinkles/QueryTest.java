@@ -9,11 +9,6 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import se.emilsjolander.sprinkles.annotations.AutoIncrementPrimaryKey;
-import se.emilsjolander.sprinkles.annotations.Column;
-import se.emilsjolander.sprinkles.annotations.DynamicColumn;
-import se.emilsjolander.sprinkles.annotations.Table;
-
 import static junit.framework.Assert.*;
 
 @Config(emulateSdk = 18)
@@ -22,47 +17,26 @@ public class QueryTest {
 
     public static class TestActivity extends Activity{}
 
-    @Table("Tests")
-    public static class TestModel extends Model {
-
-        @AutoIncrementPrimaryKey
-        @Column("id") private long id;
-
-        @Column("title")
-        private String title;
-
-        @DynamicColumn("count")
-        private int count;
-
-        public void setTitle(String title) {
-            this.title = title;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-    }
-
     @Before
     public void initTables() {
         Sprinkles.dropInstances();
-        Sprinkles.init(Robolectric.application).addMigration(new Migration().createTable(TestModel.class));
+        Sprinkles.init(Robolectric.application).addMigration(TestModel.MIGRATION);
     }
 
     @Test
     public void one() {
         TestModel t = new TestModel();
-        t.setTitle("title");
+        t.title = "hej";
         t.save();
         TestModel result = Query.one(TestModel.class, "select * from Tests where title=?", "title").get();
-        assertEquals(result.getTitle(), "title");
+        assertEquals(result.title, "title");
     }
 
     @Test
     public void many() {
         for (int i = 0 ; i<10 ; i++) {
             TestModel t = new TestModel();
-            t.setTitle("title"+i);
+            t.title = "title"+i;
             t.save();
         }
         CursorList<TestModel> result = Query.many(TestModel.class, "select * from Tests where title like 'title%'", "title").get();
@@ -74,7 +48,7 @@ public class QueryTest {
     public void all() {
         for (int i = 0 ; i<10 ; i++) {
             TestModel t = new TestModel();
-            t.setTitle("title"+i);
+            t.title = "title"+i;
             t.save();
         }
         CursorList<TestModel> result = Query.all(TestModel.class).get();
@@ -86,7 +60,7 @@ public class QueryTest {
     public void dynamicColumnResult() {
         for (int i = 0 ; i<10 ; i++) {
             TestModel t = new TestModel();
-            t.setTitle("title"+i);
+            t.title = "title"+i;
             t.save();
         }
 

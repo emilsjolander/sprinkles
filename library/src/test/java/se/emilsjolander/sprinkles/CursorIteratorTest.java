@@ -10,33 +10,11 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import se.emilsjolander.sprinkles.annotations.AutoIncrementPrimaryKey;
-import se.emilsjolander.sprinkles.annotations.Column;
-import se.emilsjolander.sprinkles.annotations.Table;
-
 import static org.junit.Assert.*;
 
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
 public class CursorIteratorTest {
-
-    @Table("Tests")
-    public static class TestModel extends Model {
-
-        @AutoIncrementPrimaryKey
-        @Column("id") private long id;
-
-        @Column("title")
-        private String title;
-
-        public void setTitle(String title) {
-            this.title = title;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-    }
 
     private CursorIterator<TestModel> iterator;
 
@@ -67,7 +45,7 @@ public class CursorIteratorTest {
     public void next() {
         iterator.next();
         TestModel model = iterator.next();
-        assertEquals(model.getTitle(), "title2");
+        assertEquals(model.title, "title2");
     }
 
     @Test(expected = UnsupportedOperationException.class)

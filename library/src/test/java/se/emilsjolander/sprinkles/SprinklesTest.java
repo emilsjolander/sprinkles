@@ -2,17 +2,14 @@ package se.emilsjolander.sprinkles;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-
 import android.database.sqlite.SQLiteDatabase;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-
-
-import java.io.File;
 
 import se.emilsjolander.sprinkles.exceptions.NoTypeSerializerFoundException;
 import se.emilsjolander.sprinkles.typeserializers.SqlType;
@@ -67,7 +64,12 @@ public class SprinklesTest {
     public void addMigration() {
         Sprinkles s = Sprinkles.init(Robolectric.application);
         assertEquals(s.mMigrations.size(), 0);
-        Migration m = new Migration();
+        Migration m = new Migration(){
+            @Override
+            protected void doMigration(SQLiteDatabase db) {
+
+            }
+        };
         s.addMigration(m);
         assertEquals(s.mMigrations.get(0), m);
     }

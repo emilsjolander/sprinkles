@@ -7,46 +7,24 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import se.emilsjolander.sprinkles.annotations.AutoIncrementPrimaryKey;
-import se.emilsjolander.sprinkles.annotations.Column;
-import se.emilsjolander.sprinkles.annotations.Table;
-
 import static junit.framework.Assert.*;
 
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
 public class TransactionTest {
 
-    @Table("Tests")
-    public static class TestModel extends Model {
-
-        @AutoIncrementPrimaryKey
-        @Column("id") private long id;
-
-        @Column("title")
-        private String title;
-
-        public void setTitle(String title) {
-            this.title = title;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-    }
-
     @Before
     public void initTables() {
         Sprinkles.dropInstances();
         Sprinkles sprinkles = Sprinkles.init(Robolectric.application);
-        sprinkles.addMigration(new Migration().createTable(TestModel.class));
+        sprinkles.addMigration(TestModel.MIGRATION);
     }
 
     @Test
     public void commit() throws InterruptedException {
         Transaction t = new Transaction();
         TestModel m = new TestModel();
-        m.setTitle("hej");
+        m.title = "hej";
         m.save(t);
         t.setSuccessful(true);
         t.finish();
@@ -57,7 +35,7 @@ public class TransactionTest {
     public void rollback() {
         Transaction t = new Transaction();
         TestModel m = new TestModel();
-        m.setTitle("hej");
+        m.title = "hej";
         m.save(t);
         t.setSuccessful(false);
         t.finish();
@@ -75,7 +53,7 @@ public class TransactionTest {
             }
         });
         TestModel m = new TestModel();
-        m.setTitle("hej");
+        m.title = "hej";
         m.save(t);
         t.setSuccessful(true);
         t.finish();
@@ -93,7 +71,7 @@ public class TransactionTest {
             }
         });
         TestModel m = new TestModel();
-        m.setTitle("hej");
+        m.title = "hej";
         m.save(t);
         t.setSuccessful(false);
         t.finish();

@@ -6,11 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Adds an CHECK constraint to the underlying database column.
- * Pass the sql clause that must pass as a parameter to this annotation.
+ * Adds an PRIMARY KEY modifier to the underlying database column
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Check {
-    String value();
+public @interface Key {
+
 }

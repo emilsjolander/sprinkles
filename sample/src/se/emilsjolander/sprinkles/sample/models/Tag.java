@@ -1,16 +1,15 @@
 package se.emilsjolander.sprinkles.sample.models;
 
 import se.emilsjolander.sprinkles.Model;
-import se.emilsjolander.sprinkles.annotations.AutoIncrementPrimaryKey;
+import se.emilsjolander.sprinkles.annotations.AutoIncrement;
 import se.emilsjolander.sprinkles.annotations.Column;
 import se.emilsjolander.sprinkles.annotations.Table;
 
 @Table("Tags")
 public class Tag extends Model {
 	
-	@AutoIncrementPrimaryKey
+	@AutoIncrement
 	@Column("id") private long id;
-
 	@Column("name") private String name;
 	
 	public long getId() {

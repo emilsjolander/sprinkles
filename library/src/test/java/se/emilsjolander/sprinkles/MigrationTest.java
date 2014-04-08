@@ -42,7 +42,6 @@ public class MigrationTest {
                 throw new IllegalStateException();
             }
         }
-
     }
 
     @Test

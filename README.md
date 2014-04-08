@@ -90,7 +90,7 @@ API
 - `@PrimaryKey` Used to mark a field as a primary key. Multiple primary keys in a class are allowed and will result in a composite primary key.
 - `@ForeignKey` Used to mark a field as a foreign key. The argument given to this annotation should be in the form of `"foreignKeyTable(foreignKeyColumn)"`.
 - `@CascadeDelete` Used to mark a field which is also marked as a foreign key as a cascade deleting field.
-- `@Unique` Used to mark a field which should be unique in the database. Optionally, a conflict clause can be specified in the form of `@Unique(ConflictClause.FAIL)`.
+- `@Unique` Used to mark a field which should be unique in the database. Optionally, a conflict clause can be specified in the form of `@Unique(ConflictClause.FAIL)` and a unique grouping can be specified in the form of `@Unique(group="unique group")` or combined in the form of `@Unique(value=ConflictClause.FAIL,group="unique group")`.
 - `@NotNull` Used to mark a field which should not allow null values in the underlying database column.
 - `@Check` Used to add a CHECK constraint to the underlying column. The string passed to this annotation is the sql clause that must pass for column to be inserted.
 

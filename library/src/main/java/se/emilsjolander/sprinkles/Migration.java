@@ -8,6 +8,7 @@ public abstract class Migration {
         onPreMigrate();
         doMigration(db);
         onPostMigrate();
+
     }
 
     protected void onPreMigrate(){}

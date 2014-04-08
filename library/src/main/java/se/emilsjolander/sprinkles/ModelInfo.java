@@ -8,14 +8,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import se.emilsjolander.sprinkles.annotations.AutoIncrement;
+import se.emilsjolander.sprinkles.annotations.AutoIncrementKey;
 import se.emilsjolander.sprinkles.annotations.Column;
 import se.emilsjolander.sprinkles.annotations.DynamicColumn;
 import se.emilsjolander.sprinkles.annotations.Key;
 import se.emilsjolander.sprinkles.exceptions.AutoIncrementMustBeIntegerException;
 import se.emilsjolander.sprinkles.exceptions.DuplicateColumnException;
 import se.emilsjolander.sprinkles.exceptions.EmptyTableException;
-import se.emilsjolander.sprinkles.exceptions.NoPrimaryKeysException;
+import se.emilsjolander.sprinkles.exceptions.NoKeysException;
 import se.emilsjolander.sprinkles.typeserializers.SqlType;
 
 class ModelInfo {
@@ -83,7 +83,7 @@ class ModelInfo {
                 StaticColumnField column = new StaticColumnField();
                 column.name = field.getAnnotation(Column.class).value();
 
-                column.isAutoIncrement = field.isAnnotationPresent(AutoIncrement.class);
+                column.isAutoIncrement = field.isAnnotationPresent(AutoIncrementKey.class);
                 column.isKey = field.isAnnotationPresent(Key.class) || column.isAutoIncrement;
 
                 column.sqlType = Sprinkles.sInstance.getTypeSerializer(field.getType()).getSqlType().name();
@@ -112,10 +112,10 @@ class ModelInfo {
         if (Model.class.isAssignableFrom(clazz)) {
             info.tableName = Utils.getTableName((Class<? extends Model>) clazz);
             if (info.keys.size() == 0) {
-                throw new NoPrimaryKeysException();
+                throw new NoKeysException();
             }
             if (info.autoIncrementColumn != null && info.keys.size() > 1) {
-                throw new IllegalStateException("A model with a field marked as @AutoIncrement may not mark any other field with @Key");
+                throw new IllegalStateException("A model with a field marked as @AutoIncrementKey may not mark any other field with @Key");
             }
         }
 

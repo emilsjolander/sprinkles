@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import java.util.Date;
 
-import se.emilsjolander.sprinkles.annotations.AutoIncrement;
+import se.emilsjolander.sprinkles.annotations.AutoIncrementKey;
 import se.emilsjolander.sprinkles.annotations.Column;
 import se.emilsjolander.sprinkles.annotations.DynamicColumn;
 import se.emilsjolander.sprinkles.annotations.Table;
@@ -26,7 +26,7 @@ public class TestModel extends Model {
         }
     };
 
-    @AutoIncrement
+    @AutoIncrementKey
     @Column("id") public long id;
     @Column("title") public String title;
     @Column("created_at") public Date createdAt;

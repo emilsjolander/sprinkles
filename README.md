@@ -2,10 +2,6 @@
 =========
 Sprinkles is a boiler-plate-reduction-library for dealing with databases in android applications. Some would call it a kind of ORM but I don't see it that way. Sprinkles lets SQL do what it is good at, making complex queries. SQL however is a mess (in my opinion) when is comes to everything else. This is why sprinkles helps you with things such as inserting, updating, and destroying models. Sprinkles will also help you with the tedious task of unpacking a cursor into a model. Sprinkles actively supports version 2.3 of Android and above but it should work on older versions as well.
 
-Sprinkles works great together with https://github.com/square/retrofit for saving information from your server.
-
-A intro into sprinkles can be found in this blog post http://emilsjolander.github.io/blog/2013/12/18/android-with-sprinkles/
-
 Download
 --------
 Using gradle, add the following to your `build.gradle`. Just replace `x.x.x` with the correct version of the library (found under the releases tab).
@@ -25,7 +21,7 @@ When you have added the library to your project add a model class to it. I will 
 @Table("Notes")
 public class Note extends Model {
 
-	@AutoIncrementPrimaryKey
+	@AutoIncrementKey
 	@Column("id")
 	private long id;
 
@@ -41,7 +37,7 @@ public class Note extends Model {
 
 }
 ```
-Ok, a lot of important stuff in this short class. First of all, a model must subclass `se.emilsjolander.sprinkles.Model` and it also must have a `@Table` annotations specifying the table name that the model corresponds to. After the class declaration we have declared three members: `id`, `title` and `body`. Notice how all of them have a `@Column` annotation to mark that they are not only a member of this class but also a column of the table that this class represents. We have one last annotation in the above example. The `@AutoIncrementPrimaryKey`, this annotation tells sprinkles that the field is both an autoincrement field and a primary key field. A field with this annotation will automatically be set upon the creation of its corresponding row in the table.
+Ok, a lot of important stuff in this short class. First of all, a model must subclass `se.emilsjolander.sprinkles.Model` and it also must have a `@Table` annotations specifying the table name that the model corresponds to. After the class declaration we have declared three members: `id`, `title` and `body`. Notice how all of them have a `@Column` annotation to mark that they are not only a member of this class but also a column of the table that this class represents. We have one last annotation in the above example. The `@AutoIncrementKey`, this annotation tells sprinkles that the field is both an autoincrement field and a key field. A field with this annotation will automatically be set upon the creation of its corresponding row in the table. Key columns are the columns that are used to decide wether a model is already stored in the database when using methods such as `delete()` and `save()`.
 
 Before using this class you must migrate it into the database. I recommend doing this in the `onCreate()` method of an `Application` subclass like this:
 ```java
@@ -53,9 +49,28 @@ public class MyApplication extends Application {
 
 		Sprinkles sprinkles = Sprinkles.init(getApplicationContext());
 
-		Migration initialMigration = new Migration();
-		initialMigration.createTable(Note.class);
-		sprinkles.addMigration(initialMigration);
+        sprinkles.addMigration(new Migration() {
+            @Override
+            protected void onPreMigrate() {
+                // do nothing
+            }
+
+            @Override
+            protected void doMigration(SQLiteDatabase db) {
+                db.execSQL(
+                        "CREATE TABLE Notes (" +
+                                "id INTEGER PRIMARY KEY AUTOINCREMENT,"+
+                                "title TEXT,"+
+                                "body TEXT"+
+                        ")"
+                );
+            }
+
+            @Override
+            protected void onPostMigrate() {
+                // do nothing
+            }
+        });
 	}
 
 }
@@ -84,15 +99,10 @@ API
 ---
 ###Annotations
 - `@Table` Used to associate a model class with a SQL table.
-- `@AutoIncrementPrimaryKey` Used to mark a field as an auto-incrementing primary key. The field must be an `int` or a `long` and cannot be in the same class as any other primary key.
+- `@AutoIncrementKey` Used to mark a field as an auto-incrementing key. The field must be an `int` or a `long` and cannot be in the same class as any other key.
 - `@Column` Used to associate a class field with a SQL column.
 - `@DynamicColumn` Used to associate a class field with a dynamic SQL column such as an alias in a query.
-- `@PrimaryKey` Used to mark a field as a primary key. Multiple primary keys in a class are allowed and will result in a composite primary key.
-- `@ForeignKey` Used to mark a field as a foreign key. The argument given to this annotation should be in the form of `"foreignKeyTable(foreignKeyColumn)"`.
-- `@CascadeDelete` Used to mark a field which is also marked as a foreign key as a cascade deleting field.
-- `@Unique` Used to mark a field which should be unique in the database. Optionally, a conflict clause can be specified in the form of `@Unique(ConflictClause.FAIL)` and a unique grouping can be specified in the form of `@Unique(group="unique group")` or combined in the form of `@Unique(value=ConflictClause.FAIL,group="unique group")`.
-- `@NotNull` Used to mark a field which should not allow null values in the underlying database column.
-- `@Check` Used to add a CHECK constraint to the underlying column. The string passed to this annotation is the sql clause that must pass for column to be inserted.
+- `@Key` Used to mark a field as a key. Multiple keys in a class are allowed and will result in a composite key. Keys will most often want to be mapped directly to primary keys in your database.
 
 ###Saving
 The save method is both an insert and an update method, the correct operation will be done depending on the model's existence in the database. The first two methods below are synchronous, the second is for use together with a transaction (more on that later). There are also two asynchronous methods, one with a callback and one without. The synchronous methods will return a boolean indicating if the model was saved or not. The asynchronous method with a callback will just not invoke the callback if saving failed.
@@ -223,22 +233,33 @@ public class MyApplication extends Application {
 
 		Sprinkles sprinkles = Sprinkles.init(getApplicationContext());
 
-		Migration initialMigration = new Migration();
-		initialMigration.createTable(Note.class);
-		sprinkles.addMigration(initialMigration);
+        sprinkles.addMigration(new Migration() {
+            @Override
+            protected void onPreMigrate() {
+                // do nothing
+            }
+
+            @Override
+            protected void doMigration(SQLiteDatabase db) {
+                db.execSQL(
+                        "CREATE TABLE Notes (" +
+                                "id INTEGER PRIMARY KEY AUTOINCREMENT,"+
+                                "title TEXT,"+
+                                "body TEXT"+
+                        ")"
+                );
+            }
+
+            @Override
+            protected void onPostMigrate() {
+                // do nothing
+            }
+        });
 	}
 
 }
 ```
-The above example uses the `createTable()` method on a migration. Here is a full list of the methods it supports:
-```java
-void createTable(Class<? extends Model> clazz);
-void dropTable(Class<? extends Model> clazz);
-void renameTable(String from, String to);
-void addColumn(Class<? extends Model> clazz, String columnName);
-void addRawStatement(String statement);
-```
-Any number of calls to any of the above migrations are allowed, if for example `createTable()` is called twice then two tables will be created once that migration has been added. Remember to never edit a migration, always create a new migration (this only applies to the production version of your app of course).
+Migrations are performed using raw SQL, this allowes full freedom to use all of the powerfull contraints that are possible to put on columns. Two optional methods are provided that allow you do some form of processing of your data before and after a migration, this can be usefull when recreating a table with different properties but you want to keep the data that was previously stored in the now deleted table. Once a migration has been added with `sprinkles.addMigration()` it should NEVER be changed, and all new migrations should be added after the previous migration. This ensures both old and new clients will have a consistent database and you will not need to care about database versioning.
 
 ###Type serializers
 Through an instance of `Sprinkles` you can register your own `TypeSerializer` instances via `registerType()` for serializing an object in your model into a column in the database. Sprinkles uses a `TypeSerializer` implementation internally for all the different data types that it supports. So check out the `se.emilsjolander.sprinkles.typeserializers` package for example implementations. These serializers will be used both when saving a model and when querying rows from the database.

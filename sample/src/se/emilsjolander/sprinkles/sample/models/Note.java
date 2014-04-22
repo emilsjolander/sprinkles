@@ -6,13 +6,14 @@ import se.emilsjolander.sprinkles.Model;
 import se.emilsjolander.sprinkles.annotations.AutoIncrement;
 import se.emilsjolander.sprinkles.annotations.Column;
 import se.emilsjolander.sprinkles.annotations.DynamicColumn;
+import se.emilsjolander.sprinkles.annotations.Key;
 import se.emilsjolander.sprinkles.annotations.Table;
 
 @Table("Notes")
 public class Note extends Model {
 
 	@AutoIncrement
-	@Column("id") private long id;
+    @Key @Column("id") private long id;
 	@Column("content") private String content;
 	@Column("created_at") private Date createdAt;
 	@Column("updated_at") private Date updatedAt;

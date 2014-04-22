@@ -16,6 +16,7 @@ import java.util.Date;
 
 import se.emilsjolander.sprinkles.annotations.AutoIncrement;
 import se.emilsjolander.sprinkles.annotations.Column;
+import se.emilsjolander.sprinkles.annotations.Key;
 import se.emilsjolander.sprinkles.annotations.Table;
 import se.emilsjolander.sprinkles.exceptions.NoTableAnnotationException;
 
@@ -27,6 +28,7 @@ public class UtilsTest {
 
     public static class AbsTestModel extends Model {
 
+        @Key
         @AutoIncrement
         @Column("id") private long id;
 

@@ -8,6 +8,7 @@ import java.util.Date;
 import se.emilsjolander.sprinkles.annotations.AutoIncrement;
 import se.emilsjolander.sprinkles.annotations.Column;
 import se.emilsjolander.sprinkles.annotations.DynamicColumn;
+import se.emilsjolander.sprinkles.annotations.Key;
 import se.emilsjolander.sprinkles.annotations.Table;
 
 @Table("Tests")
@@ -26,6 +27,7 @@ public class TestModel extends Model {
         }
     };
 
+    @Key
     @AutoIncrement
     @Column("id") public long id;
     @Column("title") public String title;

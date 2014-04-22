@@ -68,7 +68,7 @@ public abstract class Model implements QueryResult {
 
     /**
      * Save this model to the database.
-     * If this model has an @AutoIncrementKey annotation on a property
+     * If this model has an @AutoIncrement annotation on a property
      * than that property will be set when this method returns.
      *
      * @return whether or not the save was successful.
@@ -85,7 +85,7 @@ public abstract class Model implements QueryResult {
 
     /**
      * Save this model to the database within the given transaction.
-     * If this model has an @AutoIncrementKey annotation on a property
+     * If this model has an @AutoIncrement annotation on a property
      * than that property will be set when this method returns.
      *
      * @param t
@@ -119,12 +119,12 @@ public abstract class Model implements QueryResult {
                 return false;
             }
 
-            // set the @AutoIncrementKey column if one exists
+            // set the @AutoIncrement column if one exists
             final ModelInfo info = ModelInfo.from(getClass());
-            if (info.autoIncrementColumn != null) {
-                info.autoIncrementColumn.field.setAccessible(true);
+            if (info.autoIncrementField != null) {
+                info.autoIncrementField.field.setAccessible(true);
                 try {
-                    info.autoIncrementColumn.field.set(this, id);
+                    info.autoIncrementField.field.set(this, id);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }

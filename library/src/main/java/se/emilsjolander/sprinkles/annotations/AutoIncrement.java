@@ -6,10 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Adds an AUTOINCREMENT PRIMARY KEY modifier to the underlying database column
+ * Specify that a this columns set by the database on insert.
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AutoIncrementKey {
+public @interface AutoIncrement {
 
 }

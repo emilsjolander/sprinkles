@@ -41,7 +41,7 @@ class Utils {
         final Object[] args = new Object[info.keys.size()];
 
 		for (int i = 0; i < info.keys.size(); i++) {
-			final ModelInfo.StaticColumnField column = info.keys.get(i);
+			final ModelInfo.ColumnField column = info.keys.get(i);
 			where.append(column.name);
 			where.append("=?");
 
@@ -65,8 +65,8 @@ class Utils {
 		final ModelInfo info = ModelInfo.from(model.getClass());
 		final ContentValues values = new ContentValues();
 		
-		for (ModelInfo.StaticColumnField column : info.staticColumns) {
-			if (column.isAutoIncrement) {
+		for (ModelInfo.ColumnField column : info.columns) {
+			if (column.isAutoIncrement || column.isDynamic) {
 				continue;
 			}
 			column.field.setAccessible(true);

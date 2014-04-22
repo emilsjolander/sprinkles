@@ -21,7 +21,8 @@ When you have added the library to your project add a model class to it. I will 
 @Table("Notes")
 public class Note extends Model {
 
-	@AutoIncrementKey
+    @Key
+	@AutoIncrement
 	@Column("id")
 	private long id;
 
@@ -37,7 +38,7 @@ public class Note extends Model {
 
 }
 ```
-Ok, a lot of important stuff in this short class. First of all, a model must subclass `se.emilsjolander.sprinkles.Model` and it also must have a `@Table` annotations specifying the table name that the model corresponds to. After the class declaration we have declared three members: `id`, `title` and `body`. Notice how all of them have a `@Column` annotation to mark that they are not only a member of this class but also a column of the table that this class represents. We have one last annotation in the above example. The `@AutoIncrementKey`, this annotation tells sprinkles that the field is both an autoincrement field and a key field. A field with this annotation will automatically be set upon the creation of its corresponding row in the table. Key columns are the columns that are used to decide wether a model is already stored in the database when using methods such as `delete()` and `save()`.
+Ok, a lot of important stuff in this short class. First of all, a model must subclass `se.emilsjolander.sprinkles.Model` and it also must have a `@Table` annotations specifying the table name that the model corresponds to. After the class declaration we have declared three members: `id`, `title` and `body`. Notice how all of them have a `@Column` annotation to mark that they are not only a member of this class but also a column of the table that this class represents. We have one last annotation in the above example. The `@AutoIncrement` annotation tells sprinkles that the field should automatically be set upon the creation of its corresponding row in the table. Key columns are the columns that are used to decide whether a model is already stored in the database when using methods such as `delete()` and `save()`.
 
 Before using this class you must migrate it into the database. I recommend doing this in the `onCreate()` method of an `Application` subclass like this:
 ```java
@@ -99,7 +100,7 @@ API
 ---
 ###Annotations
 - `@Table` Used to associate a model class with a SQL table.
-- `@AutoIncrementKey` Used to mark a field as an auto-incrementing key. The field must be an `int` or a `long` and cannot be in the same class as any other key.
+- `@AutoIncrement` Used to mark a field as an auto-incrementing. The field must be an `int` or a `long`.
 - `@Column` Used to associate a class field with a SQL column.
 - `@DynamicColumn` Used to associate a class field with a dynamic SQL column such as an alias in a query.
 - `@Key` Used to mark a field as a key. Multiple keys in a class are allowed and will result in a composite key. Keys will most often want to be mapped directly to primary keys in your database.

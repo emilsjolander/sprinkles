@@ -1,7 +1,9 @@
 package se.emilsjolander.sprinkles;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
@@ -11,6 +13,12 @@ import static se.emilsjolander.sprinkles.ModelInfo.*;
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
 public class ModelInfoTest {
+
+    @Before
+    public void initTables() {
+        Sprinkles.dropInstances();
+        Sprinkles.init(Robolectric.application);
+    }
 
     @Test
     public void columnFieldEquals() {

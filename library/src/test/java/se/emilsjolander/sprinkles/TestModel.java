@@ -20,7 +20,7 @@ public class TestModel extends Model {
             db.execSQL(
                     "CREATE TABLE Tests("+
                             "id INTEGER PRIMARY KEY AUTOINCREMENT,"+
-                            "title TEXt,"+
+                            "title TEXT,"+
                             "created_at INTEGER"+
                     ");"
             );

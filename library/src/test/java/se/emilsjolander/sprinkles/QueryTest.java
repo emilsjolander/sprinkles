@@ -26,7 +26,7 @@ public class QueryTest {
     @Test
     public void one() {
         TestModel t = new TestModel();
-        t.title = "hej";
+        t.title = "title";
         t.save();
         TestModel result = Query.one(TestModel.class, "select * from Tests where title=?", "title").get();
         assertEquals(result.title, "title");

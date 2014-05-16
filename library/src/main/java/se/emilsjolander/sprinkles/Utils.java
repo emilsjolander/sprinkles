@@ -4,6 +4,10 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -132,4 +136,25 @@ class Utils {
         return result;
     }
 
+    static String readRawText(int rawId) {
+        final InputStream inputStream = Sprinkles.sInstance.mContext
+                .getResources().openRawResource(rawId);
+        final InputStreamReader inputStreamReader = new InputStreamReader(
+                inputStream);
+        final BufferedReader bufferedReader = new BufferedReader(
+                inputStreamReader);
+
+        String line;
+        final StringBuilder body = new StringBuilder();
+        try {
+            while ((line = bufferedReader.readLine()) != null)
+            {
+                body.append(line);
+                body.append('\n');
+            }
+        } catch (IOException e) {
+            return null;
+        }
+        return body.toString();
+    }
 }

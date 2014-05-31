@@ -13,7 +13,7 @@ dependencies {
 
     androidTestCompile 'junit:junit:4.10'
     androidTestCompile 'org.mockito:mockito-all:1.9.5'
-    androidTestCompile 'org.robolectric:robolectric:2.3-SNAPSHOT'
+    androidTestCompile 'org.robolectric:robolectric:2.3'
     androidTestCompile 'com.squareup:fest-android:1.0.+'
 }
 

@@ -1,5 +1,5 @@
 apply plugin: 'android-library'
-apply plugin: 'android-test'
+//apply plugin: 'android-test'
 
 repositories {
     mavenCentral()
@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies {
-	compile 'com.android.support:support-v4:19.0.+'
+	compile 'com.android.support:support-v4:19.1.0'
 
     androidTestCompile 'junit:junit:4.10'
     androidTestCompile 'org.mockito:mockito-all:1.9.5'
@@ -19,7 +19,7 @@ dependencies {
 
 android {
     compileSdkVersion 19
-    buildToolsVersion '19.0.3'
+    buildToolsVersion '19.1.0'
 
     sourceSets {
         main {
@@ -31,4 +31,4 @@ android {
     }
 }
 
-apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/eaa6b5404b7594e6c23b884fdc5795f545db55dd/gradle-mvn-push.gradle'
+//apply from: 'https://raw.github.com/shamanland/gradle-mvn-push/cc18d56549cdea03f744b6fff27911569394073e/gradle-mvn-push.gradle'

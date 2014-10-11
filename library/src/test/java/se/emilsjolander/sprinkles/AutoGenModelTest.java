@@ -14,23 +14,26 @@ import org.robolectric.annotation.Config;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
-public class ModelTest {
+public class AutoGenModelTest {
 
     @Before
     public void initTables() {
         Sprinkles.dropInstances();
         ModelInfo.clearCache();
-        Sprinkles sprinkles = Sprinkles.init(Robolectric.application,"sprinkle.db",1);
-//        sprinkles.addMigration(TestModel.MIGRATION);
+        Sprinkles sprinkles = Sprinkles.init(Robolectric.application);
+//        sprinkles.addMigration(AutoGenTestModel.MIGRATION);
     }
 
     @Test
     public void isValid() {
-        TestModel m = new TestModel();
+        AutoGenTestModel m = new AutoGenTestModel();
         m.title = "hej";
 
         m.valid = false;
@@ -42,13 +45,13 @@ public class ModelTest {
 
     @Test
     public void beforeCreate() {
-        TestModel m = new TestModel();
+        AutoGenTestModel m = new AutoGenTestModel();
         m.title = "hej";
         m.save();
 
         ContentValues contentValues = Utils.getContentValues(m);
-        assertEquals(2, contentValues.size());
-        assertNotNull(contentValues.get("created_at"));
+        assertEquals(6, contentValues.size());
+        assertNotNull(contentValues.get("createdAt"));
 
         assertTrue(m.created);
         m.created = false;
@@ -60,7 +63,7 @@ public class ModelTest {
 
     @Test
     public void beforeSave() {
-        TestModel m = new TestModel();
+        AutoGenTestModel m = new AutoGenTestModel();
         m.title = "hej";
 
         m.save();
@@ -74,7 +77,7 @@ public class ModelTest {
 
     @Test
     public void afterDelete() {
-        TestModel m = new TestModel();
+        AutoGenTestModel m = new AutoGenTestModel();
         m.title = "hej";
 
         m.save();
@@ -86,7 +89,7 @@ public class ModelTest {
 
     @Test
     public void exists() {
-        TestModel m = new TestModel();
+        AutoGenTestModel m = new AutoGenTestModel();
         m.title = "hej";
 
         assertFalse(m.exists());
@@ -96,7 +99,7 @@ public class ModelTest {
 
     @Test
     public void save() {
-        TestModel m = new TestModel();
+        AutoGenTestModel m = new AutoGenTestModel();
         m.title = "hej";
 
         m.save();
@@ -105,7 +108,7 @@ public class ModelTest {
 
     @Test
     public void setAutoIncrementKeyOnCreate() {
-        TestModel m = new TestModel();
+        AutoGenTestModel m = new AutoGenTestModel();
         m.title = "hej";
         m.save();
         assertFalse(m.id == 0);
@@ -113,20 +116,20 @@ public class ModelTest {
 
     @Test
     public void saveWithNullField() {
-        TestModel m = new TestModel();
+        AutoGenTestModel m = new AutoGenTestModel();
         m.title = "hej";
         assertTrue(m.save());
-        assertEquals(Query.one(TestModel.class, "select * from Tests").get().title, "hej");
+        assertEquals(Query.one(AutoGenTestModel.class, "select * from "+Utils.getTableName(AutoGenTestModel.class)).get().title, "hej");
         m.title = null;
         assertTrue(m.save());
-        assertEquals(Query.one(TestModel.class, "select * from Tests").get().title, null);
+        assertEquals(Query.one(AutoGenTestModel.class, "select * from "+Utils.getTableName(AutoGenTestModel.class)).get().title, null);
     }
 
     @Test
     public void saveAsync() throws InterruptedException {
         final CountDownLatch latch = new CountDownLatch(1);
 
-        TestModel m = new TestModel();
+        AutoGenTestModel m = new AutoGenTestModel();
         m.title = "hej";
         m.saveAsync(new Model.OnSavedCallback() {
             @Override
@@ -140,7 +143,7 @@ public class ModelTest {
 
     @Test
     public void delete() {
-        TestModel m = new TestModel();
+        AutoGenTestModel m = new AutoGenTestModel();
         m.title = "hej";
 
         m.save();
@@ -152,7 +155,7 @@ public class ModelTest {
     public void deleteAsync() throws InterruptedException {
         final CountDownLatch latch = new CountDownLatch(1);
 
-        TestModel m = new TestModel();
+        AutoGenTestModel m = new AutoGenTestModel();
         m.title = "hej";
         m.save();
         m.deleteAsync(new Model.OnDeletedCallback() {
@@ -167,11 +170,11 @@ public class ModelTest {
 
     @Test
     public void notifyContentChangeOnSave() {
-        TestModel m = new TestModel();
+        AutoGenTestModel m = new AutoGenTestModel();
         m.title = "hej";
         final boolean[] notified = new boolean[1];
         Sprinkles.sInstance.mContext.getContentResolver().
-                registerContentObserver(Utils.getNotificationUri(TestModel.class), false, new ContentObserver(new Handler()) {
+                registerContentObserver(Utils.getNotificationUri(AutoGenTestModel.class), false, new ContentObserver(new Handler()) {
                     @Override
                     public void onChange(boolean selfChange) {
                         notified[0] = true;
@@ -183,12 +186,12 @@ public class ModelTest {
 
     @Test
     public void notifyContentChangeOnDelete() {
-        TestModel m = new TestModel();
+        AutoGenTestModel m = new AutoGenTestModel();
         m.title = "hej";
         m.save();
         final boolean[] notified = new boolean[1];
         Sprinkles.sInstance.mContext.getContentResolver().
-                registerContentObserver(Utils.getNotificationUri(TestModel.class), false, new ContentObserver(new Handler()) {
+                registerContentObserver(Utils.getNotificationUri(AutoGenTestModel.class), false, new ContentObserver(new Handler()) {
                     @Override
                     public void onChange(boolean selfChange) {
                         notified[0] = true;

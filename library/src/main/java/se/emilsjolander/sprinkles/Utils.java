@@ -13,6 +13,7 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
+import se.emilsjolander.sprinkles.annotations.AutoGenerateColumnNames;
 import se.emilsjolander.sprinkles.annotations.Table;
 import se.emilsjolander.sprinkles.exceptions.NoTableAnnotationException;
 import se.emilsjolander.sprinkles.typeserializers.TypeSerializer;
@@ -22,7 +23,7 @@ class Utils {
 	static <T extends QueryResult> T getResultFromCursor(Class<T> resultClass, Cursor c) {
 		try {
             final ModelInfo info = ModelInfo.from(resultClass);
-			T result = resultClass.newInstance();
+			T result = Model.createModel(resultClass);
             List<String> colNames = Arrays.asList(c.getColumnNames());
             for (ModelInfo.ColumnField column : info.columns) {
                 if (!colNames.contains(column.name)) {

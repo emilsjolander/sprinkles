@@ -3,7 +3,9 @@ package se.emilsjolander.sprinkles;
 import android.content.ContentValues;
 import android.os.AsyncTask;
 import se.emilsjolander.sprinkles.Transaction.OnTransactionCommittedListener;
+import se.emilsjolander.sprinkles.annotations.ManyToOne;
 import se.emilsjolander.sprinkles.exceptions.ContentValuesEmptyException;
+import se.emilsjolander.sprinkles.exceptions.IllegalOneToManyColumnException;
 
 public abstract class Model implements QueryResult {
 
@@ -20,6 +22,31 @@ public abstract class Model implements QueryResult {
 	public interface OnDeletedCallback {
 		void onDeleted();
 	}
+
+    public static <T extends QueryResult> T createModel(Class<T> clazz){
+        if(clazz==null){
+            throw new IllegalArgumentException("clazz must not be null");
+        }
+        T instance = null;
+        try {
+            instance = clazz.newInstance();
+            //check relationship of model
+            final ModelInfo info = ModelInfo.from(clazz);
+            for (ModelInfo.OneToManyColumnField columnField : info.oneToManyColumns){
+                columnField.field.setAccessible(true);
+                Class one2ManyContainerType = columnField.field.getType();
+                if(!ModelList.class.isAssignableFrom(one2ManyContainerType)){
+                    throw new IllegalOneToManyColumnException();
+                }
+                columnField.field.set(instance,one2ManyContainerType.newInstance());
+            }
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return instance;
+    }
 
     /**
      * Check if this model is valid. Returning false will not allow this model to be saved.

@@ -9,6 +9,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Object representing a Query that will return a single result.
  *
@@ -54,6 +59,27 @@ public final class OneQuery<T extends QueryResult> {
 		T result = null;
 		if (c.moveToFirst()) {
 			result = Utils.getResultFromCursor(resultClass, c);
+            List<String> colNames = Arrays.asList(c.getColumnNames());
+            //fill oneToMany field
+            for (ModelInfo.OneToManyColumnField oneToManyColumnField : ModelInfo.from(resultClass).oneToManyColumns) {
+                if (!colNames.contains(oneToManyColumnField.name)) {
+                    continue;
+                }
+                final ManyQuery query = new ManyQuery();
+                query.resultClass = oneToManyColumnField.manyModelClass;
+                query.placeholderQuery = "SELECT * FROM " + Utils.getTableName(oneToManyColumnField.manyModelClass)
+                        + " "+oneToManyColumnField.manyColumn+"=?";
+                Integer foreignKeyValue = c.getInt(c.getColumnIndexOrThrow(oneToManyColumnField.oneColumn));
+                query.rawQuery = Utils.insertSqlArgs(query.placeholderQuery,new Object[]{foreignKeyValue});
+                ModelList manyModels = ModelList.from(query.get());
+                if(manyModels!=null) {
+                    try {
+                        oneToManyColumnField.field.set(result, manyModels);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
 		}
 
 		c.close();

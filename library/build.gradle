@@ -1,22 +1,51 @@
-apply plugin: 'android-library'
-//apply plugin: 'android-test'
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url 'https://oss.sonatype.org/content/repositories/snapshots/'
+        }
+    }
 
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.12.+'
+//        classpath 'org.robolectric:robolectric-gradle-plugin:0.13.+'
+        classpath 'com.github.jcandksolutions.gradle:android-unit-test:1.6.2'
+    }
+}
+apply plugin: 'android-library'
+apply plugin: 'idea'
+idea {
+    module {
+        testOutputDir = file('build/test-classes')
+    }
+}
 repositories {
     mavenCentral()
     maven {
         url 'https://oss.sonatype.org/content/repositories/snapshots/'
     }
 }
+task pushDownJdkDependency {
+    def imlFile = file("library.iml")
+    doLast {
+        try {
+            def parsedXml = (new XmlParser()).parse(imlFile)
+            def jdkNode = parsedXml.component[1].orderEntry.find { it.'@type' == 'jdk' }
 
-dependencies {
-	compile 'com.android.support:support-v4:19.1.0'
+            parsedXml.component[1].remove(jdkNode)
+            new Node(parsedXml.component[1], 'orderEntry', ['type': 'jdk', 'jdkName': "Android API 19 Platform", 'jdkType': 'Android SDK'])
+            def writer = new StringWriter()
+            new XmlNodePrinter(new PrintWriter(writer)).print(parsedXml)
+            imlFile.text = writer.toString()
 
-    androidTestCompile 'junit:junit:4.10'
-    androidTestCompile 'org.mockito:mockito-all:1.9.5'
-    androidTestCompile 'org.robolectric:robolectric:2.3'
-    androidTestCompile 'com.squareup:fest-android:1.0.+'
+        } catch (FileNotFoundException e) {
+            // nop, iml not found
+        }
+    }
 }
-
+gradle.projectsEvaluated {
+    preBuild.dependsOn(pushDownJdkDependency)
+}
 android {
     compileSdkVersion 19
     buildToolsVersion '19.1.0'
@@ -29,6 +58,24 @@ android {
             androidTest.setRoot('src/test')
         }
     }
+    defaultConfig {
+        minSdkVersion 10
+        targetSdkVersion 19
+        versionCode 2
+        versionName "2.0.0"
+        testInstrumentationRunner "com.google.android.apps.common.testing.testrunner.GoogleInstrumentationTestRunner"
+    }
+}
+apply plugin: 'android-unit-test'
+
+dependencies {
+    compile 'com.android.support:support-v4:19.1.0'
+    testCompile 'junit:junit:4.10'
+    testCompile 'org.robolectric:robolectric:2.3'
+//    testDebugCompile 'org.debugonly.dependency'
+//    testFreeCompile 'Admob.jar'
+    testCompile 'org.mockito:mockito-all:1.9.5'
+    testCompile('com.squareup:fest-android:1.0.+') { exclude module: 'support-v4' }
 }
 
 //apply from: 'https://raw.github.com/shamanland/gradle-mvn-push/cc18d56549cdea03f744b6fff27911569394073e/gradle-mvn-push.gradle'

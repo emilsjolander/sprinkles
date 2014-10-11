@@ -8,7 +8,7 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:0.12.+'
-//        classpath 'org.robolectric.gradle:gradle-android-test-plugin:0.9.+'
+//        classpath 'org.robolectric:robolectric-gradle-plugin:0.11.+'
     }
 }
 
@@ -25,4 +25,4 @@ allprojects {
     }
 }
 
-apply plugin: 'android-reporting'
+//apply plugin: 'android-reporting'

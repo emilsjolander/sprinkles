@@ -55,7 +55,7 @@ class ModelInfo {
         Class manyModelClass;
     }
 
-    private static Map<Class<? extends QueryResult>, ModelInfo> cache = new HashMap<Class<? extends QueryResult>, ModelInfo>();
+    static Map<Class<? extends QueryResult>, ModelInfo> cache = new HashMap<Class<? extends QueryResult>, ModelInfo>();
 
     String tableName;
     Set<ColumnField> columns = new HashSet<ColumnField>();
@@ -63,99 +63,106 @@ class ModelInfo {
     Set<OneToManyColumnField> oneToManyColumns = new HashSet<OneToManyColumnField>();
     Set<ManyToOneColumnField> manyToOneColumns = new HashSet<ManyToOneColumnField>();
     ColumnField autoIncrementField;
+    boolean isTableChecked = false;
 
     private ModelInfo(){
         // hide contructor
     }
 
     static ModelInfo from(Class<? extends QueryResult> clazz) {
-        if (cache.containsKey(clazz)) {
-            return cache.get(clazz);
-        }
-        ModelInfo info = new ModelInfo();
+        synchronized (clazz) {
+            if (cache.containsKey(clazz)) {
+                return cache.get(clazz);
+            }
+            ModelInfo info = new ModelInfo();
 
-        final Field[] fields = Utils.getAllDeclaredFields(clazz, Object.class);
-        boolean isAutoGenerateColumnNames = clazz.isAnnotationPresent(AutoGenerateColumnNames.class);
-        for (Field field : fields) {
-            if (field.isAnnotationPresent(DynamicColumn.class)) {
-                ColumnField column = new ColumnField();
-                column.isDynamic = true;
+            final Field[] fields = Utils.getAllDeclaredFields(clazz, Object.class);
+            boolean isAutoGenerateColumnNames = clazz.isAnnotationPresent(AutoGenerateColumnNames.class);
+            for (Field field : fields) {
+                if (field.isAnnotationPresent(DynamicColumn.class)) {
+                    ColumnField column = new ColumnField();
+                    column.isDynamic = true;
 
-                column.name = field.getAnnotation(DynamicColumn.class).value();
-                column.sqlType = Sprinkles.sInstance.getTypeSerializer(field.getType()).getSqlType().name();
-                column.field = field;
-
-                if (!info.columns.add(column)) {
-                    throw new DuplicateColumnException(column.name);
-                }
-
-            } else if (isAutoGenerateColumnNames||field.isAnnotationPresent(Column.class)) {
-                ColumnField column = new ColumnField();
-                column.isAutoIncrement = field.isAnnotationPresent(AutoIncrement.class);
-                column.isKey = field.isAnnotationPresent(Key.class) || column.isAutoIncrement;
-
-                //check relationship
-                if(field.isAnnotationPresent(ManyToOne.class)){
-                    ManyToOneColumnField m2oColumn = new ManyToOneColumnField();
-                    m2oColumn.name = isAutoGenerateColumnNames?field.getName():field.getAnnotation(Column.class).value();
-                    m2oColumn.sqlType = Sprinkles.sInstance.getTypeSerializer(Integer.class).getSqlType().name();
-                    //many2one need to store the foreign key value
-                    m2oColumn.field = field;
-                    m2oColumn.manyColumn = field.getAnnotation(ManyToOne.class).manyColumn();
-                    m2oColumn.oneColumn = field.getAnnotation(ManyToOne.class).oneColumn();
-
-                    if (!info.manyToOneColumns.add(m2oColumn)) {
-                        throw new DuplicateColumnException(column.name);
-                    }
-                }else if(field.isAnnotationPresent(OneToMany.class)){
-                    OneToManyColumnField o2mColumn = new OneToManyColumnField();
-                    o2mColumn.name = isAutoGenerateColumnNames?field.getName():field.getAnnotation(Column.class).value();
-//                    o2mColumn.sqlType = Sprinkles.sInstance.getTypeSerializer().getSqlType().name();
-                    //one2many field do not need  sqltype
-                    o2mColumn.field = field;
-                    o2mColumn.manyColumn = field.getAnnotation(OneToMany.class).manyColumn();
-                    o2mColumn.oneColumn = field.getAnnotation(OneToMany.class).oneColumn();
-                    o2mColumn.manyModelClass = field.getAnnotation(OneToMany.class).manyModelClass();
-
-                    if (!info.oneToManyColumns.add(o2mColumn)) {
-                        throw new DuplicateColumnException(column.name);
-                    }
-                }else {
-                    //if 'AutoGenerateColumnNames' property of table has been set to true,
-                    //the field will be recognized as a column default
-                    column.name = isAutoGenerateColumnNames?field.getName():field.getAnnotation(Column.class).value();
+                    column.name = field.getAnnotation(DynamicColumn.class).value();
                     column.sqlType = Sprinkles.sInstance.getTypeSerializer(field.getType()).getSqlType().name();
                     column.field = field;
 
-                    if (column.isAutoIncrement && !column.sqlType.equals(SqlType.INTEGER.name())) {
-                        throw new AutoIncrementMustBeIntegerException(column.name);
-                    }
-                    if (column.isAutoIncrement) {
-                        info.autoIncrementField = column;
-                    }
-                    if (column.isKey) {
-                        info.keys.add(column);
-                    }
                     if (!info.columns.add(column)) {
                         throw new DuplicateColumnException(column.name);
                     }
+
+                } else if (isAutoGenerateColumnNames || field.isAnnotationPresent(Column.class)) {
+                    ColumnField column = new ColumnField();
+                    column.isAutoIncrement = field.isAnnotationPresent(AutoIncrement.class);
+                    column.isKey = field.isAnnotationPresent(Key.class) || column.isAutoIncrement;
+
+                    //check relationship
+                    if (field.isAnnotationPresent(ManyToOne.class)) {
+                        ManyToOneColumnField m2oColumn = new ManyToOneColumnField();
+                        m2oColumn.name = field.getAnnotation(ManyToOne.class).manyColumn();
+                        m2oColumn.sqlType = Sprinkles.sInstance.getTypeSerializer(Integer.class).getSqlType().name();
+                        //many2one need to store the foreign key value
+                        m2oColumn.field = field;
+                        m2oColumn.manyColumn = field.getAnnotation(ManyToOne.class).manyColumn();
+                        m2oColumn.oneColumn = field.getAnnotation(ManyToOne.class).oneColumn();
+
+                        if (!info.manyToOneColumns.add(m2oColumn)) {
+                            throw new DuplicateColumnException(column.name);
+                        }
+                    } else if (field.isAnnotationPresent(OneToMany.class)) {
+                        OneToManyColumnField o2mColumn = new OneToManyColumnField();
+                        o2mColumn.name = field.getAnnotation(OneToMany.class).oneColumn();
+//                    o2mColumn.sqlType = Sprinkles.sInstance.getTypeSerializer().getSqlType().name();
+                        //one2many field do not need  sqltype
+                        o2mColumn.field = field;
+                        o2mColumn.manyColumn = field.getAnnotation(OneToMany.class).manyColumn();
+                        o2mColumn.oneColumn = field.getAnnotation(OneToMany.class).oneColumn();
+                        o2mColumn.manyModelClass = field.getAnnotation(OneToMany.class).manyModelClass();
+
+                        if (!info.oneToManyColumns.add(o2mColumn)) {
+                            throw new DuplicateColumnException(column.name);
+                        }
+                    } else {
+                        //if 'AutoGenerateColumnNames' property of table has been set to true,
+                        //the field will be recognized as a column default
+                        column.name = isAutoGenerateColumnNames ? field.getName() : field.getAnnotation(Column.class).value();
+                        column.sqlType = Sprinkles.sInstance.getTypeSerializer(field.getType()).getSqlType().name();
+                        column.field = field;
+
+                        if (column.isAutoIncrement && !column.sqlType.equals(SqlType.INTEGER.name())) {
+                            throw new AutoIncrementMustBeIntegerException(column.name);
+                        }
+                        if (column.isAutoIncrement) {
+                            info.autoIncrementField = column;
+                        }
+                        if (column.isKey) {
+                            info.keys.add(column);
+                        }
+                        if (!info.columns.add(column)) {
+                            throw new DuplicateColumnException(column.name);
+                        }
+                    }
+
                 }
-
             }
-        }
 
-        if (info.columns.isEmpty()) {
-            throw new EmptyTableException(clazz.getName());
-        }
-        if (Model.class.isAssignableFrom(clazz)) {
-            info.tableName = Utils.getTableName((Class<? extends Model>) clazz);
-            if (info.keys.size() == 0) {
-                throw new NoKeysException();
+            if (info.columns.isEmpty()) {
+                throw new EmptyTableException(clazz.getName());
             }
-        }
+            if (Model.class.isAssignableFrom(clazz)) {
+                info.tableName = Utils.getTableName((Class<? extends Model>) clazz);
+                if (info.keys.size() == 0) {
+                    throw new NoKeysException();
+                }
+            }
 
-        cache.put(clazz, info);
-        return info;
+            cache.put(clazz, info);
+            return info;
+        }
+    }
+
+    static void clearCache(){
+        cache.clear();
     }
 
 }

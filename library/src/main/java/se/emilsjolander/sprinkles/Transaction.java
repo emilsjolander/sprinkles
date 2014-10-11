@@ -60,20 +60,24 @@ public final class Transaction {
 		}
 	}
 
-	long insert(String table, ContentValues values) {
-		return mDb.insert(table, null, values);
+	long insert(ModelInfo table, ContentValues values) {
+        Utils.assureTableExist(table);
+		return mDb.insert(table.tableName, null, values);
 	}
 
-	int update(String table, ContentValues values, String where) {
-		return mDb.update(table, values, where, null);
+	int update(ModelInfo table, ContentValues values, String where) {
+        Utils.assureTableExist(table);
+		return mDb.update(table.tableName, values, where, null);
 	}
 
-	int delete(String table, String where) {
-		return mDb.delete(table, where, null);
+	int delete(ModelInfo table, String where) {
+		return mDb.delete(table.tableName, where, null);
 	}
 
 	void addOnTransactionCommittedListener(OnTransactionCommittedListener listener) {
 		mOnTransactionCommittedListeners.add(listener);
 	}
+
+
 
 }

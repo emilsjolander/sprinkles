@@ -6,14 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Specify that a class maps to a table with the table name as parameter.
+ * Specify that a this columns is a key column. It will be used to check existence of this model in the database.
  */
-@Target(ElementType.TYPE)
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Table {
-    /**
-     * if value is empty,the default table name will be class full name
-     * @return
-     */
-	String value() default "";
+public @interface Index {
+
 }

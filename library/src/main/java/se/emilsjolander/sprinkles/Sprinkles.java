@@ -69,7 +69,7 @@ public final class Sprinkles {
      * The default DB name is "sprinkles.db".
      */
     public static synchronized Sprinkles init(Context context) {
-        return init(context, "sprinkles.db", 0);
+        return init(context, "sprinkles.db", 1);
     }
 
     /**
@@ -130,6 +130,7 @@ public final class Sprinkles {
     public static synchronized void dropInstances() {
         sInstance = null;
         sDatabase = null;
+        ModelInfo.clearCache();
     }
 
     /**

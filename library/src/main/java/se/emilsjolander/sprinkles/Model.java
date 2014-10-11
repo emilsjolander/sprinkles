@@ -135,23 +135,23 @@ public abstract class Model implements QueryResult {
         if (cv.size() == 0) {
             throw new ContentValuesEmptyException();
         }
-        final String tableName = Utils.getTableName(getClass());
+//        final String tableName = Utils.getTableName(getClass());
+        ModelInfo table = ModelInfo.from(getClass());
         if (doesExist) {
-            if (t.update(tableName, cv, Utils.getWhereStatement(this)) == 0) {
+            if (t.update(table, cv, Utils.getWhereStatement(this)) == 0) {
                 return false;
             }
         } else {
-            long id = t.insert(tableName, cv);
+            long id = t.insert(table, cv);
             if (id == -1) {
                 return false;
             }
 
             // set the @AutoIncrement column if one exists
-            final ModelInfo info = ModelInfo.from(getClass());
-            if (info.autoIncrementField != null) {
-                info.autoIncrementField.field.setAccessible(true);
+            if (table.autoIncrementField != null) {
+                table.autoIncrementField.field.setAccessible(true);
                 try {
-                    info.autoIncrementField.field.set(this, id);
+                    table.autoIncrementField.field.set(this, id);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -219,7 +219,7 @@ public abstract class Model implements QueryResult {
      *      The transaction to delete this model in
      */
 	final public void delete(Transaction t) {
-		t.delete(Utils.getTableName(getClass()), Utils.getWhereStatement(this));
+		t.delete(ModelInfo.from(getClass()), Utils.getWhereStatement(this));
         t.addOnTransactionCommittedListener(new OnTransactionCommittedListener() {
 
             @Override

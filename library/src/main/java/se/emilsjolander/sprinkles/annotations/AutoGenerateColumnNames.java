@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 /**
  * Specify that column names in this table will be auto generated.
  */
-@Target(ElementType.FIELD)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AutoGenerateColumnNames {
 }

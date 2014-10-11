@@ -28,7 +28,7 @@ public final class Query {
      */
 	public static <T extends QueryResult> OneQuery<T> one(Class<T> clazz, String sql,
 			Object... sqlArgs) {
-		final OneQuery<T> query = new OneQuery<T>();
+        final OneQuery<T> query = new OneQuery<T>();
 		query.resultClass = clazz;
         query.placeholderQuery = sql;
 		query.rawQuery = Utils.insertSqlArgs(sql, sqlArgs);

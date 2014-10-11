@@ -9,8 +9,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -54,8 +52,8 @@ public final class OneQuery<T extends QueryResult> {
      */
 	public T get() {
 		final SQLiteDatabase db = Sprinkles.getDatabase();
-		final Cursor c = db.rawQuery(rawQuery, null);
-
+        Utils.assureTableExist(ModelInfo.from(resultClass));
+        final Cursor c = db.rawQuery(rawQuery, null);
 		T result = null;
 		if (c.moveToFirst()) {
 			result = Utils.getResultFromCursor(resultClass, c);

@@ -30,7 +30,7 @@ class DbOpenHelper extends SQLiteOpenHelper {
 
     private void executeMigrations(SQLiteDatabase db, int oldVersion, int newVersion) {
         for (int i = oldVersion; i < newVersion; i++) {
-            Sprinkles.sInstance.mMigrations.get(i).execute(db);
+            Sprinkles.sInstance.mMigrations.get(i-oldVersion).execute(db);
         }
     }
 }

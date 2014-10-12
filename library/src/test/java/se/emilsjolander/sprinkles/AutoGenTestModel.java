@@ -3,13 +3,13 @@ package se.emilsjolander.sprinkles;
 
 import java.util.Date;
 
-import se.emilsjolander.sprinkles.annotations.AutoGenColumnNames;
+import se.emilsjolander.sprinkles.annotations.AutoGen;
 import se.emilsjolander.sprinkles.annotations.AutoIncrement;
 import se.emilsjolander.sprinkles.annotations.Key;
 import se.emilsjolander.sprinkles.annotations.Table;
 
 @Table
-@AutoGenColumnNames
+@AutoGen
 public class AutoGenTestModel extends Model {
 
     @Key

@@ -1,19 +1,15 @@
 package se.emilsjolander.sprinkles;
 
 
-import android.database.sqlite.SQLiteDatabase;
-
 import java.util.Date;
 
-import se.emilsjolander.sprinkles.annotations.AutoGenerateColumnNames;
+import se.emilsjolander.sprinkles.annotations.AutoGenColumnNames;
 import se.emilsjolander.sprinkles.annotations.AutoIncrement;
-import se.emilsjolander.sprinkles.annotations.Column;
-import se.emilsjolander.sprinkles.annotations.DynamicColumn;
 import se.emilsjolander.sprinkles.annotations.Key;
 import se.emilsjolander.sprinkles.annotations.Table;
 
 @Table
-@AutoGenerateColumnNames
+@AutoGenColumnNames
 public class AutoGenTestModel extends Model {
 
     @Key

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import se.emilsjolander.sprinkles.annotations.AutoGenerateColumnNames;
+import se.emilsjolander.sprinkles.annotations.AutoGenColumnNames;
 import se.emilsjolander.sprinkles.annotations.AutoIncrement;
 import se.emilsjolander.sprinkles.annotations.Column;
 import se.emilsjolander.sprinkles.annotations.DynamicColumn;
@@ -77,7 +77,7 @@ class ModelInfo {
             ModelInfo info = new ModelInfo();
 
             final Field[] fields = Utils.getAllDeclaredFields(clazz, Object.class);
-            boolean isAutoGenerateColumnNames = clazz.isAnnotationPresent(AutoGenerateColumnNames.class);
+            boolean isAutoGenerateColumnNames = clazz.isAnnotationPresent(AutoGenColumnNames.class);
             for (Field field : fields) {
                 if (field.isAnnotationPresent(DynamicColumn.class)) {
                     ColumnField column = new ColumnField();

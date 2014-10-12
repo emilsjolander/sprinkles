@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import se.emilsjolander.sprinkles.annotations.AutoGenerateColumnNames;
 import se.emilsjolander.sprinkles.annotations.Index;
 import se.emilsjolander.sprinkles.annotations.Table;
 import se.emilsjolander.sprinkles.exceptions.NoTableAnnotationException;

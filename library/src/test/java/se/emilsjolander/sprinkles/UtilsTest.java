@@ -69,7 +69,7 @@ public class UtilsTest {
         c.addRow(new Object[]{"title2", 2});
         c.addRow(new Object[]{"title3", 3});
         c.moveToPosition(2);
-        TestModel m = Utils.getResultFromCursor(TestModel.class, c);
+        TestModel m = DataResolver.getResultFromCursor(TestModel.class, c);
         assertEquals(m.getId(), 3);
         assertEquals(m.getTitle(), "title3");
     }

@@ -3,6 +3,7 @@ package se.emilsjolander.sprinkles;
 import android.database.Cursor;
 import android.text.TextUtils;
 
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
@@ -14,17 +15,63 @@ import se.emilsjolander.sprinkles.exceptions.NoTableAnnotationException;
  * Created by panwenye on 14-10-12.
  */
 public class DataResolver {
-    static Hashtable<Class,Hashtable<String,Object>> sRecordCache = new Hashtable<Class, Hashtable<String, Object>>();
+    /**
+     * when the number of cached records for specific model is larger than RECORD_CACHE_LIMIT,recycleRecordCache method will be triggered
+     */
+    public static final int  RECORD_CACHE_LIMIT = 100;
+    static Hashtable<Class,Hashtable<String,WeakReference<Object>>> sCachePool = new Hashtable<Class, Hashtable<String, WeakReference<Object>>>();
+
+    /**
+     * update record in cache.usually be called after save or update data
+     * @param m
+     */
+    static void updateRecordCache(Model m){
+        Hashtable<String, WeakReference<Object>> cacheForModel = sCachePool.get(m.getClass());
+        if(cacheForModel==null){
+            cacheForModel = new Hashtable<String, WeakReference<Object>>();
+            sCachePool.put(m.getClass(), cacheForModel);
+        }
+        if(cacheForModel.size()>RECORD_CACHE_LIMIT){
+            recycleRecordCache(m.getClass());
+        }
+        cacheForModel.put(getKeyValueTag(m),new WeakReference<Object>(m));
+    }
+
+    static void removeRecordCache(Model m){
+        Hashtable<String, WeakReference<Object>> cacheForModel = sCachePool.get(m.getClass());
+        if(cacheForModel!=null){
+            cacheForModel.remove(getKeyValueTag(m));
+        }
+    }
+
+
+    /**
+     * remove useless record from cache
+     * @param modelClazz
+     */
+    static void recycleRecordCache(Class modelClazz){
+        Hashtable<String, WeakReference<Object>> cacheForModel = sCachePool.get(modelClazz);
+        if(cacheForModel !=null){
+            for (String key : cacheForModel.keySet()){
+                if(cacheForModel.get(key)==null
+                        ||cacheForModel.get(key).get()==null){
+                    cacheForModel.remove(key);
+                }
+            }
+        }
+    }
+
+
     public static <T extends QueryResult> T getResultFromCursor(Class<T> resultClass, Cursor c) {
         try {
-            if(sRecordCache.get(resultClass)==null){
-                sRecordCache.put(resultClass, new Hashtable<String, Object>());
+            if(sCachePool.get(resultClass)==null){
+                sCachePool.put(resultClass, new Hashtable<String, WeakReference<Object>>());
             }
-            Hashtable<String,Object> cacheForModel = sRecordCache.get(resultClass);
+            Hashtable<String,WeakReference<Object>> cacheForModel = sCachePool.get(resultClass);
             final ModelInfo info = ModelInfo.from(resultClass);
             String keyValueTag = getKeyValueTag(info, c);
-            if(cacheForModel.containsKey(keyValueTag)){
-                return (T)cacheForModel.get(keyValueTag);
+            if(cacheForModel.containsKey(keyValueTag)&&cacheForModel.get(keyValueTag)!=null){
+                return (T)cacheForModel.get(keyValueTag).get();
             }
 
             T result = resultClass.newInstance();
@@ -94,13 +141,14 @@ public class DataResolver {
         final StringBuilder keyValuesTag = new StringBuilder();
         final Object[] args = new Object[info.keys.size()];
 
-        for (int i = 0; i < info.keys.size(); i++) {
-            final ModelInfo.ColumnField column = info.keys.get(i);
-            column.field.setAccessible(true);
-            try {
-                keyValuesTag.append(column.field.get(m)+"_");
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
+        for (ModelInfo.ColumnField column : info.columns) {
+            if(column.isKey||column.isDynamic) {
+                column.field.setAccessible(true);
+                try {
+                    keyValuesTag.append(column.field.get(m) + "_");
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         return keyValuesTag.toString();
@@ -113,10 +161,13 @@ public class DataResolver {
      */
     public static String getKeyValueTag(ModelInfo info,Cursor c){
         final StringBuilder keyValuesTag = new StringBuilder();
-        for (int i = 0; i < info.keys.size(); i++) {
-            final ModelInfo.ColumnField column = info.keys.get(i);
-            column.field.setAccessible(true);
-            keyValuesTag.append(c.getString(c.getColumnIndex(column.name))+"_");
+        for (ModelInfo.ColumnField column : info.columns) {
+            if(column.isKey||column.isDynamic) {
+                if(c.getColumnIndex(column.name)>=0) {
+                    column.field.setAccessible(true);
+                    keyValuesTag.append(c.getString(c.getColumnIndex(column.name)) + "_");
+                }
+            }
         }
         return keyValuesTag.toString();
     }

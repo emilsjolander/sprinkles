@@ -181,6 +181,7 @@ public abstract class Model implements QueryResult {
 
 			@Override
 			public void onTransactionCommitted() {
+                DataResolver.updateRecordCache(Model.this);
 				Sprinkles.sInstance.mContext.getContentResolver().notifyChange(
 						Utils.getNotificationUri(Model.this.getClass()), null, true);
 			}
@@ -243,6 +244,7 @@ public abstract class Model implements QueryResult {
 
             @Override
             public void onTransactionCommitted() {
+                DataResolver.removeRecordCache(Model.this);
                 Sprinkles.sInstance.mContext.getContentResolver().notifyChange(
                         Utils.getNotificationUri(Model.this.getClass()), null);
             }

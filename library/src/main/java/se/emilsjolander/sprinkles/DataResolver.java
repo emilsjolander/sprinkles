@@ -139,8 +139,6 @@ public class DataResolver {
     public static String getKeyValueTag(Model m){
         final ModelInfo info = ModelInfo.from(m.getClass());
         final StringBuilder keyValuesTag = new StringBuilder();
-        final Object[] args = new Object[info.keys.size()];
-
         for (ModelInfo.ColumnField column : info.columns) {
             if(column.isKey||column.isDynamic) {
                 column.field.setAccessible(true);

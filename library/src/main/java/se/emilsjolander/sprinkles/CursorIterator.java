@@ -26,7 +26,7 @@ class CursorIterator<T extends QueryResult> implements Iterator<T> {
     public T next() {
         pos++;
         cursor.moveToPosition(pos);
-        return Utils.getResultFromCursor(type, cursor);
+        return DataResolver.getResultFromCursor(type, cursor);
     }
 
     @Override

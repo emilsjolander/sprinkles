@@ -13,6 +13,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Hashtable;
 import java.util.List;
 
 import se.emilsjolander.sprinkles.annotations.Index;
@@ -22,25 +23,6 @@ import se.emilsjolander.sprinkles.typeserializers.TypeSerializer;
 
 class Utils {
 
-    static <T extends QueryResult> T getResultFromCursor(Class<T> resultClass, Cursor c) {
-        try {
-            final ModelInfo info = ModelInfo.from(resultClass);
-            T result = Model.createModel(resultClass);
-            List<String> colNames = Arrays.asList(c.getColumnNames());
-            for (ModelInfo.ColumnField column : info.columns) {
-                if (!colNames.contains(column.name)) {
-                    continue;
-                }
-                column.field.setAccessible(true);
-                final Class<?> type = column.field.getType();
-                Object o = Sprinkles.sInstance.getTypeSerializer(type).unpack(c, column.name);
-                column.field.set(result, o);
-            }
-            return result;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     static String getCreateTableSQL(ModelInfo table) {
 
@@ -138,6 +120,8 @@ class Utils {
         return Utils.insertSqlArgs(where.toString(), args);
     }
 
+
+
     static ContentValues getContentValues(Model model) {
         final ModelInfo info = ModelInfo.from(model.getClass());
         final ContentValues values = new ContentValues();
@@ -155,7 +139,30 @@ class Utils {
             }
             Sprinkles.sInstance.getTypeSerializer(column.field.getType()).pack(value, values, column.name);
         }
-        //ToDo export foreign key value?
+        // export foreign key value
+        for (ModelInfo.ManyToOneColumnField manyToOneColumnField : info.manyToOneColumns) {
+            manyToOneColumnField.field.setAccessible(true);
+            Object oneModel;
+            try {
+                oneModel = manyToOneColumnField.field.get(model);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            if(oneModel!=null){
+                //fetch oneModel's key value
+                Field fieldInOneMdel = null;
+                try {
+                    fieldInOneMdel = oneModel.getClass().getDeclaredField(manyToOneColumnField.oneColumn);
+                    fieldInOneMdel.setAccessible(true);
+                    Object foreignKeyValue = fieldInOneMdel.get(oneModel);
+                    Sprinkles.sInstance.getTypeSerializer(fieldInOneMdel.getType()).pack(foreignKeyValue, values, manyToOneColumnField.manyColumn);
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
         return values;
     }
@@ -163,57 +170,12 @@ class Utils {
     static <T extends Model> Uri getNotificationUri(Class<T> clazz) {
         return Uri.parse("sprinkles://" + getTableName(clazz));
     }
-
-    static String getTableName(Class<? extends Model> clazz) {
-        if (clazz.isAnnotationPresent(Table.class)) {
-            String tabName = clazz.getAnnotation(Table.class).value();
-            return TextUtils.isEmpty(tabName) ? clazz.getName().replace(".","_") : tabName;
-        }
-        throw new NoTableAnnotationException();
-    }
-
-    static void assureTableExist(ModelInfo table) {
-        synchronized (table) {
-            if (!Utils.isTableExist(table)) {
-                String sql = Utils.getCreateTableSQL(table);
-                Sprinkles.getDatabase().execSQL(sql);
-            }
-        }
-    }
-
+    @Deprecated
     /**
-     * check is table exist
-     *
-     * @param table
-     * @return
+     * @see @DataResolver.getTableName
      */
-    static boolean isTableExist(ModelInfo table) {
-        if (table.isTableChecked) {
-            return true;
-        }
-
-        Cursor cursor = null;
-        try {
-            String sql = "SELECT COUNT(*) AS c FROM sqlite_master WHERE type ='table' AND name ='"
-                    + table.tableName + "' ";
-            cursor = Sprinkles.getDatabase().rawQuery(sql, null);
-            if (cursor != null && cursor.moveToNext()) {
-                int count = cursor.getInt(0);
-                if (count > 0) {
-                    table.isTableChecked = true;
-                    return true;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (cursor != null)
-                cursor.close();
-            cursor = null;
-        }
-
-        return false;
-
+    static String getTableName(Class<? extends Model> clazz) {
+        return DataResolver.getTableName(clazz);
     }
 
     static String insertSqlArgs(String sql, Object[] args) {

@@ -52,32 +52,11 @@ public final class OneQuery<T extends QueryResult> {
      */
 	public T get() {
 		final SQLiteDatabase db = Sprinkles.getDatabase();
-        Utils.assureTableExist(ModelInfo.from(resultClass));
+        DataResolver.assureTableExist(ModelInfo.from(resultClass));
         final Cursor c = db.rawQuery(rawQuery, null);
 		T result = null;
 		if (c.moveToFirst()) {
-			result = Utils.getResultFromCursor(resultClass, c);
-            List<String> colNames = Arrays.asList(c.getColumnNames());
-            //fill oneToMany field
-            for (ModelInfo.OneToManyColumnField oneToManyColumnField : ModelInfo.from(resultClass).oneToManyColumns) {
-                if (!colNames.contains(oneToManyColumnField.name)) {
-                    continue;
-                }
-                final ManyQuery query = new ManyQuery();
-                query.resultClass = oneToManyColumnField.manyModelClass;
-                query.placeholderQuery = "SELECT * FROM " + Utils.getTableName(oneToManyColumnField.manyModelClass)
-                        + " "+oneToManyColumnField.manyColumn+"=?";
-                Integer foreignKeyValue = c.getInt(c.getColumnIndexOrThrow(oneToManyColumnField.oneColumn));
-                query.rawQuery = Utils.insertSqlArgs(query.placeholderQuery,new Object[]{foreignKeyValue});
-                ModelList manyModels = ModelList.from(query.get());
-                if(manyModels!=null) {
-                    try {
-                        oneToManyColumnField.field.set(result, manyModels);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
+			result = DataResolver.getResultFromCursor(resultClass, c);
 		}
 
 		c.close();
@@ -149,7 +128,7 @@ public final class OneQuery<T extends QueryResult> {
             public void onLoadFinished(Loader<Cursor> loader, Cursor c) {
                 T result = null;
                 if (c.moveToFirst()) {
-                    result = Utils.getResultFromCursor(resultClass, c);
+                    result = DataResolver.getResultFromCursor(resultClass, c);
                 }
 
                 if (!handler.handleResult(result)) {
@@ -183,7 +162,7 @@ public final class OneQuery<T extends QueryResult> {
 					android.support.v4.content.Loader<Cursor> loader, Cursor c) {
 				T result = null;
 				if (c.moveToFirst()) {
-					result = Utils.getResultFromCursor(resultClass, c);
+					result = DataResolver.getResultFromCursor(resultClass, c);
 				}
 
 				if (!handler.handleResult(result)) {

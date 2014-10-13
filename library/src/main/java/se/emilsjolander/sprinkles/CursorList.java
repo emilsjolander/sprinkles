@@ -45,7 +45,7 @@ public class CursorList<T extends QueryResult> implements Iterable<T>, Closeable
     public T get(int pos) {
         requireOpen();
         cursor.moveToPosition(pos);
-        return Utils.getResultFromCursor(type, cursor);
+        return DataResolver.getResultFromCursor(type, cursor);
     }
 
     /**

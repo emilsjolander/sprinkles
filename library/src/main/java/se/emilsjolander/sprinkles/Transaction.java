@@ -61,12 +61,12 @@ public final class Transaction {
 	}
 
 	long insert(ModelInfo table, ContentValues values) {
-        Utils.assureTableExist(table);
+        DataResolver.assureTableExist(table);
 		return mDb.insert(table.tableName, null, values);
 	}
 
 	int update(ModelInfo table, ContentValues values, String where) {
-        Utils.assureTableExist(table);
+        DataResolver.assureTableExist(table);
 		return mDb.update(table.tableName, values, where, null);
 	}
 

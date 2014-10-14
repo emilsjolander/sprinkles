@@ -20,6 +20,13 @@ public class ModelList<E extends Model> extends ArrayList<E> {
     public static <E extends Model> ModelList<E> from(CursorList<E> cursorList) {
         return new ModelList<E>(cursorList.asList());
     }
+    public static <E extends Model> ModelList<E> from(CursorList<E> cursorList,int skip) {
+        ModelList<E> modelList = new ModelList<E>(cursorList.size()>skip?cursorList.size() - skip:0);
+        for (int i = skip; i < cursorList.size(); i++) {
+            modelList.add(cursorList.get(i));
+        }
+        return modelList;
+    }
 
     public ModelList() {
         super();

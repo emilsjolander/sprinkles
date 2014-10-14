@@ -22,7 +22,7 @@ public class ModelListTest {
     public void initTables() {
         Sprinkles.dropInstances();
         Sprinkles sprinkles = Sprinkles.init(Robolectric.application);
-        sprinkles.addMigration(TestModel.MIGRATION);
+//        sprinkles.addMigration(TestModel.MIGRATION);
     }
 
     @Test

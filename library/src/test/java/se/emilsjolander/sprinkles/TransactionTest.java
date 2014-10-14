@@ -17,7 +17,7 @@ public class TransactionTest {
     public void initTables() {
         Sprinkles.dropInstances();
         Sprinkles sprinkles = Sprinkles.init(Robolectric.application);
-        sprinkles.addMigration(TestModel.MIGRATION);
+//        sprinkles.addMigration(TestModel.MIGRATION);
     }
 
     @Test
@@ -51,6 +51,11 @@ public class TransactionTest {
             public void onTransactionCommitted() {
                 called[0] = true;
             }
+
+            @Override
+            public void onTransactionRollback() {
+
+            }
         });
         TestModel m = new TestModel();
         m.title = "hej";
@@ -68,6 +73,11 @@ public class TransactionTest {
             @Override
             public void onTransactionCommitted() {
                 called[0] = true;
+            }
+
+            @Override
+            public void onTransactionRollback() {
+
             }
         });
         TestModel m = new TestModel();

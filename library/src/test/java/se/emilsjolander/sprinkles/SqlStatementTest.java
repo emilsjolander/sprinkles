@@ -17,7 +17,7 @@ public class SqlStatementTest {
     public void setup() {
         Sprinkles.dropInstances();
         Sprinkles s = Sprinkles.init(Robolectric.application);
-        s.addMigration(TestModel.MIGRATION);
+//        s.addMigration(TestModel.MIGRATION);
     }
 
     @Test

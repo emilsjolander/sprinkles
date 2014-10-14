@@ -32,6 +32,7 @@ public class TestModel extends Model {
     @Column("id") public long id;
     @Column("title") public String title;
     @Column("created_at") public Date createdAt;
+    @Column("sn") public int sn;
     @DynamicColumn("count") public int count;
 
     public boolean valid = true;

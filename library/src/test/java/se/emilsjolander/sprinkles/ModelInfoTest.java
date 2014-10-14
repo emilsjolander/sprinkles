@@ -43,7 +43,7 @@ public class ModelInfoTest {
         ModelInfo info = ModelInfo.from(TestModel.class);
         assertEquals(info.tableName, "Tests");
         assertEquals(info.autoIncrementField.name, "id");
-        assertEquals(info.columns.size(), 4);
+        assertEquals(info.columns.size(), 5);
         assertEquals(info.keys.size(), 1);
     }
 

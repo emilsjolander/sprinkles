@@ -131,6 +131,7 @@ public final class Sprinkles {
         sInstance = null;
         sDatabase = null;
         ModelInfo.clearCache();
+        DataResolver.resetRecordCache();
     }
 
     /**

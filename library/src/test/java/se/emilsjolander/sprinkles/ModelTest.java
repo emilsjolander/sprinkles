@@ -47,7 +47,7 @@ public class ModelTest {
         m.save();
 
         ContentValues contentValues = Utils.getContentValues(m);
-        assertEquals(2, contentValues.size());
+        assertEquals(3, contentValues.size());
         assertNotNull(contentValues.get("created_at"));
 
         assertTrue(m.created);

@@ -104,6 +104,9 @@ public abstract class Model implements QueryResult {
      * @return true if this model is currently saved in the database (could be an older version)
      */
 	final public boolean exists() {
+        if(!DataResolver.isTableExist(ModelInfo.from(getClass()))){
+            return false;
+        }
 		final Model m = Query.one(
 				getClass(),
 				String.format("SELECT * FROM %s WHERE %s LIMIT 1",
@@ -176,7 +179,6 @@ public abstract class Model implements QueryResult {
                 }
             }
         }
-
 		t.addOnTransactionCommittedListener(new OnTransactionCommittedListener() {
 
 			@Override
@@ -185,7 +187,12 @@ public abstract class Model implements QueryResult {
 				Sprinkles.sInstance.mContext.getContentResolver().notifyChange(
 						Utils.getNotificationUri(Model.this.getClass()), null, true);
 			}
-		});
+
+            @Override
+            public void onTransactionRollback() {
+                DataResolver.removeRecordCache(Model.this);
+            }
+        });
 
 		return true;
 	}
@@ -247,6 +254,11 @@ public abstract class Model implements QueryResult {
                 DataResolver.removeRecordCache(Model.this);
                 Sprinkles.sInstance.mContext.getContentResolver().notifyChange(
                         Utils.getNotificationUri(Model.this.getClass()), null);
+            }
+
+            @Override
+            public void onTransactionRollback() {
+
             }
         });
 		afterDelete();

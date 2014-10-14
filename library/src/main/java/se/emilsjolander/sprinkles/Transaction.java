@@ -14,6 +14,7 @@ public final class Transaction {
 
 	interface OnTransactionCommittedListener {
 		void onTransactionCommitted();
+        void onTransactionRollback();
 	}
 
 	private SQLiteDatabase mDb;
@@ -57,7 +58,11 @@ public final class Transaction {
 			for (OnTransactionCommittedListener listener : mOnTransactionCommittedListeners) {
 				listener.onTransactionCommitted();
 			}
-		}
+		}else {
+            for (OnTransactionCommittedListener listener : mOnTransactionCommittedListeners) {
+                listener.onTransactionRollback();
+            }
+        }
 	}
 
 	long insert(ModelInfo table, ContentValues values) {

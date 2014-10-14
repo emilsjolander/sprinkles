@@ -43,12 +43,15 @@ public class DataResolver {
             cacheForModel.remove(getKeyValueTag(m));
         }
     }
+    static void resetRecordCache() {
+        sCachePool.clear();
+    }
 
 
-    /**
-     * remove useless record from cache
-     * @param modelClazz
-     */
+        /**
+         * remove useless record from cache
+         * @param modelClazz
+         */
     static void recycleRecordCache(Class modelClazz){
         Hashtable<String, WeakReference<Object>> cacheForModel = sCachePool.get(modelClazz);
         if(cacheForModel !=null){

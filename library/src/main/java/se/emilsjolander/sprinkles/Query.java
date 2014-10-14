@@ -225,11 +225,7 @@ public final class Query<T extends Model> implements IQueryPart1<T>,IQueryPart2<
     @Override
     public ModelList<T> find(){
         String sql = build();
-        if(validateQuery()) {
-            return ModelList.from(Query.many(this.mClazz, sql).get(),mSkip);
-        }else {
-            throw new IllegalStateException("illegal sql syntax:"+sql);
-        }
+        return ModelList.from(Query.many(this.mClazz, sql).get(),mSkip);
     }
     @Override
     public T findSingle(){
@@ -238,18 +234,14 @@ public final class Query<T extends Model> implements IQueryPart1<T>,IQueryPart2<
             take(1);
             sql = build();
         }
-        if(validateQuery()) {
-            return Query.one(this.mClazz, sql).get();
-        }else {
-            throw new IllegalStateException("illegal sql syntax:"+sql);
-        }
+        return Query.one(this.mClazz, sql).get();
     }
 
-    boolean validateQuery(){
-        //validate  syntax of the sql string
-//        new BigDecimal().toBigInteger()
-        return true;
-    }
+//    boolean validateQuery(){
+//        //validate  syntax of the sql string
+////        new BigDecimal().toBigInteger()
+//        return true;
+//    }
 
 //    public CalcResult max(String field){
 //        return this;

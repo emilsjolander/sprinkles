@@ -1,6 +1,5 @@
 package se.emilsjolander.sprinkles;
 
-import java.math.BigDecimal;
 import java.util.LinkedList;
 
 /**

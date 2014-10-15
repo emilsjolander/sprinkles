@@ -99,7 +99,8 @@ public class DataResolver {
                         + " WHERE "+oneToManyColumnField.manyColumn+"=?";
                 Integer foreignKeyValue = c.getInt(c.getColumnIndexOrThrow(oneToManyColumnField.oneColumn));
                 query.rawQuery = Utils.insertSqlArgs(query.placeholderQuery,new Object[]{foreignKeyValue});
-                ModelList manyModels = ModelList.from(query.get());
+                CursorList cursorList = query.get();
+                ModelList manyModels = ModelList.from(cursorList);
                 if(manyModels!=null) {
                     try {
                         oneToManyColumnField.field.set(result, manyModels);
@@ -107,6 +108,7 @@ public class DataResolver {
                         e.printStackTrace();
                     }
                 }
+                cursorList.close();
             }
             //fill manyToOne field
             for (ModelInfo.ManyToOneColumnField manyToOneColumnField : info.manyToOneColumns) {

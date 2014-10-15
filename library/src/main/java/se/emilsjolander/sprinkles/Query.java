@@ -225,7 +225,10 @@ public final class Query<T extends Model> implements IQueryPart1<T>,IQueryPart2<
     @Override
     public ModelList<T> find(){
         String sql = build();
-        return ModelList.from(Query.many(this.mClazz, sql).get(),mSkip);
+        CursorList<T> cursorList = Query.many(this.mClazz, sql).get();
+        ModelList<T> result = ModelList.from(cursorList,mSkip);
+        cursorList.close();
+        return result;
     }
     @Override
     public T findSingle(){

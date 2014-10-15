@@ -38,6 +38,7 @@ public class ModelListTest {
         assertEquals("title1", modelList.get(0).title);
         assertEquals("title2", modelList.get(1).title);
         assertEquals("title3", modelList.get(2).title);
+        cursorList.close();
     }
 
     @Test

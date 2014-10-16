@@ -2,6 +2,9 @@ package se.emilsjolander.sprinkles;
 
 import android.content.ContentValues;
 import android.os.AsyncTask;
+
+import java.util.HashMap;
+
 import se.emilsjolander.sprinkles.Transaction.OnTransactionCommittedListener;
 import se.emilsjolander.sprinkles.annotations.ManyToOne;
 import se.emilsjolander.sprinkles.exceptions.ContentValuesEmptyException;
@@ -23,6 +26,12 @@ public abstract class Model implements QueryResult {
 		void onDeleted();
 	}
 
+    /**
+     * store extra data ex: foreign key value
+     */
+    @Ignore
+    HashMap<String,Object> mHiddenFieldsMap = new HashMap<String, Object>();
+
     public Model(){
         try {
             //check relationship of model
@@ -30,10 +39,20 @@ public abstract class Model implements QueryResult {
             for (ModelInfo.OneToManyColumnField columnField : info.oneToManyColumns){
                 columnField.field.setAccessible(true);
                 Class one2ManyContainerType = columnField.field.getType();
-                if(!ModelList.class.isAssignableFrom(one2ManyContainerType)){
+                if(LazyModelList.class.isAssignableFrom(one2ManyContainerType)){
+                    columnField.field.set(this,new LazyModelList(columnField.manyModelClass,this,columnField));
+                }else if(ModelList.class.isAssignableFrom(one2ManyContainerType)){
+                    columnField.field.set(this,one2ManyContainerType.newInstance());
+                }else {
                     throw new IllegalOneToManyColumnException();
                 }
-                columnField.field.set(this,one2ManyContainerType.newInstance());
+            }
+            for (ModelInfo.ManyToOneColumnField columnField : info.manyToOneColumns) {
+                columnField.field.setAccessible(true);
+                Class one2ManyContainerType = columnField.field.getType();
+                if(LazyModel.class.isAssignableFrom(one2ManyContainerType)){
+                    columnField.field.set(this,new LazyModel(columnField.oneModelClass,this,columnField));
+                }
             }
         } catch (InstantiationException e) {
             e.printStackTrace();

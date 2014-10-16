@@ -112,21 +112,27 @@ public class DataResolver {
             }
             //fill manyToOne field
             for (ModelInfo.ManyToOneColumnField manyToOneColumnField : info.manyToOneColumns) {
-                if (!colNames.contains(manyToOneColumnField.manyColumn)) {
+                if (colNames.contains(manyToOneColumnField.manyColumn)) {
                     continue;
                 }
-                final OneQuery query = new OneQuery();
-                query.resultClass = manyToOneColumnField.field.getType();
-                query.placeholderQuery = "SELECT * FROM " + getTableName(query.resultClass)
-                        + " WHERE "+manyToOneColumnField.oneColumn+"=?";
                 Integer foreignKeyValue = c.getInt(c.getColumnIndexOrThrow(manyToOneColumnField.manyColumn));
-                query.rawQuery = Utils.insertSqlArgs(query.placeholderQuery,new Object[]{foreignKeyValue});
-                Object oneModel = query.get();
-                if(oneModel!=null) {
-                    try {
-                        manyToOneColumnField.field.set(result, oneModel);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
+
+                if(LazyModel.class.isAssignableFrom(resultClass)){
+                    //if is lazy load,just put foreign key value to hiddenFieldsMap
+                    ((Model)result).mHiddenFieldsMap.put(manyToOneColumnField.manyColumn,foreignKeyValue);
+                }else {
+                    final OneQuery query = new OneQuery();
+                    query.resultClass = manyToOneColumnField.field.getType();
+                    query.placeholderQuery = "SELECT * FROM " + getTableName(query.resultClass)
+                            + " WHERE " + manyToOneColumnField.oneColumn + "=?";
+                    query.rawQuery = Utils.insertSqlArgs(query.placeholderQuery, new Object[]{foreignKeyValue});
+                    Object oneModel = query.get();
+                    if (oneModel != null) {
+                        try {
+                            manyToOneColumnField.field.set(result, oneModel);
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }

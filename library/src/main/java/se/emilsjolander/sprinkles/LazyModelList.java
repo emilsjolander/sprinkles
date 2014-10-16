@@ -1,5 +1,7 @@
 package se.emilsjolander.sprinkles;
 
+import java.lang.reflect.Field;
+
 import se.emilsjolander.sprinkles.exceptions.LazyModelListLoadFailException;
 
 /**
@@ -16,8 +18,9 @@ public class LazyModelList<T extends Model> {
     }
     public ModelList<T> load(){
         try {
-            mOneToManyColumnField.field.setAccessible(true);
-            Object foreignKeyValue = mOneToManyColumnField.field.get(mParent);
+            Field oneColumnField = mParent.getClass().getDeclaredField(mOneToManyColumnField.oneColumn);
+            oneColumnField.setAccessible(true);
+            Object foreignKeyValue = oneColumnField.get(mParent);
             return Query.Where(mModelClass)
                     .equalTo(mOneToManyColumnField.manyColumn,foreignKeyValue)
                     .find();

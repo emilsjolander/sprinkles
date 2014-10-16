@@ -47,7 +47,7 @@ class ModelInfo {
     public static class ManyToOneColumnField extends ColumnField{
         String manyColumn;
         String oneColumn;
-//        Class<? extends Model> oneModelClass;
+        Class<? extends Model> oneModelClass;
     }
     public static class OneToManyColumnField extends ColumnField{
         String manyColumn;
@@ -105,6 +105,7 @@ class ModelInfo {
                         m2oColumn.field = field;
                         m2oColumn.manyColumn = field.getAnnotation(ManyToOne.class).manyColumn();
                         m2oColumn.oneColumn = field.getAnnotation(ManyToOne.class).oneColumn();
+                        m2oColumn.oneModelClass = field.getAnnotation(ManyToOne.class).oneModelClass();
 
                         if (!info.manyToOneColumns.add(m2oColumn)) {
                             throw new DuplicateColumnException(column.name);
@@ -122,7 +123,7 @@ class ModelInfo {
                         if (!info.oneToManyColumns.add(o2mColumn)) {
                             throw new DuplicateColumnException(column.name);
                         }
-                    } else {
+                    } else if (!field.isAnnotationPresent(Ignore.class)){
                         //if 'AutoGenerateColumnNames' property of table has been set to true,
                         //the field will be recognized as a column default
                         column.name = isAutoGenerateColumnNames ? field.getName() : field.getAnnotation(Column.class).value();

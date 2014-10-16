@@ -14,6 +14,8 @@ import org.robolectric.annotation.Config;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import se.emilsjolander.sprinkles.model.Company;
+import se.emilsjolander.sprinkles.model.Person;
 import se.emilsjolander.sprinkles.model.TestModel;
 
 import static junit.framework.Assert.assertEquals;
@@ -34,174 +36,20 @@ public class LazyLoadTest {
     }
 
     @Test
-    public void lazyModelList() {
-        TestModel m = new TestModel();
-        m.title = "hej";
+    public void lazyModel() {
+        Company company = new Company();
+        company.name = "google";
+        company.save();
 
-        m.valid = false;
-        assertFalse(m.save());
+        Person staff = new Person();
+        staff.company_id = company.id;
+        staff.save();
 
-        m.valid = true;
-        assertTrue(m.save());
+        assertNotNull(staff.company);
+        assertEquals(company,staff.company.load());
+        assertEquals(1,company.Staffs.load().size());
+
     }
 
-    @Test
-    public void beforeCreate() {
-        TestModel m = new TestModel();
-        m.title = "hej";
-        m.save();
-
-        ContentValues contentValues = Utils.getContentValues(m);
-        assertEquals(3, contentValues.size());
-        assertNotNull(contentValues.get("created_at"));
-
-        assertTrue(m.created);
-        m.created = false;
-
-        m.title = "tjena";
-        m.save();
-        assertFalse(m.created);
-    }
-
-    @Test
-    public void beforeSave() {
-        TestModel m = new TestModel();
-        m.title = "hej";
-
-        m.save();
-        assertTrue(m.saved);
-        m.saved = false;
-
-        m.title = "tjena";
-        m.save();
-        assertTrue(m.saved);
-    }
-
-    @Test
-    public void afterDelete() {
-        TestModel m = new TestModel();
-        m.title = "hej";
-
-        m.save();
-        assertFalse(m.deleted);
-
-        m.delete();
-        assertTrue(m.deleted);
-    }
-
-    @Test
-    public void exists() {
-        TestModel m = new TestModel();
-        m.title = "hej";
-
-        assertFalse(m.exists());
-        m.save();
-        assertTrue(m.exists());
-    }
-
-    @Test
-    public void save() {
-        TestModel m = new TestModel();
-        m.title = "hej";
-
-        m.save();
-        assertTrue(m.exists());
-    }
-
-    @Test
-    public void setAutoIncrementKeyOnCreate() {
-        TestModel m = new TestModel();
-        m.title = "hej";
-        m.save();
-        assertFalse(m.id == 0);
-    }
-
-    @Test
-    public void saveWithNullField() {
-        TestModel m = new TestModel();
-        m.title = "hej";
-        assertTrue(m.save());
-        assertEquals(Query.one(TestModel.class, "select * from Tests").get().title, "hej");
-        m.title = null;
-        assertTrue(m.save());
-        assertEquals(Query.one(TestModel.class, "select * from Tests").get().title, null);
-    }
-
-    @Test
-    public void saveAsync() throws InterruptedException {
-        final CountDownLatch latch = new CountDownLatch(1);
-
-        TestModel m = new TestModel();
-        m.title = "hej";
-        m.saveAsync(new Model.OnSavedCallback() {
-            @Override
-            public void onSaved() {
-                latch.countDown();
-            }
-        });
-
-        assertTrue(latch.await(30, TimeUnit.SECONDS));
-    }
-
-    @Test
-    public void delete() {
-        TestModel m = new TestModel();
-        m.title = "hej";
-
-        m.save();
-        m.delete();
-        assertFalse(m.exists());
-    }
-
-    @Test
-    public void deleteAsync() throws InterruptedException {
-        final CountDownLatch latch = new CountDownLatch(1);
-
-        TestModel m = new TestModel();
-        m.title = "hej";
-        m.save();
-        m.deleteAsync(new Model.OnDeletedCallback() {
-            @Override
-            public void onDeleted() {
-                latch.countDown();
-            }
-        });
-
-        assertTrue(latch.await(30, TimeUnit.SECONDS));
-    }
-
-    @Test
-    public void notifyContentChangeOnSave() {
-        TestModel m = new TestModel();
-        m.title = "hej";
-        final boolean[] notified = new boolean[1];
-        Sprinkles.sInstance.mContext.getContentResolver().
-                registerContentObserver(Utils.getNotificationUri(TestModel.class), false, new ContentObserver(new Handler()) {
-                    @Override
-                    public void onChange(boolean selfChange) {
-                        notified[0] = true;
-                    }
-                });
-        m.save();
-        assertTrue(notified[0]);
-    }
-
-    @Test
-    public void notifyContentChangeOnDelete() {
-        TestModel m = new TestModel();
-        m.title = "hej";
-        m.save();
-        final boolean[] notified = new boolean[1];
-        Sprinkles.sInstance.mContext.getContentResolver().
-                registerContentObserver(Utils.getNotificationUri(TestModel.class), false, new ContentObserver(new Handler()) {
-                    @Override
-                    public void onChange(boolean selfChange) {
-                        notified[0] = true;
-                    }
-                });
-        assertFalse(notified[0]);
-        m.delete();
-        assertTrue(notified[0]);
-    }
 
 }

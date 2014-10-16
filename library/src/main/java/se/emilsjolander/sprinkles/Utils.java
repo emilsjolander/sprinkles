@@ -13,8 +13,11 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import se.emilsjolander.sprinkles.annotations.Index;
 import se.emilsjolander.sprinkles.annotations.Table;
@@ -28,6 +31,8 @@ class Utils {
 
         StringBuffer strIndexCreatorSQL = new StringBuffer();
         StringBuffer strSQL = new StringBuffer();
+        Set<String> fieldNames = new HashSet<String>();
+
         strSQL.append("CREATE TABLE IF NOT EXISTS ");
         strSQL.append(table.tableName);
         strSQL.append(" ( ");
@@ -47,6 +52,7 @@ class Utils {
             } else {
                 strSQL.append(keyField.name).append(" TEXT PRIMARY KEY,");
             }
+            fieldNames.add(keyField.name);
         }
 
         Collection<ModelInfo.ColumnField> columns = table.columns;
@@ -55,6 +61,7 @@ class Utils {
             if (columnField.isKey) {
                 continue;
             }
+            fieldNames.add(columnField.name);
             strSQL.append(columnField.name);
             Class<?> dataType = columnField.field.getType();
             if (dataType == int.class || dataType == Integer.class
@@ -77,6 +84,9 @@ class Utils {
 
         Collection<ModelInfo.ManyToOneColumnField> manyToOnes = table.manyToOneColumns;
         for (ModelInfo.ManyToOneColumnField manyToOne : manyToOnes) {
+            if(fieldNames.contains(manyToOne.manyColumn)){
+                continue;
+            }
             strSQL.append("\"").append(manyToOne.manyColumn);
             Class<?> dataType = manyToOne.field.getType();
             if (dataType == int.class || dataType == Integer.class
@@ -141,6 +151,10 @@ class Utils {
         }
         // export foreign key value
         for (ModelInfo.ManyToOneColumnField manyToOneColumnField : info.manyToOneColumns) {
+            //skip lazy load field
+            if(LazyModelList.class.isAssignableFrom(manyToOneColumnField.field.getType())){
+                continue;
+            }
             manyToOneColumnField.field.setAccessible(true);
             Object oneModel;
             try {
@@ -161,6 +175,14 @@ class Utils {
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
+            }
+        }
+        //export hiddenFields
+        for(Map.Entry<String,Object> hiddenField : model.mHiddenFieldsMap.entrySet()) {
+            if (hiddenField.getValue() == null) {
+                values.putNull(hiddenField.getKey());
+            } else {
+                Sprinkles.sInstance.getTypeSerializer(hiddenField.getValue().getClass()).pack(hiddenField.getValue(), values, hiddenField.getKey());
             }
         }
 

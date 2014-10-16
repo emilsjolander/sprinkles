@@ -11,6 +11,8 @@ import org.robolectric.annotation.Config;
 
 import java.util.List;
 
+import se.emilsjolander.sprinkles.model.TestModel;
+
 import static org.junit.Assert.*;
 
 @Config(emulateSdk = 18)

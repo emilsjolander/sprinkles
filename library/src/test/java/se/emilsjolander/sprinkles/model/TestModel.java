@@ -1,10 +1,12 @@
-package se.emilsjolander.sprinkles;
+package se.emilsjolander.sprinkles.model;
 
 
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.Date;
 
+import se.emilsjolander.sprinkles.Migration;
+import se.emilsjolander.sprinkles.Model;
 import se.emilsjolander.sprinkles.annotations.AutoIncrement;
 import se.emilsjolander.sprinkles.annotations.Column;
 import se.emilsjolander.sprinkles.annotations.DynamicColumn;

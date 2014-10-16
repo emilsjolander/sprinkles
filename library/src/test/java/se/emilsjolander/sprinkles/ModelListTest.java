@@ -12,6 +12,8 @@ import org.robolectric.annotation.Config;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import se.emilsjolander.sprinkles.model.TestModel;
+
 import static junit.framework.Assert.*;
 
 @Config(emulateSdk = 18)

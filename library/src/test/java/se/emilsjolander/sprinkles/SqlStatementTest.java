@@ -7,6 +7,8 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import se.emilsjolander.sprinkles.model.TestModel;
+
 import static junit.framework.Assert.*;
 
 @Config(emulateSdk = 18)

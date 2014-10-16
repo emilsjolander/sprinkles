@@ -1,8 +1,7 @@
-package se.emilsjolander.sprinkles;
+package se.emilsjolander.sprinkles.model;
 
 
-import java.util.Date;
-
+import se.emilsjolander.sprinkles.Model;
 import se.emilsjolander.sprinkles.annotations.AutoGen;
 import se.emilsjolander.sprinkles.annotations.AutoIncrement;
 import se.emilsjolander.sprinkles.annotations.Key;
@@ -19,6 +18,6 @@ public class Email extends Model {
 
     public String address;
 
-    @ManyToOne(manyColumn = "owner_id",oneColumn = "id")
+    @ManyToOne(manyColumn = "owner_id",oneColumn = "id",oneModelClass = Person.class)
     public Person owner;
 }

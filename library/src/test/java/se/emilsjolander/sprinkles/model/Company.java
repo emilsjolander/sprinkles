@@ -1,24 +1,23 @@
-package se.emilsjolander.sprinkles;
+package se.emilsjolander.sprinkles.model;
 
 
-import java.util.Date;
-
+import se.emilsjolander.sprinkles.Model;
+import se.emilsjolander.sprinkles.LazyModelList;
 import se.emilsjolander.sprinkles.annotations.AutoGen;
 import se.emilsjolander.sprinkles.annotations.AutoIncrement;
 import se.emilsjolander.sprinkles.annotations.Key;
-import se.emilsjolander.sprinkles.annotations.ManyToOne;
 import se.emilsjolander.sprinkles.annotations.OneToMany;
 import se.emilsjolander.sprinkles.annotations.Table;
 
 @Table
 @AutoGen
-public class Person extends Model {
+public class Company extends Model {
 
     @Key
     @AutoIncrement
     public long id;
     public String name;
 
-    @OneToMany(manyColumn = "owner_id",oneColumn = "id",manyModelClass = Email.class)
-    public ModelList<Email> emails;
+    @OneToMany(manyColumn = "company_id",oneColumn = "id",manyModelClass = Person.class)
+    public LazyModelList<Person> Staffs;
 }

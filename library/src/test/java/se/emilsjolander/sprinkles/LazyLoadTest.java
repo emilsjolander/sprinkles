@@ -16,11 +16,14 @@ import java.util.concurrent.TimeUnit;
 
 import se.emilsjolander.sprinkles.model.TestModel;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
-public class ModelTest {
+public class LazyLoadTest {
 
     @Before
     public void initTables() {
@@ -31,7 +34,7 @@ public class ModelTest {
     }
 
     @Test
-    public void isValid() {
+    public void lazyModelList() {
         TestModel m = new TestModel();
         m.title = "hej";
 

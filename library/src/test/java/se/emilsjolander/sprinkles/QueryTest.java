@@ -9,6 +9,8 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import se.emilsjolander.sprinkles.model.TestModel;
+
 import static junit.framework.Assert.*;
 
 @Config(emulateSdk = 18)
@@ -135,7 +137,7 @@ public class QueryTest {
         }
 
         ModelList<TestModel> query = Query.Where(TestModel.class)
-                .greaterThanOrEqualTo("sn",1)
+                .greaterThanOrEqualTo("sn", 1)
                 .find();
         assertEquals(9, query.size());
     }
@@ -149,7 +151,7 @@ public class QueryTest {
         }
 
         ModelList<TestModel> query = Query.Where(TestModel.class)
-                .lessThan("sn",1)
+                .lessThan("sn", 1)
                 .find();
         assertEquals(1, query.size());
     }
@@ -163,7 +165,7 @@ public class QueryTest {
         }
 
         ModelList<TestModel> query = Query.Where(TestModel.class)
-                .lessThanOrEqualTo("sn",1)
+                .lessThanOrEqualTo("sn", 1)
                 .find();
         assertEquals(2, query.size());
     }
@@ -194,7 +196,7 @@ public class QueryTest {
         }
 
         ModelList<TestModel> query = Query.Where(TestModel.class)
-                .lessThanOrEqualTo("sn",10)
+                .lessThanOrEqualTo("sn", 10)
                 .skip(8)
                 .find();
         assertEquals(2, query.size());
@@ -212,7 +214,7 @@ public class QueryTest {
         }
 
         ModelList<TestModel> query = Query.Where(TestModel.class)
-                .like("title","title1%")
+                .like("title", "title1%")
                 .find();
         assertEquals(2, query.size());
 

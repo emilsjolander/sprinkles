@@ -6,6 +6,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import se.emilsjolander.sprinkles.Model;
+
 /**
  * Specify that a Many Model refer to a One Model,their relationship depends on OneColumn and ManyColumn.
  */
@@ -22,5 +24,11 @@ public @interface ManyToOne {
      * @return
      */
     String oneColumn();
+
+    /**
+     * for LazyModel
+     * @return
+     */
+    Class<? extends Model> oneModelClass();
 
 }

@@ -1,8 +1,9 @@
-package se.emilsjolander.sprinkles;
+package se.emilsjolander.sprinkles.model;
 
 
 import java.util.Date;
 
+import se.emilsjolander.sprinkles.Model;
 import se.emilsjolander.sprinkles.annotations.AutoGen;
 import se.emilsjolander.sprinkles.annotations.AutoIncrement;
 import se.emilsjolander.sprinkles.annotations.Key;

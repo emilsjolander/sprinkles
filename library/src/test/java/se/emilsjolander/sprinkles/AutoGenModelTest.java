@@ -14,6 +14,8 @@ import org.robolectric.annotation.Config;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import se.emilsjolander.sprinkles.model.AutoGenTestModel;
+
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;

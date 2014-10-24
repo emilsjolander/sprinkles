@@ -29,7 +29,7 @@ public class LazyModel<T extends Model> {
             if(foreignKeyValue==null){
                 return null;
             }
-            return Query.Where(mModelClass)
+            return Query.where(mModelClass)
                     .equalTo(mManyToOneColumnField.oneColumn,foreignKeyValue)
                     .findSingle();
         } catch (Exception e) {

@@ -126,7 +126,7 @@ public final class Query<T extends Model> implements IQueryPart1<T>,IQueryPart2<
         return many(clazz, "SELECT * FROM " + Utils.getTableName(clazz));
     }
 
-    public static <C extends Model> Query<C> Where(Class<C> modelClazz){
+    public static <C extends Model> Query<C> where(Class<C> modelClazz){
         return new Query<C>(modelClazz);
     }
 

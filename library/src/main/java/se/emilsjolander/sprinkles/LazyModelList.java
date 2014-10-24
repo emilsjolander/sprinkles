@@ -21,7 +21,7 @@ public class LazyModelList<T extends Model> {
             Field oneColumnField = mParent.getClass().getDeclaredField(mOneToManyColumnField.oneColumn);
             oneColumnField.setAccessible(true);
             Object foreignKeyValue = oneColumnField.get(mParent);
-            return Query.Where(mModelClass)
+            return Query.where(mModelClass)
                     .equalTo(mOneToManyColumnField.manyColumn,foreignKeyValue)
                     .find();
         } catch (Exception e) {

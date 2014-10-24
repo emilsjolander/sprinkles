@@ -78,7 +78,7 @@ public class QueryTest {
             t.sn = i;
             t.save();
         }
-        TestModel result = Query.Where(TestModel.class)
+        TestModel result = Query.where(TestModel.class)
                 .equalTo("sn",1)
                 .findSingle();
         assertEquals(1, result.sn);
@@ -92,7 +92,7 @@ public class QueryTest {
             t.sn = i;
             t.save();
         }
-        ModelList<TestModel> queryForEqualTo = Query.Where(TestModel.class)
+        ModelList<TestModel> queryForEqualTo = Query.where(TestModel.class)
                 .equalTo("sn",1)
                 .find();
         assertEquals(1, queryForEqualTo.size());
@@ -106,7 +106,7 @@ public class QueryTest {
             t.save();
         }
 
-        ModelList<TestModel> queryForNotEqualTo = Query.Where(TestModel.class)
+        ModelList<TestModel> queryForNotEqualTo = Query.where(TestModel.class)
                 .notEqualTo("sn",1)
                 .find();
         assertEquals(9, queryForNotEqualTo.size());
@@ -122,7 +122,7 @@ public class QueryTest {
             t.save();
         }
 
-        ModelList<TestModel> queryForGreaterThan = Query.Where(TestModel.class)
+        ModelList<TestModel> queryForGreaterThan = Query.where(TestModel.class)
                 .greaterThan("sn",1)
                 .find();
         assertEquals(8, queryForGreaterThan.size());
@@ -136,7 +136,7 @@ public class QueryTest {
             t.save();
         }
 
-        ModelList<TestModel> query = Query.Where(TestModel.class)
+        ModelList<TestModel> query = Query.where(TestModel.class)
                 .greaterThanOrEqualTo("sn", 1)
                 .find();
         assertEquals(9, query.size());
@@ -150,7 +150,7 @@ public class QueryTest {
             t.save();
         }
 
-        ModelList<TestModel> query = Query.Where(TestModel.class)
+        ModelList<TestModel> query = Query.where(TestModel.class)
                 .lessThan("sn", 1)
                 .find();
         assertEquals(1, query.size());
@@ -164,7 +164,7 @@ public class QueryTest {
             t.save();
         }
 
-        ModelList<TestModel> query = Query.Where(TestModel.class)
+        ModelList<TestModel> query = Query.where(TestModel.class)
                 .lessThanOrEqualTo("sn", 1)
                 .find();
         assertEquals(2, query.size());
@@ -179,7 +179,7 @@ public class QueryTest {
             t.save();
         }
 
-        ModelList<TestModel> query = Query.Where(TestModel.class)
+        ModelList<TestModel> query = Query.where(TestModel.class)
                 .lessThanOrEqualTo("sn",10)
                 .take(2)
                 .find();
@@ -195,7 +195,7 @@ public class QueryTest {
             t.save();
         }
 
-        ModelList<TestModel> query = Query.Where(TestModel.class)
+        ModelList<TestModel> query = Query.where(TestModel.class)
                 .lessThanOrEqualTo("sn", 10)
                 .skip(8)
                 .find();
@@ -213,7 +213,7 @@ public class QueryTest {
             t.save();
         }
 
-        ModelList<TestModel> query = Query.Where(TestModel.class)
+        ModelList<TestModel> query = Query.where(TestModel.class)
                 .like("title", "title1%")
                 .find();
         assertEquals(2, query.size());
@@ -229,7 +229,7 @@ public class QueryTest {
             t.save();
         }
 
-        ModelList<TestModel> query = Query.Where(TestModel.class)
+        ModelList<TestModel> query = Query.where(TestModel.class)
                 .lessThanOrEqualTo("sn",10)
                 .and()
                 .like("title","1%")

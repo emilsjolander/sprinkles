@@ -11,12 +11,18 @@ public class LazyModel<T extends Model> {
     Class<T> mModelClass;
     ModelInfo.ManyToOneColumnField mManyToOneColumnField;
     Object mSource;
+
+    T mCache;
+
     public LazyModel(Class<T> modelClass, Object source, ModelInfo.ManyToOneColumnField columnField){
         mModelClass = modelClass;
         mSource = source;
         mManyToOneColumnField = columnField;
     }
     public T load(){
+        if(mCache!=null){
+            return mCache;
+        }
         try {
             Field manyColumnField = mSource.getClass().getDeclaredField(mManyToOneColumnField.manyColumn);
             Object foreignKeyValue = null;
@@ -29,9 +35,10 @@ public class LazyModel<T extends Model> {
             if(foreignKeyValue==null){
                 return null;
             }
-            return Query.where(mModelClass)
+            mCache = Query.where(mModelClass)
                     .equalTo(mManyToOneColumnField.oneColumn,foreignKeyValue)
                     .findSingle();
+            return mCache;
         } catch (Exception e) {
             throw new LazyModelLoadFailException(e);
         }

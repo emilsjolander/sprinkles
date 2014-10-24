@@ -6,7 +6,7 @@ import android.os.AsyncTask;
 import java.util.HashMap;
 
 import se.emilsjolander.sprinkles.Transaction.OnTransactionCommittedListener;
-import se.emilsjolander.sprinkles.annotations.ManyToOne;
+import se.emilsjolander.sprinkles.annotations.Ignore;
 import se.emilsjolander.sprinkles.exceptions.ContentValuesEmptyException;
 import se.emilsjolander.sprinkles.exceptions.IllegalOneToManyColumnException;
 

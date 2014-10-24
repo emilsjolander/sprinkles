@@ -12,6 +12,7 @@ import se.emilsjolander.sprinkles.annotations.AutoGen;
 import se.emilsjolander.sprinkles.annotations.AutoIncrement;
 import se.emilsjolander.sprinkles.annotations.Column;
 import se.emilsjolander.sprinkles.annotations.DynamicColumn;
+import se.emilsjolander.sprinkles.annotations.Ignore;
 import se.emilsjolander.sprinkles.annotations.Key;
 import se.emilsjolander.sprinkles.annotations.ManyToOne;
 import se.emilsjolander.sprinkles.annotations.OneToMany;
@@ -69,7 +70,7 @@ class ModelInfo {
         // hide contructor
     }
 
-    public static ModelInfo from(Class<? extends QueryResult> clazz) {
+    static ModelInfo from(Class<? extends QueryResult> clazz) {
         synchronized (clazz) {
             if (cache.containsKey(clazz)) {
                 return cache.get(clazz);

@@ -1,4 +1,4 @@
-package se.emilsjolander.sprinkles;
+package se.emilsjolander.sprinkles.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

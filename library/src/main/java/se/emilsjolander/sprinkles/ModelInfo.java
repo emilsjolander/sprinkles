@@ -127,6 +127,10 @@ class ModelInfo {
                     } else if (!field.isAnnotationPresent(Ignore.class)){
                         //if 'AutoGenerateColumnNames' property of table has been set to true,
                         //the field will be recognized as a column default
+                        if(!isAutoGenerateColumnNames&&!field.isAnnotationPresent(Column.class)){
+                            //if not declare as column,then move to next
+                            continue;
+                        }
                         column.name = isAutoGenerateColumnNames ? field.getName() : field.getAnnotation(Column.class).value();
                         column.sqlType = Sprinkles.sInstance.getTypeSerializer(field.getType()).getSqlType().name();
                         column.field = field;

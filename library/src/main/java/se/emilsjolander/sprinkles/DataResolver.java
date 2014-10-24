@@ -182,7 +182,7 @@ public class DataResolver {
     }
 
 
-    static String getTableName(Class<? extends Model> clazz) {
+    public static String getTableName(Class<? extends Model> clazz) {
         if (clazz.isAnnotationPresent(Table.class)) {
             String tabName = clazz.getAnnotation(Table.class).value();
             return TextUtils.isEmpty(tabName) ? clazz.getName().replace(".","_") : tabName;
@@ -190,7 +190,7 @@ public class DataResolver {
         throw new NoTableAnnotationException();
     }
 
-    static void assureTableExist(ModelInfo table) {
+    public static void assureTableExist(ModelInfo table) {
         synchronized (table) {
             if (!isTableExist(table)) {
                 String sql = Utils.getCreateTableSQL(table);
@@ -205,7 +205,7 @@ public class DataResolver {
      * @param table
      * @return
      */
-    static boolean isTableExist(ModelInfo table) {
+    public static boolean isTableExist(ModelInfo table) {
         if (table.isTableChecked) {
             return true;
         }

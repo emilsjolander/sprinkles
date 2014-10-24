@@ -69,7 +69,7 @@ class ModelInfo {
         // hide contructor
     }
 
-    static ModelInfo from(Class<? extends QueryResult> clazz) {
+    public static ModelInfo from(Class<? extends QueryResult> clazz) {
         synchronized (clazz) {
             if (cache.containsKey(clazz)) {
                 return cache.get(clazz);

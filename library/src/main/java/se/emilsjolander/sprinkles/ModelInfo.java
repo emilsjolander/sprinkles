@@ -93,10 +93,6 @@ class ModelInfo {
                     }
 
                 } else if (isAutoGenerateColumnNames || field.isAnnotationPresent(Column.class)) {
-                    ColumnField column = new ColumnField();
-                    column.isAutoIncrement = field.isAnnotationPresent(AutoIncrement.class);
-                    column.isKey = field.isAnnotationPresent(Key.class) || column.isAutoIncrement;
-
                     //check relationship
                     if (field.isAnnotationPresent(ManyToOne.class)) {
                         ManyToOneColumnField m2oColumn = new ManyToOneColumnField();
@@ -109,7 +105,7 @@ class ModelInfo {
                         m2oColumn.oneModelClass = field.getAnnotation(ManyToOne.class).oneModelClass();
 
                         if (!info.manyToOneColumns.add(m2oColumn)) {
-                            throw new DuplicateColumnException(column.name);
+                            throw new DuplicateColumnException(m2oColumn.name);
                         }
                     } else if (field.isAnnotationPresent(OneToMany.class)) {
                         OneToManyColumnField o2mColumn = new OneToManyColumnField();
@@ -122,9 +118,13 @@ class ModelInfo {
                         o2mColumn.manyModelClass = field.getAnnotation(OneToMany.class).manyModelClass();
 
                         if (!info.oneToManyColumns.add(o2mColumn)) {
-                            throw new DuplicateColumnException(column.name);
+                            throw new DuplicateColumnException(o2mColumn.name);
                         }
                     } else if (!field.isAnnotationPresent(Ignore.class)){
+                        ColumnField column = new ColumnField();
+                        column.isAutoIncrement = field.isAnnotationPresent(AutoIncrement.class);
+                        column.isKey = field.isAnnotationPresent(Key.class) || column.isAutoIncrement;
+
                         //if 'AutoGenerateColumnNames' property of table has been set to true,
                         //the field will be recognized as a column default
                         column.name = isAutoGenerateColumnNames ? field.getName() : field.getAnnotation(Column.class).value();

@@ -192,7 +192,11 @@ public abstract class Model implements QueryResult {
             if (table.autoIncrementField != null) {
                 table.autoIncrementField.field.setAccessible(true);
                 try {
-                    table.autoIncrementField.field.set(this, id);
+                    if(table.autoIncrementField.field.getType()==Integer.class){
+                        table.autoIncrementField.field.set(this, (int)id);
+                    }else {
+                        table.autoIncrementField.field.set(this, id);
+                    }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }

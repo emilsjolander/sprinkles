@@ -33,20 +33,30 @@ public class LazyLoadTest {
         ModelInfo.clearCache();
         Sprinkles sprinkles = Sprinkles.init(Robolectric.application,"sprinkle.db",1);
 //        sprinkles.addMigration(TestModel.MIGRATION);
-    }
-
-    @Test
-    public void lazyModel() {
         Company company = new Company();
         company.name = "google";
         company.save();
 
         Person staff = new Person();
+        staff.name = "goodman";
         staff.company_id = company.id;
         staff.save();
+    }
 
+    @Test
+    public void lazyModel() {
+        Person staff = Query.where(Person.class).equalTo("name","goodman").findSingle();
+        Company company =  Query.where(Company.class).equalTo("name","google").findSingle();
         assertNotNull(staff.company);
         assertEquals(company,staff.company.load());
+
+    }
+
+    @Test
+    public void lazyModelList() {
+        Person staff = Query.where(Person.class).equalTo("name","goodman").findSingle();
+        Company company =  Query.where(Company.class).equalTo("name","google").findSingle();
+        assertNotNull(company.Staffs);
         assertEquals(1,company.Staffs.load().size());
 
     }

@@ -49,11 +49,27 @@ class ModelInfo {
         String manyColumn;
         String oneColumn;
         Class<? extends Model> oneModelClass;
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof ManyToOneColumnField) {
+                return ((ManyToOneColumnField) o).manyColumn.equals(manyColumn)
+                        &&((ManyToOneColumnField) o).oneColumn.equals(oneColumn);
+            }
+            return false;
+        }
     }
     public static class OneToManyColumnField extends ColumnField{
         String manyColumn;
         String oneColumn;
         Class manyModelClass;
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof OneToManyColumnField) {
+                return ((OneToManyColumnField) o).manyColumn.equals(manyColumn)
+                        &&((OneToManyColumnField) o).oneColumn.equals(oneColumn);
+            }
+            return false;
+        }
     }
 
     static Map<Class<? extends QueryResult>, ModelInfo> cache = new HashMap<Class<? extends QueryResult>, ModelInfo>();

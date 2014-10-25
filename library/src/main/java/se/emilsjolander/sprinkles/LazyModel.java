@@ -27,6 +27,7 @@ public class LazyModel<T extends Model> {
             Field manyColumnField = mSource.getClass().getDeclaredField(mManyToOneColumnField.manyColumn);
             Object foreignKeyValue = null;
             if(manyColumnField!=null){
+                manyColumnField.setAccessible(true);
                 foreignKeyValue = manyColumnField.get(mSource);
             }else {
                 //if manyColumn is not been implicit declared,find it from mHiddenFieldsMap

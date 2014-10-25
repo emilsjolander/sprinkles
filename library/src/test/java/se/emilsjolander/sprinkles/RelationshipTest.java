@@ -25,17 +25,8 @@ public class RelationshipTest {
         ModelInfo.clearCache();
         Sprinkles sprinkles = Sprinkles.init(Robolectric.application);
 //        sprinkles.addMigration(AutoGenTestModel.MIGRATION);
-    }
-
-    @Test
-    public void constructor() {
         Person p = new Person();
-        assertNotNull(p.emails);
-    }
-
-    @Test
-    public void oneToMany() {
-        Person p = new Person();
+        p.name="goodman";
         Email email1 = new Email();
         email1.address = "1@gmail.com";
         email1.owner = p;
@@ -52,8 +43,19 @@ public class RelationshipTest {
 
         p.save();
         p.emails.saveAll();
+        DataResolver.resetRecordCache();
+    }
 
-        OneQuery<Person> query = Query.one(Person.class,"SELECT * FROM "+Utils.getTableName(Person.class)+" where id="+p.id);
+    @Test
+    public void constructor() {
+        Person p = new Person();
+        assertNotNull(p.emails);
+    }
+
+    @Test
+    public void oneToMany() {
+
+        OneQuery<Person> query = Query.one(Person.class,"SELECT * FROM "+Utils.getTableName(Person.class)+" where name='goodman'");
         Person pFromQuery = query.get();
         assertEquals(2,pFromQuery.emails.size());
     }

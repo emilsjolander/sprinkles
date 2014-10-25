@@ -93,22 +93,25 @@ public class DataResolver {
                 if (!colNames.contains(oneToManyColumnField.oneColumn)) {
                     continue;
                 }
-                final ManyQuery query = new ManyQuery();
-                query.resultClass = oneToManyColumnField.manyModelClass;
-                query.placeholderQuery = "SELECT * FROM " + getTableName(oneToManyColumnField.manyModelClass)
-                        + " WHERE "+oneToManyColumnField.manyColumn+"=?";
-                Integer foreignKeyValue = c.getInt(c.getColumnIndexOrThrow(oneToManyColumnField.oneColumn));
-                query.rawQuery = Utils.insertSqlArgs(query.placeholderQuery,new Object[]{foreignKeyValue});
-                CursorList cursorList = query.get();
-                ModelList manyModels = ModelList.from(cursorList);
-                if(manyModels!=null) {
-                    try {
-                        oneToManyColumnField.field.set(result, manyModels);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
+                if(!LazyModelList.class.isAssignableFrom(oneToManyColumnField.field.getType())){
+                    final ManyQuery query = new ManyQuery();
+                    query.resultClass = oneToManyColumnField.manyModelClass;
+                    query.placeholderQuery = "SELECT * FROM " + getTableName(oneToManyColumnField.manyModelClass)
+                            + " WHERE " + oneToManyColumnField.manyColumn + "=?";
+                    Integer foreignKeyValue = c.getInt(c.getColumnIndexOrThrow(oneToManyColumnField.oneColumn));
+                    query.rawQuery = Utils.insertSqlArgs(query.placeholderQuery, new Object[]{foreignKeyValue});
+                    CursorList cursorList = query.get();
+                    ModelList manyModels = ModelList.from(cursorList);
+                    if (manyModels != null) {
+                        try {
+                            oneToManyColumnField.field.setAccessible(true);
+                            oneToManyColumnField.field.set(result, manyModels);
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
                     }
+                    cursorList.close();
                 }
-                cursorList.close();
             }
             //fill manyToOne field
             for (ModelInfo.ManyToOneColumnField manyToOneColumnField : info.manyToOneColumns) {
@@ -117,7 +120,7 @@ public class DataResolver {
                 }
                 Integer foreignKeyValue = c.getInt(c.getColumnIndexOrThrow(manyToOneColumnField.manyColumn));
 
-                if(LazyModel.class.isAssignableFrom(resultClass)){
+                if(LazyModel.class.isAssignableFrom(manyToOneColumnField.field.getType())){
                     //if is lazy load,just put foreign key value to hiddenFieldsMap
                     ((Model)result).mHiddenFieldsMap.put(manyToOneColumnField.manyColumn,foreignKeyValue);
                 }else {
@@ -129,6 +132,7 @@ public class DataResolver {
                     Object oneModel = query.get();
                     if (oneModel != null) {
                         try {
+                            manyToOneColumnField.field.setAccessible(true);
                             manyToOneColumnField.field.set(result, oneModel);
                         } catch (IllegalAccessException e) {
                             e.printStackTrace();

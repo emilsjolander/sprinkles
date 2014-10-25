@@ -31,7 +31,7 @@ public class AutoGenTestModel extends Model {
 
     @Override
     public void beforeCreate() {
-        createdAt = new Date();
+//        createdAt = new Date();
         created = true;
     }
 

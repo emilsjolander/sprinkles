@@ -9,17 +9,19 @@ public class DateSerializer implements TypeSerializer<Date> {
 
     @Override
     public Date unpack(Cursor c, String name) {
-        return new Date(c.getLong(c.getColumnIndexOrThrow(name)));
+        long l = c.getLong(c.getColumnIndexOrThrow(name));
+        return l > 0 ? new Date(l) : null;
     }
 
     @Override
     public void pack(Date object, ContentValues cv, String name) {
-        cv.put(name, object.getTime());
+        if(object != null)
+            cv.put(name, object.getTime());
     }
 
     @Override
     public String toSql(Date object) {
-        return String.valueOf(object.getTime());
+        return object != null ? String.valueOf(object.getTime()) : null;
     }
 
     @Override

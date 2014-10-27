@@ -73,8 +73,11 @@ public class DataResolver {
             Hashtable<String,WeakReference<Object>> cacheForModel = sCachePool.get(resultClass);
             final ModelInfo info = ModelInfo.from(resultClass);
             String keyValueTag = getKeyValueTag(info, c);
-            if(cacheForModel.containsKey(keyValueTag)&&cacheForModel.get(keyValueTag)!=null){
-                return (T)cacheForModel.get(keyValueTag).get();
+            if(cacheForModel.containsKey(keyValueTag)
+                    &&cacheForModel.get(keyValueTag)!=null){
+                if(cacheForModel.get(keyValueTag).get()!=null) {
+                    return (T) cacheForModel.get(keyValueTag).get();
+                }
             }
 
             T result = resultClass.newInstance();
@@ -140,6 +143,7 @@ public class DataResolver {
                     }
                 }
             }
+            updateRecordCache((Model)result);
             return result;
         } catch (Exception e) {
             throw new RuntimeException(e);

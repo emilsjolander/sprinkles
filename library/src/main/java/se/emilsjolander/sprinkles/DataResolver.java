@@ -91,6 +91,20 @@ public class DataResolver {
                 Object o = Sprinkles.sInstance.getTypeSerializer(type).unpack(c, column.name);
                 column.field.set(result, o);
             }
+            /**
+             * call updateRecordCache before fill o2m and m2o fields,to avoid stackoverflow error when has circular relation
+             * class Person{
+             *     ...
+             *   @ManyToOne
+             *   public Email email;
+             * }
+             * *class Email{
+             *     ...
+             *   @ManyToOne
+             *   public Person owner;
+             * }
+             */
+            updateRecordCache((Model)result);
             //fill oneToMany field
             for (ModelInfo.OneToManyColumnField oneToManyColumnField : info.oneToManyColumns) {
                 if (!colNames.contains(oneToManyColumnField.oneColumn)) {
@@ -118,7 +132,7 @@ public class DataResolver {
             }
             //fill manyToOne field
             for (ModelInfo.ManyToOneColumnField manyToOneColumnField : info.manyToOneColumns) {
-                if (colNames.contains(manyToOneColumnField.manyColumn)) {
+                if (!colNames.contains(manyToOneColumnField.manyColumn)) {
                     continue;
                 }
                 Integer foreignKeyValue = c.getInt(c.getColumnIndexOrThrow(manyToOneColumnField.manyColumn));
@@ -143,7 +157,6 @@ public class DataResolver {
                     }
                 }
             }
-            updateRecordCache((Model)result);
             return result;
         } catch (Exception e) {
             throw new RuntimeException(e);

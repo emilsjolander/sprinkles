@@ -1,5 +1,6 @@
 package se.emilsjolander.sprinkles;
 
+import java.math.BigDecimal;
 import java.util.LinkedList;
 
 /**
@@ -131,23 +132,28 @@ public final class Query<T extends Model> implements IQueryPart1<T>,IQueryPart2<
     }
 
 
+
     Class<T> mClazz;
     LinkedList<String> mSqlStatementList = new LinkedList<String>();
+    LinkedList<Object> mSqlArgList = new LinkedList<Object>();
+    String mInitSql;
     int mSkip = 0;
     private Query(Class<T> clazz) {
         mClazz = clazz;
-        mSqlStatementList.add("SELECT * FROM "+DataResolver.getTableName(clazz) + " WHERE ");
+        mInitSql = "SELECT * FROM "+DataResolver.getTableName(clazz);
     }
 
     /***************QueryPart1 start**********************/
     @Override
     public IQueryPart4<T> equalTo(String field,Object value){
-        mSqlStatementList.add(field + "='" + value+"'");
+        mSqlStatementList.add(field + "=?");
+        mSqlArgList.add(value);
         return this;
     }
     @Override
     public IQueryPart4<T> notEqualTo(String field,Object value){
-        mSqlStatementList.add(field+"<>'"+value+"'");
+        mSqlStatementList.add(field+"<>?");
+        mSqlArgList.add(value);
         return this;
     }
     @Override
@@ -167,27 +173,33 @@ public final class Query<T extends Model> implements IQueryPart1<T>,IQueryPart2<
     }
     @Override
     public IQueryPart4<T> between(String field,Object from,Object to){
-        mSqlStatementList.add(field + " BETWEEN '" + from + "' AND '" + to +"'");
+        mSqlStatementList.add(field + " BETWEEN ? AND ?");
+        mSqlArgList.add(from);
+        mSqlArgList.add(to);
         return this;
     }
     @Override
     public IQueryPart4<T> greaterThan(String field,Object value){
-        mSqlStatementList.add(field + ">'" + value+"'");
+        mSqlStatementList.add(field + ">?");
+        mSqlArgList.add(value);
         return this;
     }
     @Override
     public IQueryPart4<T> greaterThanOrEqualTo(String field,int value){
-        mSqlStatementList.add(field + ">='" + value+"'");
+        mSqlStatementList.add(field + ">=?");
+        mSqlArgList.add(value);
         return this;
     }
     @Override
     public IQueryPart4<T> lessThan(String field,Object value){
-        mSqlStatementList.add(field + "<'" + value+"'");
+        mSqlStatementList.add(field + "<?");
+        mSqlArgList.add(value);
         return this;
     }
     @Override
     public IQueryPart4<T> lessThanOrEqualTo(String field,Object value){
-        mSqlStatementList.add(field + "<='" + value+"'");
+        mSqlStatementList.add(field + "<=?");
+        mSqlArgList.add(value);
         return this;
     }
 
@@ -216,10 +228,14 @@ public final class Query<T extends Model> implements IQueryPart1<T>,IQueryPart2<
     @Override
     public String build(){
         StringBuilder sqlBuilder = new StringBuilder();
+        sqlBuilder.append(mInitSql);
+        if(mSqlStatementList.size()>0){
+            sqlBuilder.append(" WHERE ");
+        }
         for(String sqlPart:mSqlStatementList){
             sqlBuilder.append(sqlPart);
         }
-        return sqlBuilder.toString();
+        return Utils.insertSqlArgs(sqlBuilder.toString(), mSqlArgList.toArray());
     }
     @Override
     public ModelList<T> find(){

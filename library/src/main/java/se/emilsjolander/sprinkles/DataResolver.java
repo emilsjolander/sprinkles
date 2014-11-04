@@ -55,7 +55,7 @@ public class DataResolver {
     static void recycleRecordCache(Class modelClazz){
         Hashtable<String, WeakReference<Object>> cacheForModel = sCachePool.get(modelClazz);
         if(cacheForModel !=null){
-            for (String key : cacheForModel.keySet()){
+            for (Object key : cacheForModel.keySet().toArray()){
                 if(cacheForModel.get(key)==null
                         ||cacheForModel.get(key).get()==null){
                     cacheForModel.remove(key);

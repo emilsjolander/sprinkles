@@ -25,6 +25,6 @@ public @interface OneToMany {
      */
     String oneColumn();
 
-    Class<? extends Model> manyModelClass();
+//    Class<? extends Model> manyModelClass();
 
 }

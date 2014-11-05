@@ -1,6 +1,7 @@
 package se.emilsjolander.sprinkles;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,8 +53,10 @@ class ModelInfo {
         @Override
         public boolean equals(Object o) {
             if (o instanceof ManyToOneColumnField) {
-                return ((ManyToOneColumnField) o).manyColumn.equals(manyColumn)
-                        &&((ManyToOneColumnField) o).oneColumn.equals(oneColumn);
+                ManyToOneColumnField columnField = (ManyToOneColumnField) o;
+                return columnField.manyColumn.equals(manyColumn)
+                        && columnField.oneColumn.equals(oneColumn)
+                        && columnField.oneModelClass.equals(oneModelClass);
             }
             return false;
         }
@@ -65,8 +68,10 @@ class ModelInfo {
         @Override
         public boolean equals(Object o) {
             if (o instanceof OneToManyColumnField) {
-                return ((OneToManyColumnField) o).manyColumn.equals(manyColumn)
-                        &&((OneToManyColumnField) o).oneColumn.equals(oneColumn);
+                OneToManyColumnField columnField = (OneToManyColumnField) o;
+                return columnField.manyColumn.equals(manyColumn)
+                        && columnField.oneColumn.equals(oneColumn)
+                        && columnField.manyModelClass.equals(manyModelClass);
             }
             return false;
         }
@@ -118,7 +123,11 @@ class ModelInfo {
                         m2oColumn.field = field;
                         m2oColumn.manyColumn = field.getAnnotation(ManyToOne.class).manyColumn();
                         m2oColumn.oneColumn = field.getAnnotation(ManyToOne.class).oneColumn();
-                        m2oColumn.oneModelClass = field.getAnnotation(ManyToOne.class).oneModelClass();
+                        if(field.getType()!=field.getGenericType()){
+                            m2oColumn.oneModelClass = (Class) ((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0];
+                        }else{
+                            m2oColumn.oneModelClass = (Class)field.getType();
+                        }
 
                         if (!info.manyToOneColumns.add(m2oColumn)) {
                             throw new DuplicateColumnException(m2oColumn.name);
@@ -131,7 +140,7 @@ class ModelInfo {
                         o2mColumn.field = field;
                         o2mColumn.manyColumn = field.getAnnotation(OneToMany.class).manyColumn();
                         o2mColumn.oneColumn = field.getAnnotation(OneToMany.class).oneColumn();
-                        o2mColumn.manyModelClass = field.getAnnotation(OneToMany.class).manyModelClass();
+                        o2mColumn.manyModelClass = (Class) ((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0];//field.getAnnotation(OneToMany.class).manyModelClass();
 
                         if (!info.oneToManyColumns.add(o2mColumn)) {
                             throw new DuplicateColumnException(o2mColumn.name);

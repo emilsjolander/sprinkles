@@ -18,6 +18,6 @@ public class Email extends Model {
 
     public String address;
 
-    @ManyToOne(manyColumn = "owner_id",oneColumn = "id",oneModelClass = Person.class)
+    @ManyToOne(manyColumn = "owner_id",oneColumn = "id")
     public Person owner;
 }

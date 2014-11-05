@@ -22,9 +22,9 @@ public class Person extends Model {
     public long company_id;
 
 
-    @OneToMany(manyColumn = "owner_id",oneColumn = "id",manyModelClass = Email.class)
+    @OneToMany(manyColumn = "owner_id",oneColumn = "id")
     public ModelList<Email> emails;
 
-    @ManyToOne(manyColumn = "company_id",oneColumn = "id",oneModelClass = Company.class)
+    @ManyToOne(manyColumn = "company_id",oneColumn = "id")
     public LazyModel<Company> company;
 }

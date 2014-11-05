@@ -29,6 +29,6 @@ public @interface ManyToOne {
      * for LazyModel
      * @return
      */
-    Class<? extends Model> oneModelClass();
+//    Class<? extends Model> oneModelClass();
 
 }

@@ -18,6 +18,6 @@ public class Company extends Model {
     public long id;
     public String name;
 
-    @OneToMany(manyColumn = "company_id",oneColumn = "id",manyModelClass = Person.class)
+    @OneToMany(manyColumn = "company_id",oneColumn = "id")
     public LazyModelList<Person> Staffs;
 }

@@ -4,6 +4,9 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.List;
+import java.util.Map;
+
 class DbOpenHelper extends SQLiteOpenHelper {
     private int baseVersion;
 
@@ -29,8 +32,15 @@ class DbOpenHelper extends SQLiteOpenHelper {
     }
 
     private void executeMigrations(SQLiteDatabase db, int oldVersion, int newVersion) {
-        for (int i = oldVersion; i < newVersion; i++) {
-            Sprinkles.sInstance.mMigrations.get(i-oldVersion).execute(db);
+        for (Map.Entry<Integer, List<Migration>> entry : Sprinkles.sInstance.mMigrations.entrySet()) {
+            if (entry.getKey() > oldVersion && entry.getValue() != null) {
+                int size = entry.getValue().size();
+                for (int j = 0; j < size; j++) {
+                    if (entry.getValue().get(j) != null) {
+                        entry.getValue().get(j).execute(db);
+                    }
+                }
+            }
         }
     }
 }

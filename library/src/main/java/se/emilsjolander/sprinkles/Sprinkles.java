@@ -28,7 +28,8 @@ public final class Sprinkles {
     static SQLiteDatabase sDatabase;
 
     Context mContext;
-    List<Migration> mMigrations = new ArrayList<Migration>();
+    Map<Integer,List<Migration>> mMigrations = new ConcurrentHashMap<Integer,List<Migration>>();
+
 
     private String databaseName;
     private int initialDatabaseVersion;
@@ -140,8 +141,19 @@ public final class Sprinkles {
      * @param migration The migration that should be performed.
      */
     public void addMigration(Migration migration) {
-        mMigrations.add(migration);
+        addMigration(migration,sInstance.initialDatabaseVersion);
     }
+
+    public void addMigration(Migration migration,int dbVersionCode) {
+        if(mMigrations.get(dbVersionCode)==null){
+            ArrayList<Migration> migrations = new ArrayList<Migration>();
+            mMigrations.put(dbVersionCode, migrations);
+            migrations.add(migration);
+        }else {
+            mMigrations.get(dbVersionCode).add(migration);
+        }
+    }
+
 
     public <T> void registerType(Class<T> clazz, TypeSerializer<T> serializer) {
         typeSerializers.put(clazz, serializer);

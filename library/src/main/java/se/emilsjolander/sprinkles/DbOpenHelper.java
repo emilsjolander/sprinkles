@@ -11,13 +11,13 @@ class DbOpenHelper extends SQLiteOpenHelper {
     private int baseVersion;
 
     protected DbOpenHelper(Context context, String databaseName, int baseVersion) {
-        super(context, databaseName, null, Sprinkles.sInstance.mMigrations.size() + baseVersion);
+        super(context, databaseName, null, baseVersion);
         this.baseVersion = baseVersion;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        executeMigrations(db, baseVersion, Sprinkles.sInstance.mMigrations.size() + baseVersion);
+        executeMigrations(db, baseVersion, baseVersion);
     }
 
     @Override
@@ -33,11 +33,16 @@ class DbOpenHelper extends SQLiteOpenHelper {
 
     private void executeMigrations(SQLiteDatabase db, int oldVersion, int newVersion) {
         for (Map.Entry<Integer, List<Migration>> entry : Sprinkles.sInstance.mMigrations.entrySet()) {
-            if (entry.getKey() > oldVersion && entry.getValue() != null) {
+            if ((entry.getKey() > oldVersion||oldVersion==newVersion)
+                    && entry.getValue() != null) {
                 int size = entry.getValue().size();
                 for (int j = 0; j < size; j++) {
                     if (entry.getValue().get(j) != null) {
-                        entry.getValue().get(j).execute(db);
+                        try {
+                            entry.getValue().get(j).execute(db);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
                     }
                 }
             }

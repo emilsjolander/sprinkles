@@ -201,4 +201,25 @@ public class ModelTest {
         assertTrue(notified[0]);
     }
 
+    @Test
+    public void updateEntityCache() {
+        TestModel originalModel = new TestModel();
+        originalModel.title = "hej";
+        originalModel.save();
+        TestModel newModel = new TestModel();
+        newModel.id = originalModel.id;
+        newModel.title = "new hej";
+        newModel.save();
+        assertEquals("new hej",originalModel.title);
+    }
+
+    @Test
+    public void olderModel() {
+        TestModel originalModel = new TestModel();
+        originalModel.title = "hej";
+        assertNotSame(originalModel.getOlderModel(),originalModel);
+        originalModel.save();
+        assertEquals(originalModel.getOlderModel(),originalModel);
+    }
+
 }

@@ -126,13 +126,25 @@ public abstract class Model implements QueryResult {
         if(!DataResolver.isTableExist(ModelInfo.from(getClass()))){
             return false;
         }
-		final Model m = Query.one(
-				getClass(),
-				String.format("SELECT * FROM %s WHERE %s LIMIT 1",
-						Utils.getTableName(getClass()),
-						Utils.getWhereStatement(this))).get();
-		return m != null;
+		return getOlderModel() != null;
 	}
+
+    /**
+     * get an older version of this model exists in the database
+     *
+     * @return true if this model is currently saved in the database (could be an older version)
+     */
+    final public Model getOlderModel() {
+        if(!DataResolver.isTableExist(ModelInfo.from(getClass()))){
+            return null;
+        }
+        final Model m = Query.one(
+                getClass(),
+                String.format("SELECT * FROM %s WHERE %s LIMIT 1",
+                        Utils.getTableName(getClass()),
+                        Utils.getWhereStatement(this))).get();
+        return m;
+    }
 
     /**
      * Save this model to the database.
@@ -158,13 +170,48 @@ public abstract class Model implements QueryResult {
      *
      * @param t
      *      The transaction to save this model in
-     *
      * @return whether or not the save was successful.
      */
-	final public boolean save(Transaction t) {
+    final public boolean save(Transaction t) {
+        return save(t,true);
+    }
+
+    /**
+     * Save this model to the database within the given transaction.
+     * If this model has an @AutoIncrement annotation on a property
+     * than that property will be set when this method returns.
+     *
+     * @param t
+     *      The transaction to save this model in
+     * @param checkOlder
+     *      whether to check and update older model
+     * @return whether or not the save was successful.
+     */
+	final public boolean save(Transaction t,boolean checkOlder) {
 		if (!isValid()) {
 			return false;
 		}
+
+        if(checkOlder&&DataResolver.isCached(this)){
+            //if the model has been cached,just update the older model and update the order model to db
+            Model olderModel = getOlderModel();
+//            throw new IllegalStateException(""+DataResolver.getKeyValueTag(olderModel));
+            if(olderModel!=this&&olderModel!=null){
+                //sync changes to older model
+                ModelInfo table = ModelInfo.from(getClass());
+                for (ModelInfo.ColumnField columnField:table.columns){
+                    Object newValue = null;
+                    try {
+                        columnField.field.setAccessible(true);
+                        newValue = columnField.field.get(this);
+                        columnField.field.set(olderModel, newValue);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return olderModel.save(t,false);
+            }
+        }
 
         boolean doesExist = exists();
         if (!doesExist) {

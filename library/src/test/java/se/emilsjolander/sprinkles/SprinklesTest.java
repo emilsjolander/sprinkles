@@ -71,7 +71,7 @@ public class SprinklesTest {
             }
         };
         s.addMigration(m);
-        assertEquals(s.mMigrations.get(0).get(0), m);
+        assertEquals(s.mMigrations.get(1).get(0), m);
     }
 
     @Test

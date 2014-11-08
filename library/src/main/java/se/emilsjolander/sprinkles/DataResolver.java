@@ -26,25 +26,51 @@ public class DataResolver {
      * @param m
      */
     static void updateRecordCache(Model m){
-        Hashtable<String, WeakReference<Object>> cacheForModel = sCachePool.get(m.getClass());
-        if(cacheForModel==null){
-            cacheForModel = new Hashtable<String, WeakReference<Object>>();
-            sCachePool.put(m.getClass(), cacheForModel);
+        synchronized (m) {
+            Hashtable<String, WeakReference<Object>> cacheForModel = sCachePool.get(m.getClass());
+            if (cacheForModel == null) {
+                cacheForModel = new Hashtable<String, WeakReference<Object>>();
+                sCachePool.put(m.getClass(), cacheForModel);
+            }
+            if (cacheForModel.size() > RECORD_CACHE_LIMIT) {
+                recycleRecordCache(m.getClass());
+            }
+            cacheForModel.put(getKeyValueTag(m), new WeakReference<Object>(m));
         }
-        if(cacheForModel.size()>RECORD_CACHE_LIMIT){
-            recycleRecordCache(m.getClass());
-        }
-        cacheForModel.put(getKeyValueTag(m),new WeakReference<Object>(m));
     }
 
     static void removeRecordCache(Model m){
-        Hashtable<String, WeakReference<Object>> cacheForModel = sCachePool.get(m.getClass());
-        if(cacheForModel!=null){
-            cacheForModel.remove(getKeyValueTag(m));
+        synchronized (m) {
+            Hashtable<String, WeakReference<Object>> cacheForModel = sCachePool.get(m.getClass());
+            if (cacheForModel != null) {
+                cacheForModel.remove(getKeyValueTag(m));
+            }
         }
     }
     static void resetRecordCache() {
         sCachePool.clear();
+    }
+
+    /**
+     * whether the model has been cached
+     * @param m
+     * @return
+     */
+    public static boolean isCached(Model m){
+        synchronized (m) {
+            if (sCachePool.get(m.getClass()) == null) {
+                sCachePool.put(m.getClass(), new Hashtable<String, WeakReference<Object>>());
+            }
+            Hashtable<String, WeakReference<Object>> cacheForModel = sCachePool.get(m.getClass());
+            String keyValueTag = getKeyValueTag(m);
+            if (cacheForModel.containsKey(keyValueTag)
+                    && cacheForModel.get(keyValueTag) != null) {
+                if (cacheForModel.get(keyValueTag).get() != null) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
 
@@ -172,7 +198,7 @@ public class DataResolver {
         final ModelInfo info = ModelInfo.from(m.getClass());
         final StringBuilder keyValuesTag = new StringBuilder();
         for (ModelInfo.ColumnField column : info.columns) {
-            if(column.isKey||column.isDynamic) {
+            if(column.isKey) {
                 column.field.setAccessible(true);
                 try {
                     keyValuesTag.append(column.field.get(m) + "_");
@@ -192,7 +218,7 @@ public class DataResolver {
     public static String getKeyValueTag(ModelInfo info,Cursor c){
         final StringBuilder keyValuesTag = new StringBuilder();
         for (ModelInfo.ColumnField column : info.columns) {
-            if(column.isKey||column.isDynamic) {
+            if(column.isKey) {
                 if(c.getColumnIndex(column.name)>=0) {
                     column.field.setAccessible(true);
                     keyValuesTag.append(c.getString(c.getColumnIndex(column.name)) + "_");

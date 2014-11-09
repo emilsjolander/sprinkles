@@ -250,13 +250,13 @@ public abstract class Model implements QueryResult {
 		}
         ModelInfo table = ModelInfo.from(getClass());
         DataResolver.assureTableExist(table);
-        if(checkOlder&&DataResolver.isCached(this)){
+        Model cachedModel = DataResolver.getCachedModel(getClass(), DataResolver.getKeyValueTag(this));
+        if(checkOlder&& !this.equals(cachedModel)){
             //if the model has been cached,just update the older model and update the order model to db
-            Model olderModel = getOlderModel();
 //            throw new IllegalStateException(""+DataResolver.getKeyValueTag(olderModel));
-            if(olderModel!=this&&olderModel!=null){
+            if(cachedModel!=this&&cachedModel!=null){
                 //sync changes to older model
-                copyTo(olderModel,new IFieldCopyAction() {
+                copyTo(cachedModel,new IFieldCopyAction() {
                     @Override
                     public void doCopy(ModelInfo.ColumnField columnField, Object from, Object to) {
                         try {
@@ -287,7 +287,7 @@ public abstract class Model implements QueryResult {
                         }
                     }
                 });
-                return olderModel.save(t,false);
+                return cachedModel.save(t,false);
             }
         }
 

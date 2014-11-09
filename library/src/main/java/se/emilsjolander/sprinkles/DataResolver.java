@@ -52,29 +52,27 @@ public class DataResolver {
     }
 
     /**
-     * whether the model has been cached
-     * @param m
+     * get the cached model
+     * @param keyTag
      * @return
      */
-    public static boolean isCached(Model m){
-        synchronized (m) {
-            if (sCachePool.get(m.getClass()) == null) {
-                sCachePool.put(m.getClass(), new Hashtable<String, WeakReference<Object>>());
+    public static Model getCachedModel(Class modelClass,String keyTag){
+        synchronized (modelClass) {
+            if (sCachePool.get(modelClass) == null) {
+                sCachePool.put(modelClass, new Hashtable<String, WeakReference<Object>>());
             }
-            Hashtable<String, WeakReference<Object>> cacheForModel = sCachePool.get(m.getClass());
-            String keyValueTag = getKeyValueTag(m);
-            if (cacheForModel.containsKey(keyValueTag)
-                    && cacheForModel.get(keyValueTag) != null) {
-                if (cacheForModel.get(keyValueTag).get() != null) {
-                    return true;
-                }
+            Hashtable<String, WeakReference<Object>> cacheForModel = sCachePool.get(modelClass);
+            if (cacheForModel.containsKey(keyTag)
+                    && cacheForModel.get(keyTag) != null) {
+                return (Model)cacheForModel.get(keyTag).get();
             }
-            return false;
+            return null;
         }
     }
 
 
-        /**
+
+    /**
          * remove useless record from cache
          * @param modelClazz
          */

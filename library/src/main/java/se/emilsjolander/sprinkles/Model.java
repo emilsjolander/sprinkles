@@ -248,7 +248,8 @@ public abstract class Model implements QueryResult {
 		if (!isValid()) {
 			return false;
 		}
-
+        ModelInfo table = ModelInfo.from(getClass());
+        DataResolver.assureTableExist(table);
         if(checkOlder&&DataResolver.isCached(this)){
             //if the model has been cached,just update the older model and update the order model to db
             Model olderModel = getOlderModel();
@@ -301,7 +302,7 @@ public abstract class Model implements QueryResult {
             throw new ContentValuesEmptyException();
         }
 //        final String tableName = Utils.getTableName(getClass());
-        ModelInfo table = ModelInfo.from(getClass());
+
         if (doesExist) {
             if (t.update(table, cv, Utils.getWhereStatement(this)) == 0) {
                 return false;

@@ -27,6 +27,13 @@ public abstract class Model implements QueryResult {
 	}
 
     /**
+     * Notifies you when a model has been saved
+     */
+    public interface IFieldCopyAction {
+        void doCopy(ModelInfo.ColumnField columnField,Object from,Object to);
+    }
+
+    /**
      * store extra data ex: foreign key value
      */
     @Ignore
@@ -147,6 +154,56 @@ public abstract class Model implements QueryResult {
     }
 
     /**
+     * Copy this model to another model.
+     * @param m
+     */
+    final public void copyTo(Model m){
+        copyTo(m,new IFieldCopyAction() {
+            @Override
+            public void doCopy(ModelInfo.ColumnField columnField, Object from, Object to) {
+                try {
+                    columnField.field.setAccessible(true);
+                    Object valueInThis = columnField.field.get(from);
+                    Object valueInTarget = columnField.field.get(to);
+                    //if the target has not null value , skip it or over write it
+                    if(valueInTarget!=null&&!valueInTarget.equals(valueInThis)){
+                        columnField.field.set(to, valueInThis);
+                    }else {
+                        columnField.field.set(to, valueInThis);
+                    }
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+    /**
+     * Copy this model to another model.
+     * @param m
+     */
+    final public void copyTo(Model m,IFieldCopyAction fieldCopyAction) {
+        ModelInfo table = ModelInfo.from(getClass());
+        //copy normal columns
+        for (ModelInfo.ColumnField columnField:table.columns){
+            if(fieldCopyAction!=null){
+                fieldCopyAction.doCopy(columnField, this, m);
+            }
+        };
+        //copy  manyToOneColumns
+        for (ModelInfo.ColumnField columnField:table.manyToOneColumns){
+            if(fieldCopyAction!=null){
+                fieldCopyAction.doCopy(columnField,this,m);
+            }
+        };
+        //copy  oneToManyColumns
+        for (ModelInfo.ColumnField columnField:table.oneToManyColumns){
+            if(fieldCopyAction!=null){
+                fieldCopyAction.doCopy(columnField,this,m);
+            }
+        };
+    }
+
+    /**
      * Save this model to the database.
      * If this model has an @AutoIncrement annotation on a property
      * than that property will be set when this method returns.
@@ -198,17 +255,37 @@ public abstract class Model implements QueryResult {
 //            throw new IllegalStateException(""+DataResolver.getKeyValueTag(olderModel));
             if(olderModel!=this&&olderModel!=null){
                 //sync changes to older model
-                ModelInfo table = ModelInfo.from(getClass());
-                for (ModelInfo.ColumnField columnField:table.columns){
-                    Object newValue = null;
-                    try {
-                        columnField.field.setAccessible(true);
-                        newValue = columnField.field.get(this);
-                        columnField.field.set(olderModel, newValue);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
+                copyTo(olderModel,new IFieldCopyAction() {
+                    @Override
+                    public void doCopy(ModelInfo.ColumnField columnField, Object from, Object to) {
+                        try {
+                            //if field is a lazy load field, skip it
+                            if(LazyModel.class.isAssignableFrom(columnField.field.getType())
+                                    ||LazyModelList.class.isAssignableFrom(columnField.field.getType())){
+                                return;
+                            }
+                            columnField.field.setAccessible(true);
+                            Object valueInThis = columnField.field.get(from);
+                            Object valueInTarget = columnField.field.get(to);
+                            //if field is One2Many Field,then check the modellist
+                            //if the modellist is empty,add modellist of this model to target model
+                            if(columnField instanceof ModelInfo.OneToManyColumnField
+                                    &&valueInTarget instanceof ModelList){
+                                if(((ModelList)valueInTarget).size()==0){
+                                    ((ModelList)valueInTarget).addAll(((ModelList)valueInThis));
+                                }
+                            }
+                            //if the target has not null value , skip it or over write it
+                            if(valueInTarget!=null&&!valueInTarget.equals(valueInThis)){
+                                columnField.field.set(to, valueInThis);
+                            }else {
+                                columnField.field.set(to, valueInThis);
+                            }
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
+                });
                 return olderModel.save(t,false);
             }
         }

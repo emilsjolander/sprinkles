@@ -2,6 +2,8 @@ package se.emilsjolander.sprinkles;
 
 import android.content.ContentValues;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 
 import java.util.HashMap;
 
@@ -359,6 +361,16 @@ public abstract class Model implements QueryResult {
      *      The callback to invoke when this model has been saved.
      */
 	final public void saveAsync(final OnSavedCallback callback) {
+        if(Looper.myLooper()!=Looper.getMainLooper()){
+            new Handler(Looper.getMainLooper())
+                    .post(new Runnable() {
+                        @Override
+                        public void run() {
+                            saveAsync(callback);
+                        }
+                    });
+            return;
+        }
 		new AsyncTask<Model, Void, Boolean>() {
 
 			protected Boolean doInBackground(Model... params) {
@@ -426,6 +438,16 @@ public abstract class Model implements QueryResult {
      *      The callback to invoke when this model has been deleted.
      */
 	final public void deleteAsync(final OnDeletedCallback callback) {
+        if(Looper.myLooper()!=Looper.getMainLooper()){
+            new Handler(Looper.getMainLooper())
+                    .post(new Runnable() {
+                        @Override
+                        public void run() {
+                            deleteAsync(callback);
+                        }
+                    });
+            return;
+        }
 		new AsyncTask<Model, Void, Void>() {
 
 			protected Void doInBackground(Model... params) {

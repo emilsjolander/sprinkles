@@ -26,7 +26,9 @@ public class BitmapSerializer implements TypeSerializer<Bitmap> {
     @Override
     public void pack(Bitmap object, ContentValues cv, String name) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        object.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        if(object != null) {
+            object.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        }
         byte[] bytes = stream.toByteArray();
         cv.put(name, bytes);
     }
@@ -34,7 +36,9 @@ public class BitmapSerializer implements TypeSerializer<Bitmap> {
     @Override
     public String toSql(Bitmap object) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        object.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        if(object != null) {
+            object.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        }
         byte[] bytes = stream.toByteArray();
         return new String(bytes);
     }

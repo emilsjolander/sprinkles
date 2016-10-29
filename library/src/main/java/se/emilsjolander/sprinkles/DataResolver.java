@@ -29,7 +29,7 @@ public class DataResolver {
         synchronized (m) {
             Hashtable<String, WeakReference<Object>> cacheForModel = sCachePool.get(m.getClass());
             if (cacheForModel == null) {
-                cacheForModel = new Hashtable<String, WeakReference<Object>>();
+                cacheForModel = new Hashtable<>();
                 sCachePool.put(m.getClass(), cacheForModel);
             }
             if (cacheForModel.size() > RECORD_CACHE_LIMIT) {

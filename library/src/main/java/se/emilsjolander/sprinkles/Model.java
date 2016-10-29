@@ -1,6 +1,7 @@
 package se.emilsjolander.sprinkles;
 
 import android.content.ContentValues;
+import android.database.sqlite.SQLiteException;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
@@ -147,12 +148,17 @@ public abstract class Model implements QueryResult {
         if(!DataResolver.isTableExist(ModelInfo.from(getClass()))){
             return null;
         }
-        final Model m = Query.one(
-                getClass(),
-                String.format("SELECT * FROM %s WHERE %s LIMIT 1",
-                        Utils.getTableName(getClass()),
-                        Utils.getWhereStatement(this))).get();
-        return m;
+        try {
+          return Query.one(
+              getClass(),
+              String.format("SELECT * FROM %s WHERE %s LIMIT 1",
+                  Utils.getTableName(getClass()),
+                  Utils.getWhereStatement(this))).get();
+        } catch (SQLiteException e) {
+          // We can not guarantee getOlderModel will be call safety. See {@TransactionTest.rollback}
+          e.printStackTrace();
+          return null;
+        }
     }
 
     /**

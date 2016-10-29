@@ -16,19 +16,6 @@ import se.emilsjolander.sprinkles.annotations.Table;
 @Table("Tests")
 public class TestModel extends Model {
 
-    public static Migration MIGRATION = new Migration() {
-        @Override
-        protected void doMigration(SQLiteDatabase db) {
-            db.execSQL(
-                    "CREATE TABLE Tests("+
-                            "id INTEGER PRIMARY KEY AUTOINCREMENT,"+
-                            "title TEXT,"+
-                            "created_at INTEGER"+
-                    ");"
-            );
-        }
-    };
-
     @Key
     @AutoIncrement
     @Column("id") public long id;

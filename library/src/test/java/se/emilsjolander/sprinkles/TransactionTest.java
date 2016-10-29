@@ -19,7 +19,6 @@ public class TransactionTest {
     public void initTables() {
         Sprinkles.dropInstances();
         Sprinkles sprinkles = Sprinkles.init(Robolectric.application);
-//        sprinkles.addMigration(TestModel.MIGRATION);
     }
 
     @Test

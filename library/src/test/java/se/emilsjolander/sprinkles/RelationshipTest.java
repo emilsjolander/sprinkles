@@ -19,19 +19,19 @@ import static junit.framework.Assert.assertTrue;
 @RunWith(RobolectricTestRunner.class)
 public class RelationshipTest {
 
+    private Sprinkles sprinkles;
+
     @Before
     public void initTables() {
-        Sprinkles.dropInstances();
-        ModelInfo.clearCache();
-        Sprinkles sprinkles = Sprinkles.init(Robolectric.application);
+        sprinkles = Sprinkles.init(Robolectric.application);
 //        sprinkles.addMigration(AutoGenTestModel.MIGRATION);
-        Person p = new Person();
+        Person p = new Person(sprinkles);
         p.name="goodman";
-        Email email1 = new Email();
+        Email email1 = new Email(sprinkles);
         email1.address = "1@gmail.com";
         email1.owner = p;
 
-        Email email2 = new Email();
+        Email email2 = new Email(sprinkles);
         email2.address = "1@gmail.com";
         email2.owner = p;
 
@@ -43,31 +43,31 @@ public class RelationshipTest {
 
         p.save();
         p.emails.saveAll();
-        DataResolver.resetRecordCache();
+        sprinkles.dataResolver.resetRecordCache();
     }
 
     @Test
     public void constructor() {
-        Person p = new Person();
+        Person p = new Person(sprinkles);
         assertNotNull(p.emails);
     }
 
     @Test
     public void oneToMany() {
 
-        OneQuery<Person> query = Query.one(Person.class,"SELECT * FROM "+Utils.getTableName(Person.class)+" where name='goodman'");
+        OneQuery<Person> query = Query.one(sprinkles, Person.class,"SELECT * FROM "+DataResolver.getTableName(Person.class)+" where name='goodman'");
         Person pFromQuery = query.get();
         assertEquals(2,pFromQuery.emails.size());
     }
 
     @Test
     public void manyToOne() {
-        Person p = new Person();
-        Email email1 = new Email();
+        Person p = new Person(sprinkles);
+        Email email1 = new Email(sprinkles);
         email1.address = "1@gmail.com";
         email1.owner = p;
 
-        Email email2 = new Email();
+        Email email2 = new Email(sprinkles);
         email2.address = "1@gmail.com";
         email2.owner = p;
 
@@ -80,7 +80,7 @@ public class RelationshipTest {
         p.save();
         p.emails.saveAll();
 
-        OneQuery<Email> query = Query.one(Email.class,"SELECT * FROM "+Utils.getTableName(Email.class)+" where id="+email1.id);
+        OneQuery<Email> query = Query.one(sprinkles, Email.class,"SELECT * FROM "+DataResolver.getTableName(Email.class)+" where id="+email1.id);
         Email eFromQuery = query.get();
         assertNotNull(eFromQuery.owner);
     }

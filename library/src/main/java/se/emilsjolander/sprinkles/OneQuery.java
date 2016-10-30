@@ -41,8 +41,10 @@ public final class OneQuery<T extends QueryResult> {
 	Class<T> resultClass;
     String placeholderQuery;
 	String rawQuery;
+	Sprinkles sprinkles;
 
-	OneQuery() {
+	OneQuery(Sprinkles sprinkles) {
+		this.sprinkles = sprinkles;
 	}
 
     /**
@@ -51,12 +53,12 @@ public final class OneQuery<T extends QueryResult> {
      * @return the result of the query.
      */
 	public T get() {
-		final SQLiteDatabase db = Sprinkles.getDatabase();
-        DataResolver.assureTableExist(ModelInfo.from(resultClass));
+		final SQLiteDatabase db = sprinkles.getDatabase();
+		sprinkles.dataResolver.assureTableExist(ModelInfo.from(sprinkles, resultClass));
         final Cursor c = db.rawQuery(rawQuery, null);
 		T result = null;
 		if (c.moveToFirst()) {
-			result = DataResolver.getResultFromCursor(resultClass, c);
+			result = sprinkles.dataResolver.getResultFromCursor(resultClass, c);
 		}
 
 		c.close();
@@ -128,7 +130,7 @@ public final class OneQuery<T extends QueryResult> {
             public void onLoadFinished(Loader<Cursor> loader, Cursor c) {
                 T result = null;
                 if (c.moveToFirst()) {
-                    result = DataResolver.getResultFromCursor(resultClass, c);
+                    result = sprinkles.dataResolver.getResultFromCursor(resultClass, c);
                 }
 
                 if (!handler.handleResult(result)) {
@@ -139,7 +141,7 @@ public final class OneQuery<T extends QueryResult> {
 
             @Override
             public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-                return new CursorLoader(Sprinkles.sInstance.mContext, sqlQuery, respondsToUpdatedOf);
+                return new CursorLoader(sprinkles, sqlQuery, respondsToUpdatedOf);
             }
         };
     }
@@ -162,7 +164,7 @@ public final class OneQuery<T extends QueryResult> {
 					android.support.v4.content.Loader<Cursor> loader, Cursor c) {
 				T result = null;
 				if (c.moveToFirst()) {
-					result = DataResolver.getResultFromCursor(resultClass, c);
+					result = sprinkles.dataResolver.getResultFromCursor(resultClass, c);
 				}
 
 				if (!handler.handleResult(result)) {
@@ -174,7 +176,7 @@ public final class OneQuery<T extends QueryResult> {
 			@Override
 			public android.support.v4.content.Loader<Cursor> onCreateLoader(
 					int id, Bundle args) {
-				return new SupportCursorLoader(Sprinkles.sInstance.mContext, sqlQuery, respondsToUpdatedOf);
+				return new SupportCursorLoader(sprinkles, sqlQuery, respondsToUpdatedOf);
 			}
 		};
 	}

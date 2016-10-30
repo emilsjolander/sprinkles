@@ -12,26 +12,25 @@ import org.robolectric.annotation.Config;
 
 import se.emilsjolander.sprinkles.model.TestModel;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @Config(emulateSdk = 18)
 @RunWith(RobolectricTestRunner.class)
 public class CursorIteratorTest {
 
     private CursorIterator<TestModel> iterator;
-
-    @Before
-    public void initSprinkles() {
-        Sprinkles.init(Robolectric.application);
-    }
+    private Sprinkles sprinkles;
 
     @Before
     public void createIterator() {
+        sprinkles = Sprinkles.init(Robolectric.application);
         MatrixCursor c = new MatrixCursor(new String[]{"title", "id"});
         c.addRow(new Object[]{"title1", 1});
         c.addRow(new Object[]{"title2", 2});
         c.addRow(new Object[]{"title3", 3});
-        iterator = new CursorIterator<TestModel>(c, TestModel.class);
+        iterator = new CursorIterator<>(sprinkles, c, TestModel.class);
     }
 
     @Test

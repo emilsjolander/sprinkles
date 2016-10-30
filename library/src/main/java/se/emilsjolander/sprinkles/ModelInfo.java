@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import android.support.annotation.NonNull;
+
 import se.emilsjolander.sprinkles.annotations.AutoGen;
 import se.emilsjolander.sprinkles.annotations.AutoIncrement;
 import se.emilsjolander.sprinkles.annotations.Column;
@@ -77,8 +79,6 @@ class ModelInfo {
         }
     }
 
-    static Map<Class<? extends QueryResult>, ModelInfo> cache = new HashMap<Class<? extends QueryResult>, ModelInfo>();
-
     String tableName;
     Set<ColumnField> columns = new HashSet<ColumnField>();
     List<ColumnField> keys = new ArrayList<ColumnField>();
@@ -86,17 +86,19 @@ class ModelInfo {
     Set<ManyToOneColumnField> manyToOneColumns = new HashSet<ManyToOneColumnField>();
     ColumnField autoIncrementField;
     boolean isTableChecked = false;
+    final Sprinkles sprinkles;
 
-    private ModelInfo(){
+    private ModelInfo(Sprinkles sprinkles){
         // hide contructor
+        this.sprinkles = sprinkles;
     }
 
-    static ModelInfo from(Class<? extends QueryResult> clazz) {
+  static ModelInfo from(@NonNull Sprinkles sprinkles, @NonNull Class<? extends QueryResult> clazz) {
         synchronized (clazz) {
-            if (cache.containsKey(clazz)) {
-                return cache.get(clazz);
+            if (sprinkles.modelInfoCache.containsKey(clazz)) {
+                return sprinkles.modelInfoCache.get(clazz);
             }
-            ModelInfo info = new ModelInfo();
+            ModelInfo info = new ModelInfo(sprinkles);
 
             final Field[] fields = Utils.getAllDeclaredFields(clazz, Object.class);
             boolean isAutoGenerateColumnNames = clazz.isAnnotationPresent(AutoGen.class);
@@ -106,7 +108,7 @@ class ModelInfo {
                     column.isDynamic = true;
 
                     column.name = field.getAnnotation(DynamicColumn.class).value();
-                    column.sqlType = Sprinkles.sInstance.getTypeSerializer(field.getType()).getSqlType().name();
+                    column.sqlType = sprinkles.getTypeSerializer(field.getType()).getSqlType().name();
                     column.field = field;
 
                     if (!info.columns.add(column)) {
@@ -118,7 +120,7 @@ class ModelInfo {
                     if (field.isAnnotationPresent(ManyToOne.class)) {
                         ManyToOneColumnField m2oColumn = new ManyToOneColumnField();
                         m2oColumn.name = field.getAnnotation(ManyToOne.class).manyColumn();
-                        m2oColumn.sqlType = Sprinkles.sInstance.getTypeSerializer(Integer.class).getSqlType().name();
+                        m2oColumn.sqlType = sprinkles.getTypeSerializer(Integer.class).getSqlType().name();
                         //many2one need to store the foreign key value
                         m2oColumn.field = field;
                         m2oColumn.manyColumn = field.getAnnotation(ManyToOne.class).manyColumn();
@@ -153,7 +155,7 @@ class ModelInfo {
                         //if 'AutoGenerateColumnNames' property of table has been set to true,
                         //the field will be recognized as a column default
                         column.name = isAutoGenerateColumnNames ? field.getName() : field.getAnnotation(Column.class).value();
-                        column.sqlType = Sprinkles.sInstance.getTypeSerializer(field.getType()).getSqlType().name();
+                        column.sqlType = sprinkles.getTypeSerializer(field.getType()).getSqlType().name();
                         column.field = field;
 
                         if (column.isAutoIncrement && !column.sqlType.equals(SqlType.INTEGER.name())) {
@@ -177,19 +179,15 @@ class ModelInfo {
                 throw new EmptyTableException(clazz.getName());
             }
             if (Model.class.isAssignableFrom(clazz)) {
-                info.tableName = Utils.getTableName((Class<? extends Model>) clazz);
+                info.tableName = DataResolver.getTableName((Class<? extends Model>) clazz);
                 if (info.keys.size() == 0) {
                     throw new NoKeysException();
                 }
             }
 
-            cache.put(clazz, info);
+            sprinkles.modelInfoCache.put(clazz, info);
             return info;
         }
-    }
-
-    static void clearCache(){
-        cache.clear();
     }
 
 }

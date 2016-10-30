@@ -1,6 +1,5 @@
 package se.emilsjolander.sprinkles;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.content.AsyncTaskLoader;
@@ -9,14 +8,16 @@ import android.support.v4.content.AsyncTaskLoader;
 class SupportCursorLoader extends AsyncTaskLoader<Cursor> {
 
 	private final ForceLoadContentObserver mObserver;
+	private final Sprinkles mSprinkles;
 
 	private String mSql;
 	private Class<? extends Model>[] mDependencies;
 	private Cursor mCursor;
 
-	public SupportCursorLoader(Context context, String sql,
+	public SupportCursorLoader(Sprinkles sprinkles, String sql,
 			Class<? extends Model>[] dependencies) {
-		super(context);
+		super(sprinkles.mContext);
+		mSprinkles = sprinkles;
 		mObserver = new ForceLoadContentObserver();
 		mSql = sql;
 		mDependencies = dependencies;
@@ -25,7 +26,7 @@ class SupportCursorLoader extends AsyncTaskLoader<Cursor> {
 	/* Runs on a worker thread */
 	@Override
 	public Cursor loadInBackground() {
-		final SQLiteDatabase db = Sprinkles.getDatabase();
+		final SQLiteDatabase db = mSprinkles.getDatabase();
 		Cursor cursor = db.rawQuery(mSql, null);
 
 		if (cursor != null) {

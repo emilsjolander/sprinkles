@@ -22,17 +22,17 @@ import static junit.framework.Assert.*;
 @RunWith(RobolectricTestRunner.class)
 public class ModelTest {
 
+    private Sprinkles sprinkles;
+
     @Before
     public void initTables() {
-        Sprinkles.dropInstances();
-        ModelInfo.clearCache();
-        Sprinkles sprinkles = Sprinkles.init(Robolectric.application,"sprinkle.db",1);
+        sprinkles = Sprinkles.init(Robolectric.application,"sprinkle.db",1);
 //        sprinkles.addMigration(TestModel.MIGRATION);
     }
 
     @Test
     public void isValid() {
-        TestModel m = new TestModel();
+        TestModel m = new TestModel(sprinkles);
         m.title = "hej";
 
         m.valid = false;
@@ -44,11 +44,11 @@ public class ModelTest {
 
     @Test
     public void beforeCreate() {
-        TestModel m = new TestModel();
+        TestModel m = new TestModel(sprinkles);
         m.title = "hej";
         m.save();
 
-        ContentValues contentValues = Utils.getContentValues(m);
+        ContentValues contentValues = Utils.getContentValues(sprinkles, m);
         assertEquals(3, contentValues.size());
         assertNotNull(contentValues.get("created_at"));
 
@@ -62,7 +62,7 @@ public class ModelTest {
 
     @Test
     public void beforeSave() {
-        TestModel m = new TestModel();
+        TestModel m = new TestModel(sprinkles);
         m.title = "hej";
 
         m.save();
@@ -76,7 +76,7 @@ public class ModelTest {
 
     @Test
     public void afterDelete() {
-        TestModel m = new TestModel();
+        TestModel m = new TestModel(sprinkles);
         m.title = "hej";
 
         m.save();
@@ -88,7 +88,7 @@ public class ModelTest {
 
     @Test
     public void exists() {
-        TestModel m = new TestModel();
+        TestModel m = new TestModel(sprinkles);
         m.title = "hej";
 
         assertFalse(m.exists());
@@ -98,7 +98,7 @@ public class ModelTest {
 
     @Test
     public void save() {
-        TestModel m = new TestModel();
+        TestModel m = new TestModel(sprinkles);
         m.title = "hej";
 
         m.save();
@@ -107,7 +107,7 @@ public class ModelTest {
 
     @Test
     public void setAutoIncrementKeyOnCreate() {
-        TestModel m = new TestModel();
+        TestModel m = new TestModel(sprinkles);
         m.title = "hej";
         m.save();
         assertFalse(m.id == 0);
@@ -115,20 +115,20 @@ public class ModelTest {
 
     @Test
     public void saveWithNullField() {
-        TestModel m = new TestModel();
+        TestModel m = new TestModel(sprinkles);
         m.title = "hej";
         assertTrue(m.save());
-        assertEquals(Query.one(TestModel.class, "select * from Tests").get().title, "hej");
+        assertEquals(Query.one(sprinkles, TestModel.class, "select * from Tests").get().title, "hej");
         m.title = null;
         assertTrue(m.save());
-        assertEquals(Query.one(TestModel.class, "select * from Tests").get().title, null);
+        assertEquals(Query.one(sprinkles, TestModel.class, "select * from Tests").get().title, null);
     }
 
     @Test
     public void saveAsync() throws InterruptedException {
         final CountDownLatch latch = new CountDownLatch(1);
 
-        TestModel m = new TestModel();
+        TestModel m = new TestModel(sprinkles);
         m.title = "hej";
         m.saveAsync(new Model.OnSavedCallback() {
             @Override
@@ -142,7 +142,7 @@ public class ModelTest {
 
     @Test
     public void delete() {
-        TestModel m = new TestModel();
+        TestModel m = new TestModel(sprinkles);
         m.title = "hej";
 
         m.save();
@@ -154,7 +154,7 @@ public class ModelTest {
     public void deleteAsync() throws InterruptedException {
         final CountDownLatch latch = new CountDownLatch(1);
 
-        TestModel m = new TestModel();
+        TestModel m = new TestModel(sprinkles);
         m.title = "hej";
         m.save();
         m.deleteAsync(new Model.OnDeletedCallback() {
@@ -169,10 +169,10 @@ public class ModelTest {
 
     @Test
     public void notifyContentChangeOnSave() {
-        TestModel m = new TestModel();
+        TestModel m = new TestModel(sprinkles);
         m.title = "hej";
         final boolean[] notified = new boolean[1];
-        Sprinkles.sInstance.mContext.getContentResolver().
+        sprinkles.mContext.getContentResolver().
                 registerContentObserver(Utils.getNotificationUri(TestModel.class), false, new ContentObserver(new Handler()) {
                     @Override
                     public void onChange(boolean selfChange) {
@@ -185,11 +185,11 @@ public class ModelTest {
 
     @Test
     public void notifyContentChangeOnDelete() {
-        TestModel m = new TestModel();
+        TestModel m = new TestModel(sprinkles);
         m.title = "hej";
         m.save();
         final boolean[] notified = new boolean[1];
-        Sprinkles.sInstance.mContext.getContentResolver().
+        sprinkles.mContext.getContentResolver().
                 registerContentObserver(Utils.getNotificationUri(TestModel.class), false, new ContentObserver(new Handler()) {
                     @Override
                     public void onChange(boolean selfChange) {
@@ -203,10 +203,10 @@ public class ModelTest {
 
     @Test
     public void updateEntityCache() {
-        TestModel originalModel = new TestModel();
+        TestModel originalModel = new TestModel(sprinkles);
         originalModel.title = "hej";
         originalModel.save();
-        TestModel newModel = new TestModel();
+        TestModel newModel = new TestModel(sprinkles);
         newModel.id = originalModel.id;
         newModel.title = "new hej";
         newModel.save();
@@ -215,7 +215,7 @@ public class ModelTest {
 
     @Test
     public void olderModel() {
-        TestModel originalModel = new TestModel();
+        TestModel originalModel = new TestModel(sprinkles);
         originalModel.title = "hej";
         assertNotSame(originalModel.getOlderModel(),originalModel);
         originalModel.save();

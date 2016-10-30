@@ -16,10 +16,11 @@ import static se.emilsjolander.sprinkles.ModelInfo.*;
 @RunWith(RobolectricTestRunner.class)
 public class ModelInfoTest {
 
+    private Sprinkles sprinkles;
+
     @Before
     public void initTables() {
-        Sprinkles.dropInstances();
-        Sprinkles.init(Robolectric.application);
+        sprinkles = Sprinkles.init(Robolectric.application);
     }
 
     @Test
@@ -42,7 +43,7 @@ public class ModelInfoTest {
 
     @Test
     public void fromModel() {
-        ModelInfo info = ModelInfo.from(TestModel.class);
+        ModelInfo info = ModelInfo.from(sprinkles, TestModel.class);
         assertEquals(info.tableName, "Tests");
         assertEquals(info.autoIncrementField.name, "id");
         assertEquals(info.columns.size(), 5);
@@ -51,7 +52,7 @@ public class ModelInfoTest {
 
     @Test
     public void caching() {
-        assertTrue(ModelInfo.from(TestModel.class) == ModelInfo.from(TestModel.class));
+        assertTrue(ModelInfo.from(sprinkles, TestModel.class) == ModelInfo.from(sprinkles, TestModel.class));
     }
 
 }

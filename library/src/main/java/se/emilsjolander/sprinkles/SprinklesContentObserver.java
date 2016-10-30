@@ -4,19 +4,22 @@ import android.annotation.TargetApi;
 import android.database.ContentObserver;
 import android.net.Uri;
 import android.os.Build;
+import android.support.annotation.NonNull;
 
 /**
  * Created by zsiegel on 2/25/14.
  */
 public class SprinklesContentObserver extends ContentObserver {
 
+    final Sprinkles sprinkles;
     ContentObserver observer;
 
-    public SprinklesContentObserver(ContentObserver observer) {
+    public SprinklesContentObserver(@NonNull Sprinkles sprinkles, @NonNull ContentObserver observer) {
         super(null);
         if (observer == null) {
             throw new NullPointerException("ContentObserver may not be null");
         }
+        this.sprinkles = sprinkles;
         this.observer = observer;
     }
 
@@ -34,11 +37,11 @@ public class SprinklesContentObserver extends ContentObserver {
     }
 
     public void register(Class<? extends Model> clazz, boolean notifyDescendants) {
-        Sprinkles.sInstance.mContext.getContentResolver().registerContentObserver(Utils.getNotificationUri(clazz), notifyDescendants, this);
+        sprinkles.mContext.getContentResolver().registerContentObserver(Utils.getNotificationUri(clazz), notifyDescendants, this);
     }
 
     public void unregister() {
-        Sprinkles.sInstance.mContext.getContentResolver().unregisterContentObserver(this);
+        sprinkles.mContext.getContentResolver().unregisterContentObserver(this);
     }
     
 }

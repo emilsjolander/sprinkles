@@ -1,17 +1,20 @@
 package se.emilsjolander.sprinkles;
 
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 
 import java.util.Iterator;
 
 class CursorIterator<T extends QueryResult> implements Iterator<T> {
 
+    private final Sprinkles sprinkles;
     private Cursor cursor;
     private Class<T> type;
     private int pos = -1;
     private int count;
 
-    CursorIterator(Cursor cursor, Class<T> type) {
+    CursorIterator(@NonNull Sprinkles sprinkles, Cursor cursor, Class<T> type) {
+        this.sprinkles = sprinkles;
         this.cursor = cursor;
         this.type = type;
         this.count = cursor == null ? 0 : cursor.getCount();
@@ -26,7 +29,7 @@ class CursorIterator<T extends QueryResult> implements Iterator<T> {
     public T next() {
         pos++;
         cursor.moveToPosition(pos);
-        return DataResolver.getResultFromCursor(type, cursor);
+        return sprinkles.dataResolver.getResultFromCursor(type, cursor);
     }
 
     @Override

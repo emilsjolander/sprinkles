@@ -8,6 +8,7 @@ import java.util.Collection;
 public class ModelList<E extends Model> extends ArrayList<E> {
 
     private static final long serialVersionUID = 9111033070491580889L;
+    private final Sprinkles sprinkles;
 
     public interface OnAllSavedCallback {
         void onAllSaved();
@@ -17,31 +18,34 @@ public class ModelList<E extends Model> extends ArrayList<E> {
         void onAllDeleted();
     }
 
-    public static <E extends Model> ModelList<E> from(CursorList<E> cursorList) {
-        return new ModelList<E>(cursorList.asList());
+    public static <E extends Model> ModelList<E> from(Sprinkles sprinkles, CursorList<E> cursorList) {
+        return new ModelList<E>(sprinkles, cursorList.asList());
     }
-    public static <E extends Model> ModelList<E> from(CursorList<E> cursorList,int skip) {
-        ModelList<E> modelList = new ModelList<E>(cursorList.size()>skip?cursorList.size() - skip:0);
+    public static <E extends Model> ModelList<E> from(Sprinkles sprinkles, CursorList<E> cursorList,int skip) {
+        ModelList<E> modelList = new ModelList<E>(sprinkles, cursorList.size()>skip?cursorList.size() - skip:0);
         for (int i = skip; i < cursorList.size(); i++) {
             modelList.add(cursorList.get(i));
         }
         return modelList;
     }
 
-    public ModelList() {
+    public ModelList(Sprinkles sprinkles) {
         super();
+        this.sprinkles = sprinkles;
     }
 
-    public ModelList(int capacity) {
+    public ModelList(Sprinkles sprinkles, int capacity) {
         super(capacity);
+        this.sprinkles = sprinkles;
     }
 
-    public ModelList(Collection<? extends E> collection) {
+    public ModelList(Sprinkles sprinkles, Collection<? extends E> collection) {
         super(collection);
+        this.sprinkles = sprinkles;
     }
 
     public boolean saveAll() {
-        Transaction t = new Transaction();
+        Transaction t = new Transaction(sprinkles);
         try {
             t.setSuccessful(saveAll(t));
         } finally {
@@ -82,7 +86,7 @@ public class ModelList<E extends Model> extends ArrayList<E> {
     }
 
     public void deleteAll() {
-        Transaction t = new Transaction();
+        Transaction t = new Transaction(sprinkles);
         try {
             deleteAll(t);
             t.setSuccessful(true);

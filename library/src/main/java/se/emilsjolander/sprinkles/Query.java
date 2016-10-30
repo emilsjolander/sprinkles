@@ -1,7 +1,8 @@
 package se.emilsjolander.sprinkles;
 
-import java.math.BigDecimal;
 import java.util.LinkedList;
+
+import android.support.annotation.NonNull;
 
 /**
  * Contains static methods to initiate queries
@@ -28,14 +29,16 @@ public final class Query<T extends Model> implements IQueryPart1<T>,IQueryPart2<
      *
      * @return the query to execute
      */
-	public static <T extends QueryResult> OneQuery<T> one(Class<T> clazz, String sql,
-			Object... sqlArgs) {
-        final OneQuery<T> query = new OneQuery<T>();
-		query.resultClass = clazz;
-        query.placeholderQuery = sql;
-		query.rawQuery = Utils.insertSqlArgs(sql, sqlArgs);
-		return query;
-	}
+  public static <T extends QueryResult> OneQuery<T> one(@NonNull Sprinkles sprinkles,
+      @NonNull Class<T> clazz,
+      @NonNull String sql,
+      Object... sqlArgs) {
+    final OneQuery<T> query = new OneQuery<>(sprinkles);
+    query.resultClass = clazz;
+    query.placeholderQuery = sql;
+    query.rawQuery = Utils.insertSqlArgs(sprinkles, sql, sqlArgs);
+    return query;
+  }
 
     /**
      * Start a query for a single instance of type T
@@ -55,10 +58,11 @@ public final class Query<T extends Model> implements IQueryPart1<T>,IQueryPart2<
      *
      * @return the query to execute
      */
-    public static <T extends QueryResult> OneQuery<T> one(Class<T> clazz, int sqlResId,
+    public static <T extends QueryResult> OneQuery<T> one(@NonNull Sprinkles sprinkles,
+                                                          @NonNull Class<T> clazz, int sqlResId,
                                                           Object... sqlArgs) {
-        String sql = Utils.readRawText(sqlResId);
-        return one(clazz, sql, sqlArgs);
+        String sql = Utils.readRawText(sprinkles.mContext.getResources(), sqlResId);
+        return one(sprinkles, clazz, sql, sqlArgs);
     }
 
     /**
@@ -79,12 +83,13 @@ public final class Query<T extends Model> implements IQueryPart1<T>,IQueryPart2<
      *
      * @return the query to execute
      */
-	public static <T extends QueryResult> ManyQuery<T> many(Class<T> clazz, String sql,
+	public static <T extends QueryResult> ManyQuery<T> many(@NonNull Sprinkles sprinkles,
+                                                          @NonNull Class<T> clazz, String sql,
 			Object... sqlArgs) {
-		final ManyQuery<T> query = new ManyQuery<T>();
+		final ManyQuery<T> query = new ManyQuery<>(sprinkles);
 		query.resultClass = clazz;
         query.placeholderQuery = sql;
-		query.rawQuery = Utils.insertSqlArgs(sql, sqlArgs);
+		query.rawQuery = Utils.insertSqlArgs(sprinkles, sql, sqlArgs);
 		return query;
 	}
 
@@ -106,10 +111,11 @@ public final class Query<T extends Model> implements IQueryPart1<T>,IQueryPart2<
      *
      * @return the query to execute
      */
-    public static <T extends QueryResult> ManyQuery<T> many(Class<T> clazz, int sqlResId,
+    public static <T extends QueryResult> ManyQuery<T> many(@NonNull Sprinkles sprinkles,
+                                                            @NonNull Class<T> clazz, int sqlResId,
                                                             Object... sqlArgs) {
-        String sql = Utils.readRawText(sqlResId);
-        return many(clazz, sql, sqlArgs);
+        String sql = Utils.readRawText(sprinkles.mContext.getResources(), sqlResId);
+        return many(sprinkles, clazz, sql, sqlArgs);
     }
 
     /**
@@ -123,22 +129,24 @@ public final class Query<T extends Model> implements IQueryPart1<T>,IQueryPart2<
      *
      * @return the query to execute
      */
-    public static <T extends Model> ManyQuery<T> all(Class<T> clazz) {
-        return many(clazz, "SELECT * FROM " + Utils.getTableName(clazz));
+    public static <T extends Model> ManyQuery<T> all(@NonNull Sprinkles sprinkles, @NonNull Class<T> clazz) {
+        return many(sprinkles, clazz, "SELECT * FROM " + DataResolver.getTableName(clazz));
     }
 
-    public static <C extends Model> Query<C> where(Class<C> modelClazz){
-        return new Query<C>(modelClazz);
+    public static <C extends Model> Query<C> where(@NonNull Sprinkles sprinkles, Class<C> modelClazz){
+        return new Query<>(sprinkles, modelClazz);
     }
 
 
 
+    Sprinkles sprinkles;
     Class<T> mClazz;
     LinkedList<String> mSqlStatementList = new LinkedList<String>();
     LinkedList<Object> mSqlArgList = new LinkedList<Object>();
     String mInitSql;
     int mSkip = 0;
-    private Query(Class<T> clazz) {
+    private Query(Sprinkles sprinkles, Class<T> clazz) {
+        this.sprinkles = sprinkles;
         mClazz = clazz;
         mInitSql = "SELECT * FROM "+DataResolver.getTableName(clazz);
     }
@@ -235,13 +243,13 @@ public final class Query<T extends Model> implements IQueryPart1<T>,IQueryPart2<
         for(String sqlPart:mSqlStatementList){
             sqlBuilder.append(sqlPart);
         }
-        return Utils.insertSqlArgs(sqlBuilder.toString(), mSqlArgList.toArray());
+        return Utils.insertSqlArgs(sprinkles, sqlBuilder.toString(), mSqlArgList.toArray());
     }
     @Override
     public ModelList<T> find(){
         String sql = build();
-        CursorList<T> cursorList = Query.many(this.mClazz, sql).get();
-        ModelList<T> result = ModelList.from(cursorList,mSkip);
+        CursorList<T> cursorList = Query.many(sprinkles, this.mClazz, sql).get();
+        ModelList<T> result = ModelList.from(sprinkles, cursorList,mSkip);
         cursorList.close();
         return result;
     }
@@ -252,7 +260,7 @@ public final class Query<T extends Model> implements IQueryPart1<T>,IQueryPart2<
             take(1);
             sql = build();
         }
-        return Query.one(this.mClazz, sql).get();
+        return Query.one(sprinkles, this.mClazz, sql).get();
     }
 
 //    boolean validateQuery(){

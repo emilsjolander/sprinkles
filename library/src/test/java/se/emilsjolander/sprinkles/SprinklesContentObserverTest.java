@@ -7,6 +7,7 @@ import android.os.Build;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
@@ -19,8 +20,9 @@ public class SprinklesContentObserverTest {
     @Test
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public void delegateToWrappedObserver() {
+        Sprinkles sprinkles = Sprinkles.init(Robolectric.application);
         ContentObserver observer = mock(ContentObserver.class);
-        SprinklesContentObserver sprinklesContentObserver = new SprinklesContentObserver(observer);
+        SprinklesContentObserver sprinklesContentObserver = new SprinklesContentObserver(sprinkles, observer);
 
         sprinklesContentObserver.onChange(true);
         verify(observer).onChange(true);

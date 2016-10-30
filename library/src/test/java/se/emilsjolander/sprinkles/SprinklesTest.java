@@ -48,16 +48,10 @@ public class SprinklesTest {
 
     @Before
     public void reset() {
-        Sprinkles.dropInstances();
     }
 
     @Test
     public void init() {
-        assertNull(Sprinkles.sInstance);
-        Sprinkles s1 = Sprinkles.init(Robolectric.application);
-        assertNotNull(Sprinkles.sInstance);
-        Sprinkles s2 = Sprinkles.init(Robolectric.application);
-        assertEquals(s1, s2);
     }
 
     @Test

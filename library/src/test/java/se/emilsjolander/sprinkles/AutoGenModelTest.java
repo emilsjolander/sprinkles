@@ -25,17 +25,17 @@ import static junit.framework.Assert.assertTrue;
 @RunWith(RobolectricTestRunner.class)
 public class AutoGenModelTest {
 
+    private Sprinkles sprinkles;
+
     @Before
     public void initTables() {
-        Sprinkles.dropInstances();
-        ModelInfo.clearCache();
-        Sprinkles sprinkles = Sprinkles.init(Robolectric.application);
+        sprinkles = Sprinkles.init(Robolectric.application);
 //        sprinkles.addMigration(AutoGenTestModel.MIGRATION);
     }
 
     @Test
     public void isValid() {
-        AutoGenTestModel m = new AutoGenTestModel();
+        AutoGenTestModel m = new AutoGenTestModel(sprinkles);
         m.title = "hej";
 
         m.valid = false;
@@ -47,11 +47,11 @@ public class AutoGenModelTest {
 
     @Test
     public void beforeCreate() {
-        AutoGenTestModel m = new AutoGenTestModel();
+        AutoGenTestModel m = new AutoGenTestModel(sprinkles);
         m.title = "hej";
         m.save();
 
-        ContentValues contentValues = Utils.getContentValues(m);
+        ContentValues contentValues = Utils.getContentValues(sprinkles, m);
         assertEquals(6, contentValues.size());
         assertNotNull(contentValues.get("createdAt"));
 
@@ -65,7 +65,7 @@ public class AutoGenModelTest {
 
     @Test
     public void beforeSave() {
-        AutoGenTestModel m = new AutoGenTestModel();
+        AutoGenTestModel m = new AutoGenTestModel(sprinkles);
         m.title = "hej";
 
         m.save();
@@ -79,7 +79,7 @@ public class AutoGenModelTest {
 
     @Test
     public void afterDelete() {
-        AutoGenTestModel m = new AutoGenTestModel();
+        AutoGenTestModel m = new AutoGenTestModel(sprinkles);
         m.title = "hej";
 
         m.save();
@@ -91,7 +91,7 @@ public class AutoGenModelTest {
 
     @Test
     public void exists() {
-        AutoGenTestModel m = new AutoGenTestModel();
+        AutoGenTestModel m = new AutoGenTestModel(sprinkles);
         m.title = "hej";
 
         assertFalse(m.exists());
@@ -101,7 +101,7 @@ public class AutoGenModelTest {
 
     @Test
     public void save() {
-        AutoGenTestModel m = new AutoGenTestModel();
+        AutoGenTestModel m = new AutoGenTestModel(sprinkles);
         m.title = "hej";
 
         m.save();
@@ -110,7 +110,7 @@ public class AutoGenModelTest {
 
     @Test
     public void setAutoIncrementKeyOnCreate() {
-        AutoGenTestModel m = new AutoGenTestModel();
+        AutoGenTestModel m = new AutoGenTestModel(sprinkles);
         m.title = "hej";
         m.save();
         assertFalse(m.id == 0);
@@ -118,20 +118,20 @@ public class AutoGenModelTest {
 
     @Test
     public void saveWithNullField() {
-        AutoGenTestModel m = new AutoGenTestModel();
+        AutoGenTestModel m = new AutoGenTestModel(sprinkles);
         m.title = "hej";
         assertTrue(m.save());
-        assertEquals(Query.one(AutoGenTestModel.class, "select * from "+Utils.getTableName(AutoGenTestModel.class)).get().title, "hej");
+        assertEquals(Query.one(sprinkles, AutoGenTestModel.class, "select * from "+DataResolver.getTableName(AutoGenTestModel.class)).get().title, "hej");
         m.title = null;
         assertTrue(m.save());
-        assertEquals(Query.one(AutoGenTestModel.class, "select * from "+Utils.getTableName(AutoGenTestModel.class)).get().title, null);
+        assertEquals(Query.one(sprinkles, AutoGenTestModel.class, "select * from "+DataResolver.getTableName(AutoGenTestModel.class)).get().title, null);
     }
 
     @Test
     public void saveAsync() throws InterruptedException {
         final CountDownLatch latch = new CountDownLatch(1);
 
-        AutoGenTestModel m = new AutoGenTestModel();
+        AutoGenTestModel m = new AutoGenTestModel(sprinkles);
         m.title = "hej";
         m.saveAsync(new Model.OnSavedCallback() {
             @Override
@@ -145,7 +145,7 @@ public class AutoGenModelTest {
 
     @Test
     public void delete() {
-        AutoGenTestModel m = new AutoGenTestModel();
+        AutoGenTestModel m = new AutoGenTestModel(sprinkles);
         m.title = "hej";
 
         m.save();
@@ -157,7 +157,7 @@ public class AutoGenModelTest {
     public void deleteAsync() throws InterruptedException {
         final CountDownLatch latch = new CountDownLatch(1);
 
-        AutoGenTestModel m = new AutoGenTestModel();
+        AutoGenTestModel m = new AutoGenTestModel(sprinkles);
         m.title = "hej";
         m.save();
         m.deleteAsync(new Model.OnDeletedCallback() {
@@ -172,10 +172,10 @@ public class AutoGenModelTest {
 
     @Test
     public void notifyContentChangeOnSave() {
-        AutoGenTestModel m = new AutoGenTestModel();
+        AutoGenTestModel m = new AutoGenTestModel(sprinkles);
         m.title = "hej";
         final boolean[] notified = new boolean[1];
-        Sprinkles.sInstance.mContext.getContentResolver().
+        sprinkles.mContext.getContentResolver().
                 registerContentObserver(Utils.getNotificationUri(AutoGenTestModel.class), false, new ContentObserver(new Handler()) {
                     @Override
                     public void onChange(boolean selfChange) {
@@ -188,11 +188,11 @@ public class AutoGenModelTest {
 
     @Test
     public void notifyContentChangeOnDelete() {
-        AutoGenTestModel m = new AutoGenTestModel();
+        AutoGenTestModel m = new AutoGenTestModel(sprinkles);
         m.title = "hej";
         m.save();
         final boolean[] notified = new boolean[1];
-        Sprinkles.sInstance.mContext.getContentResolver().
+        sprinkles.mContext.getContentResolver().
                 registerContentObserver(Utils.getNotificationUri(AutoGenTestModel.class), false, new ContentObserver(new Handler()) {
                     @Override
                     public void onChange(boolean selfChange) {

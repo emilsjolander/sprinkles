@@ -15,16 +15,17 @@ import static junit.framework.Assert.*;
 @RunWith(RobolectricTestRunner.class)
 public class TransactionTest {
 
+    private Sprinkles sprinkles;
+
     @Before
     public void initTables() {
-        Sprinkles.dropInstances();
-        Sprinkles sprinkles = Sprinkles.init(Robolectric.application);
+        sprinkles = Sprinkles.init(Robolectric.application);
     }
 
     @Test
     public void commit() throws InterruptedException {
-        Transaction t = new Transaction();
-        TestModel m = new TestModel();
+        Transaction t = new Transaction(sprinkles);
+        TestModel m = new TestModel(sprinkles);
         m.title = "hej";
         m.save(t);
         t.setSuccessful(true);
@@ -34,8 +35,8 @@ public class TransactionTest {
 
     @Test
     public void rollback() {
-        Transaction t = new Transaction();
-        TestModel m = new TestModel();
+        Transaction t = new Transaction(sprinkles);
+        TestModel m = new TestModel(sprinkles);
         m.title = "hej";
         m.save(t);
         t.setSuccessful(false);
@@ -45,7 +46,7 @@ public class TransactionTest {
 
     @Test
     public void listenerCalledOnCommit() {
-        Transaction t = new Transaction();
+        Transaction t = new Transaction(sprinkles);
         final boolean[] called = new boolean[1];
         t.addOnTransactionCommittedListener(new Transaction.OnTransactionCommittedListener() {
             @Override
@@ -58,7 +59,7 @@ public class TransactionTest {
 
             }
         });
-        TestModel m = new TestModel();
+        TestModel m = new TestModel(sprinkles);
         m.title = "hej";
         m.save(t);
         t.setSuccessful(true);
@@ -68,7 +69,7 @@ public class TransactionTest {
 
     @Test
     public void listenerNotCalledOnRollback() {
-        Transaction t = new Transaction();
+        Transaction t = new Transaction(sprinkles);
         final boolean[] called = new boolean[1];
         t.addOnTransactionCommittedListener(new Transaction.OnTransactionCommittedListener() {
             @Override
@@ -81,7 +82,7 @@ public class TransactionTest {
 
             }
         });
-        TestModel m = new TestModel();
+        TestModel m = new TestModel(sprinkles);
         m.title = "hej";
         m.save(t);
         t.setSuccessful(false);

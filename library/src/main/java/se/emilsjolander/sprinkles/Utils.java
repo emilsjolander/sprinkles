@@ -1,8 +1,10 @@
 package se.emilsjolander.sprinkles;
 
 import android.content.ContentValues;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import java.io.BufferedReader;
@@ -104,8 +106,8 @@ class Utils {
         return strSQL.toString();
     }
 
-    static String getWhereStatement(Model m) {
-        final ModelInfo info = ModelInfo.from(m.getClass());
+    static String getWhereStatement(@NonNull Sprinkles sprinkles, @NonNull Model m) {
+        final ModelInfo info = ModelInfo.from(sprinkles, m.getClass());
         final StringBuilder where = new StringBuilder();
         final Object[] args = new Object[info.keys.size()];
 
@@ -127,13 +129,13 @@ class Utils {
             }
         }
 
-        return Utils.insertSqlArgs(where.toString(), args);
+        return Utils.insertSqlArgs(sprinkles, where.toString(), args);
     }
 
 
 
-    static ContentValues getContentValues(Model model) {
-        final ModelInfo info = ModelInfo.from(model.getClass());
+    static ContentValues getContentValues(@NonNull Sprinkles sprinkles, Model model) {
+        final ModelInfo info = ModelInfo.from(sprinkles, model.getClass());
         final ContentValues values = new ContentValues();
 
         for (ModelInfo.ColumnField column : info.columns) {
@@ -147,7 +149,7 @@ class Utils {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            Sprinkles.sInstance.getTypeSerializer(column.field.getType()).pack(value, values, column.name);
+            sprinkles.getTypeSerializer(column.field.getType()).pack(value, values, column.name);
         }
         // export foreign key value
         for (ModelInfo.ManyToOneColumnField manyToOneColumnField : info.manyToOneColumns) {
@@ -169,7 +171,7 @@ class Utils {
                     fieldInOneMdel = oneModel.getClass().getDeclaredField(manyToOneColumnField.oneColumn);
                     fieldInOneMdel.setAccessible(true);
                     Object foreignKeyValue = fieldInOneMdel.get(oneModel);
-                    Sprinkles.sInstance.getTypeSerializer(fieldInOneMdel.getType()).pack(foreignKeyValue, values, manyToOneColumnField.manyColumn);
+                    sprinkles.getTypeSerializer(fieldInOneMdel.getType()).pack(foreignKeyValue, values, manyToOneColumnField.manyColumn);
                 } catch (NoSuchFieldException e) {
                     e.printStackTrace();
                 } catch (IllegalAccessException e) {
@@ -182,30 +184,23 @@ class Utils {
             if (hiddenField.getValue() == null) {
                 values.putNull(hiddenField.getKey());
             } else {
-                Sprinkles.sInstance.getTypeSerializer(hiddenField.getValue().getClass()).pack(hiddenField.getValue(), values, hiddenField.getKey());
+                sprinkles.getTypeSerializer(hiddenField.getValue().getClass()).pack(hiddenField.getValue(), values, hiddenField.getKey());
             }
         }
 
         return values;
     }
 
-    static <T extends Model> Uri getNotificationUri(Class<T> clazz) {
-        return Uri.parse("sprinkles://" + getTableName(clazz));
-    }
-    @Deprecated
-    /**
-     * @see @DataResolver.getTableName
-     */
-    static String getTableName(Class<? extends Model> clazz) {
-        return DataResolver.getTableName(clazz);
+    static <T extends Model> Uri getNotificationUri(@NonNull Class<T> clazz) {
+        return Uri.parse("sprinkles://" + DataResolver.getTableName(clazz));
     }
 
-    static String insertSqlArgs(String sql, Object[] args) {
+    static String insertSqlArgs(Sprinkles sprinkles, String sql, Object[] args) {
         if (args == null) {
             return sql;
         }
         for (Object o : args) {
-            TypeSerializer typeSerializer = Sprinkles.sInstance.getTypeSerializer(o.getClass());
+            TypeSerializer typeSerializer = sprinkles.getTypeSerializer(o.getClass());
             String sqlObject = typeSerializer.toSql(o);
             sql = sql.replaceFirst("\\?", sqlObject);
         }
@@ -239,9 +234,8 @@ class Utils {
         return result;
     }
 
-    static String readRawText(int rawId) {
-        final InputStream inputStream = Sprinkles.sInstance.mContext
-                .getResources().openRawResource(rawId);
+    static String readRawText(Resources resources, int rawId) {
+        final InputStream inputStream = resources.openRawResource(rawId);
         final InputStreamReader inputStreamReader = new InputStreamReader(
                 inputStream);
         final BufferedReader bufferedReader = new BufferedReader(

@@ -8,11 +8,13 @@ import java.util.List;
 import java.util.Map;
 
 class DbOpenHelper extends SQLiteOpenHelper {
+    private final Sprinkles sprinkles;
     private int baseVersion;
 
-    protected DbOpenHelper(Context context, String databaseName, int baseVersion) {
+    protected DbOpenHelper(Sprinkles sprinkles, Context context, String databaseName, int baseVersion) {
         super(context, databaseName, null, baseVersion);
         this.baseVersion = baseVersion;
+        this.sprinkles = sprinkles;
     }
 
     @Override
@@ -32,7 +34,7 @@ class DbOpenHelper extends SQLiteOpenHelper {
     }
 
     private void executeMigrations(SQLiteDatabase db, int oldVersion, int newVersion) {
-        for (Map.Entry<Integer, List<Migration>> entry : Sprinkles.sInstance.mMigrations.entrySet()) {
+        for (Map.Entry<Integer, List<Migration>> entry : sprinkles.mMigrations.entrySet()) {
             if ((entry.getKey() > oldVersion||oldVersion==newVersion)
                     && entry.getValue() != null) {
                 int size = entry.getValue().size();

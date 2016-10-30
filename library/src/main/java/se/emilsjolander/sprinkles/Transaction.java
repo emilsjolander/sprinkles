@@ -17,12 +17,14 @@ public final class Transaction {
         void onTransactionRollback();
 	}
 
+	private final Sprinkles sprinkles;
 	private SQLiteDatabase mDb;
 	private boolean mSuccessful;
 	private List<OnTransactionCommittedListener> mOnTransactionCommittedListeners = new ArrayList<OnTransactionCommittedListener>();
 
-	public Transaction() {
-		mDb = Sprinkles.getDatabase();
+	public Transaction(Sprinkles sprinkles) {
+		this.sprinkles = sprinkles;
+		mDb = sprinkles.getDatabase();
 		mDb.beginTransaction();
 	}
 
@@ -66,12 +68,12 @@ public final class Transaction {
 	}
 
 	public long insert(ModelInfo table, ContentValues values) {
-        DataResolver.assureTableExist(table);
+        sprinkles.dataResolver.assureTableExist(table);
 		return mDb.insert(table.tableName, null, values);
 	}
 
 	public int update(ModelInfo table, ContentValues values, String where) {
-        DataResolver.assureTableExist(table);
+		sprinkles.dataResolver.assureTableExist(table);
 		return mDb.update(table.tableName, values, where, null);
 	}
 

@@ -6,12 +6,12 @@ import android.graphics.Bitmap;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import se.emilsjolander.sprinkles.exceptions.NoTypeSerializerFoundException;
-import se.emilsjolander.sprinkles.exceptions.SprinklesNotInitializedException;
 import se.emilsjolander.sprinkles.typeserializers.BitmapSerializer;
 import se.emilsjolander.sprinkles.typeserializers.BooleanSerializer;
 import se.emilsjolander.sprinkles.typeserializers.DateSerializer;
@@ -24,20 +24,20 @@ import se.emilsjolander.sprinkles.typeserializers.TypeSerializer;
 
 public final class Sprinkles {
 
-    static Sprinkles sInstance;
-    static SQLiteDatabase sDatabase;
-
     Context mContext;
-    Map<Integer,List<Migration>> mMigrations = new ConcurrentHashMap<Integer,List<Migration>>();
-
+    Map<Integer,List<Migration>> mMigrations = new ConcurrentHashMap<>();
+    final DataResolver dataResolver;
+    final Map<Class<? extends QueryResult>, ModelInfo> modelInfoCache = new HashMap<>();
 
     private String databaseName;
     private int initialDatabaseVersion;
 
-    private Map<Class, TypeSerializer> typeSerializers = new ConcurrentHashMap<Class, TypeSerializer>();
+    private Map<Class, TypeSerializer> typeSerializers = new ConcurrentHashMap<>();
+    private SQLiteDatabase database;
 
     private Sprinkles() {
         addStandardTypeSerializers();
+        dataResolver = new DataResolver(this);
     }
 
     private void addStandardTypeSerializers() {
@@ -87,52 +87,36 @@ public final class Sprinkles {
      * @param initialDatabaseVersion
      *     The version of the existing database.
      *
-     * @return The singleton Sprinkles instance.
+     * @return The Sprinkles instance.
      */
     public static synchronized Sprinkles init(Context context, String databaseName, int initialDatabaseVersion) {
-        if (sInstance == null) {
-            sInstance = new Sprinkles();
-        }
-        sInstance.mContext = context.getApplicationContext();
-        sInstance.databaseName = databaseName;
-        sInstance.initialDatabaseVersion = initialDatabaseVersion;
-        return sInstance;
-    }
-
-    /**
-     * Use init() instead.
-     */
-    @Deprecated
-    public static synchronized Sprinkles getInstance(Context context) {
-        return init(context);
+        Sprinkles  sprinkles = new Sprinkles();
+        sprinkles.mContext = context.getApplicationContext();
+        sprinkles.databaseName = databaseName;
+        sprinkles.initialDatabaseVersion = initialDatabaseVersion;
+        return sprinkles;
     }
 
     /**
      * Throws SprinklesNotInitializedException if you try to access the database before initializing Sprinkles.
      * @return the SQL Database used by Sprinkles.
      */
-    static synchronized SQLiteDatabase getDatabase() {
-        if(sInstance == null) {
-           throw new SprinklesNotInitializedException();
+    public synchronized SQLiteDatabase getDatabase() {
+        if (database != null) {
+            return database;
         }
-
-        if(sDatabase == null) {
-            DbOpenHelper dbOpenHelper = new DbOpenHelper(sInstance.mContext, sInstance.databaseName, sInstance.initialDatabaseVersion);
-            sDatabase = dbOpenHelper.getWritableDatabase();
-        }
-
-        return sDatabase;
+        DbOpenHelper dbOpenHelper = new DbOpenHelper(this, mContext, databaseName, initialDatabaseVersion);
+        database = dbOpenHelper.getWritableDatabase();
+        return database;
     }
 
     /**
      * Used by unit tests to reset sprinkles instances between tests. This method can change at any time and should
      * never be called outside of a unit test.
      */
-    public static synchronized void dropInstances() {
-        sInstance = null;
-        sDatabase = null;
-        ModelInfo.clearCache();
-        DataResolver.resetRecordCache();
+    public synchronized void clearCache() {
+        modelInfoCache.clear();
+        dataResolver.resetRecordCache();
     }
 
     /**
@@ -141,12 +125,12 @@ public final class Sprinkles {
      * @param migration The migration that should be performed.
      */
     public void addMigration(Migration migration) {
-        addMigration(migration,sInstance.initialDatabaseVersion);
+        addMigration(migration, initialDatabaseVersion);
     }
 
     public void addMigration(Migration migration,int dbVersionCode) {
         if(mMigrations.get(dbVersionCode)==null){
-            ArrayList<Migration> migrations = new ArrayList<Migration>();
+            ArrayList<Migration> migrations = new ArrayList<>();
             mMigrations.put(dbVersionCode, migrations);
             migrations.add(migration);
         }else {
@@ -159,7 +143,7 @@ public final class Sprinkles {
         typeSerializers.put(clazz, serializer);
     }
 
-    TypeSerializer getTypeSerializer(Class<?> type) {
+    public TypeSerializer getTypeSerializer(Class<?> type) {
         if (!typeSerializers.containsKey(type)) {
             throw new NoTypeSerializerFoundException(type);
         }

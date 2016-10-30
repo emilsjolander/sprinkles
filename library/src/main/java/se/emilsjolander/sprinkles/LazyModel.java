@@ -8,13 +8,15 @@ import se.emilsjolander.sprinkles.exceptions.LazyModelLoadFailException;
  * Created by panwenye on 14-10-14.
  */
 public class LazyModel<T extends Model> {
+    final Sprinkles sprinkles;
     Class<T> mModelClass;
     ModelInfo.ManyToOneColumnField mManyToOneColumnField;
     Object mSource;
 
     T mCache;
 
-    public LazyModel(Class<T> modelClass, Object source, ModelInfo.ManyToOneColumnField columnField){
+    public LazyModel(Sprinkles sprinkles, Class<T> modelClass, Object source, ModelInfo.ManyToOneColumnField columnField){
+        this.sprinkles = sprinkles;
         mModelClass = modelClass;
         mSource = source;
         mManyToOneColumnField = columnField;
@@ -36,7 +38,7 @@ public class LazyModel<T extends Model> {
             if(foreignKeyValue==null){
                 return null;
             }
-            mCache = Query.where(mModelClass)
+            mCache = Query.where(sprinkles, mModelClass)
                     .equalTo(mManyToOneColumnField.oneColumn,foreignKeyValue)
                     .findSingle();
             return mCache;

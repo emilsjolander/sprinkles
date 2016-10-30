@@ -20,11 +20,11 @@ import static junit.framework.Assert.*;
 @RunWith(RobolectricTestRunner.class)
 public class ModelListTest {
 
+    private Sprinkles sprinkles;
+
     @Before
     public void initTables() {
-        Sprinkles.dropInstances();
-        Sprinkles sprinkles = Sprinkles.init(Robolectric.application);
-//        sprinkles.addMigration(TestModel.MIGRATION);
+        sprinkles = Sprinkles.init(Robolectric.application);
     }
 
     @Test
@@ -33,9 +33,9 @@ public class ModelListTest {
         c.addRow(new Object[]{"title1", 1});
         c.addRow(new Object[]{"title2", 2});
         c.addRow(new Object[]{"title3", 3});
-        CursorList<TestModel> cursorList = new CursorList<TestModel>(c, TestModel.class);
+        CursorList<TestModel> cursorList = new CursorList<TestModel>(sprinkles, c, TestModel.class);
 
-        ModelList<TestModel> modelList = ModelList.from(cursorList);
+        ModelList<TestModel> modelList = ModelList.from(sprinkles, cursorList);
         assertEquals(3, modelList.size());
         assertEquals("title1", modelList.get(0).title);
         assertEquals("title2", modelList.get(1).title);
@@ -45,12 +45,12 @@ public class ModelListTest {
 
     @Test
     public void saveAllModels() {
-        TestModel m1 = new TestModel();
+        TestModel m1 = new TestModel(sprinkles);
         m1.title = "foo";
-        TestModel m2 = new TestModel();
+        TestModel m2 = new TestModel(sprinkles);
         m2.title = "bar";
 
-        ModelList<Model> modelList = new ModelList<Model>();
+        ModelList<Model> modelList = new ModelList<Model>(sprinkles);
         modelList.add(m1);
         modelList.add(m2);
 
@@ -63,12 +63,12 @@ public class ModelListTest {
     public void saveAllModelsAsync() throws InterruptedException {
         final CountDownLatch latch = new CountDownLatch(1);
 
-        TestModel m1 = new TestModel();
+        TestModel m1 = new TestModel(sprinkles);
         m1.title = "foo";
-        TestModel m2 = new TestModel();
+        TestModel m2 = new TestModel(sprinkles);
         m2.title = "bar";
 
-        ModelList<Model> modelList = new ModelList<Model>();
+        ModelList<Model> modelList = new ModelList<Model>(sprinkles);
         modelList.add(m1);
         modelList.add(m2);
 
@@ -85,12 +85,12 @@ public class ModelListTest {
 
     @Test
     public void deleteAllModels() {
-        TestModel m1 = new TestModel();
+        TestModel m1 = new TestModel(sprinkles);
         m1.title = "foo";
-        TestModel m2 = new TestModel();
+        TestModel m2 = new TestModel(sprinkles);
         m2.title = "bar";
 
-        ModelList<Model> modelList = new ModelList<Model>();
+        ModelList<Model> modelList = new ModelList<Model>(sprinkles);
         modelList.add(m1);
         modelList.add(m2);
 
@@ -105,12 +105,12 @@ public class ModelListTest {
     public void deleteAllModelsAsync() throws InterruptedException {
         final CountDownLatch latch = new CountDownLatch(1);
 
-        TestModel m1 = new TestModel();
+        TestModel m1 = new TestModel(sprinkles);
         m1.title = "foo";
-        TestModel m2 = new TestModel();
+        TestModel m2 = new TestModel(sprinkles);
         m2.title = "bar";
 
-        ModelList<Model> modelList = new ModelList<Model>();
+        ModelList<Model> modelList = new ModelList<Model>(sprinkles);
         modelList.add(m1);
         modelList.add(m2);
 

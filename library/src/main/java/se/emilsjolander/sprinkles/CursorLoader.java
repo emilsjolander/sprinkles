@@ -11,14 +11,16 @@ import android.os.Build;
 class CursorLoader extends AsyncTaskLoader<Cursor> {
 
 	private final ForceLoadContentObserver mObserver;
+	private final Sprinkles mSprinkles;
 
 	private String mSql;
 	private Class<? extends Model>[] mDependencies;
 	private Cursor mCursor;
 
-	public CursorLoader(Context context, String sql,
+	public CursorLoader(Sprinkles sprinkles, String sql,
 			Class<? extends Model>[] dependencies) {
-		super(context);
+		super(sprinkles.mContext);
+		mSprinkles = sprinkles;
 		mObserver = new ForceLoadContentObserver();
 		mSql = sql;
 		mDependencies = dependencies;
@@ -27,7 +29,7 @@ class CursorLoader extends AsyncTaskLoader<Cursor> {
 	/* Runs on a worker thread */
 	@Override
 	public Cursor loadInBackground() {
-		final SQLiteDatabase db = Sprinkles.getDatabase();
+		final SQLiteDatabase db = mSprinkles.getDatabase();
 		Cursor cursor = db.rawQuery(mSql, null);
 
 		if (cursor != null) {

@@ -2,6 +2,7 @@ package se.emilsjolander.sprinkles.model;
 
 
 import se.emilsjolander.sprinkles.Model;
+import se.emilsjolander.sprinkles.Sprinkles;
 import se.emilsjolander.sprinkles.annotations.AutoGen;
 import se.emilsjolander.sprinkles.annotations.AutoIncrement;
 import se.emilsjolander.sprinkles.annotations.Key;
@@ -20,4 +21,8 @@ public class Email extends Model {
 
     @ManyToOne(manyColumn = "owner_id",oneColumn = "id")
     public Person owner;
+
+    public Email(Sprinkles sprinkles) {
+        super(sprinkles);
+    }
 }

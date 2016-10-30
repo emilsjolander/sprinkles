@@ -17,11 +17,13 @@ import java.util.List;
  */
 public class CursorList<T extends QueryResult> implements Iterable<T>, Closeable {
 
+    private final Sprinkles sprinkles;
     private Cursor cursor;
     private Class<T> type;
     private boolean closed;
 
-    CursorList(Cursor cursor, Class<T> type) {
+    CursorList(Sprinkles sprinkles, Cursor cursor, Class<T> type) {
+        this.sprinkles = sprinkles;
         this.cursor = cursor;
         this.type = type;
     }
@@ -45,7 +47,7 @@ public class CursorList<T extends QueryResult> implements Iterable<T>, Closeable
     public T get(int pos) {
         requireOpen();
         cursor.moveToPosition(pos);
-        return DataResolver.getResultFromCursor(type, cursor);
+        return sprinkles.dataResolver.getResultFromCursor(type, cursor);
     }
 
     /**
@@ -62,7 +64,7 @@ public class CursorList<T extends QueryResult> implements Iterable<T>, Closeable
 
     @Override
     public Iterator<T> iterator() {
-        return new CursorIterator<T>(cursor, type);
+        return new CursorIterator<>(sprinkles, cursor, type);
     }
 
     /**

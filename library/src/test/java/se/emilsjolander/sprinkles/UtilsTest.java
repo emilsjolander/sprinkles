@@ -26,11 +26,17 @@ import static junit.framework.Assert.*;
 @RunWith(RobolectricTestRunner.class)
 public class UtilsTest {
 
+    private Sprinkles sprinkles;
+
     public static class AbsTestModel extends Model {
 
         @Key
         @AutoIncrement
         @Column("id") private long id;
+
+        public AbsTestModel(Sprinkles sprinkles) {
+            super(sprinkles);
+        }
 
         public long getId() {
             return id;
@@ -48,6 +54,10 @@ public class UtilsTest {
         @Column("title")
         private String title;
 
+        public TestModel(Sprinkles sprinkles) {
+            super(sprinkles);
+        }
+
         public void setTitle(String title) {
             this.title = title;
         }
@@ -59,7 +69,7 @@ public class UtilsTest {
 
     @Before
     public void initSprinkles() {
-        Sprinkles.init(Robolectric.application);
+        sprinkles = Sprinkles.init(Robolectric.application);
     }
 
     @Test
@@ -69,25 +79,25 @@ public class UtilsTest {
         c.addRow(new Object[]{"title2", 2});
         c.addRow(new Object[]{"title3", 3});
         c.moveToPosition(2);
-        TestModel m = DataResolver.getResultFromCursor(TestModel.class, c);
+        TestModel m = sprinkles.dataResolver.getResultFromCursor(TestModel.class, c);
         assertEquals(m.getId(), 3);
         assertEquals(m.getTitle(), "title3");
     }
 
     @Test
     public void getWhereStatement() {
-        TestModel m = new TestModel();
+        TestModel m = new TestModel(sprinkles);
         m.setId(4);
-        String where = Utils.getWhereStatement(m);
+        String where = Utils.getWhereStatement(sprinkles, m);
         assertEquals(where, "id=4");
     }
 
     @Test
     public void getContentValues() {
-        TestModel m = new TestModel();
+        TestModel m = new TestModel(sprinkles);
         m.setId(1);
         m.setTitle("tjena");
-        ContentValues cv = Utils.getContentValues(m);
+        ContentValues cv = Utils.getContentValues(sprinkles, m);
         assertFalse(cv.containsKey("id"));
         assertEquals(cv.getAsString("title"), "tjena");
     }
@@ -100,24 +110,24 @@ public class UtilsTest {
 
     @Test
     public void getTableName() {
-        assertEquals(Utils.getTableName(TestModel.class), "Tests");
+        assertEquals(DataResolver.getTableName(TestModel.class), "Tests");
     }
 
     @Test(expected = NoTableAnnotationException.class)
     public void getTableNameNoAnnotation() {
-        Utils.getTableName(AbsTestModel.class);
+        DataResolver.getTableName(AbsTestModel.class);
     }
 
     @Test
     public void insertSqlArgs() {
-        String result = Utils.insertSqlArgs("? ?", new Object[]{1, "hej"});
+        String result = Utils.insertSqlArgs(sprinkles, "? ?", new Object[]{1, "hej"});
         assertEquals(result, "1 'hej'");
     }
 
     @Test
     public void insertTypeSerializedSqlArgs() {
         Date date = new Date();
-        String result = Utils.insertSqlArgs("?", new Object[]{date});
+        String result = Utils.insertSqlArgs(sprinkles, "?", new Object[]{date});
         assertEquals(result, ""+date.getTime());
     }
 

@@ -8,16 +8,18 @@ import se.emilsjolander.sprinkles.exceptions.LazyModelListLoadFailException;
  * Created by panwenye on 14-10-14.
  */
 public class LazyModelList<T extends Model> {
+    final Sprinkles sprinkles;
     Class<T> mModelClass;
     ModelInfo.OneToManyColumnField mOneToManyColumnField;
     Object mParent;
 
     ModelList<T> mCache;
 
-    public LazyModelList(Class<T> modelClass,Object parent,ModelInfo.OneToManyColumnField columnField){
+    public LazyModelList(Sprinkles sprinkles, Class<T> modelClass,Object parent,ModelInfo.OneToManyColumnField columnField){
         mModelClass = modelClass;
         mParent = parent;
         mOneToManyColumnField = columnField;
+        this.sprinkles = sprinkles;
     }
     public ModelList<T> load(){
         if(mCache!=null){
@@ -27,7 +29,7 @@ public class LazyModelList<T extends Model> {
             Field oneColumnField = mParent.getClass().getDeclaredField(mOneToManyColumnField.oneColumn);
             oneColumnField.setAccessible(true);
             Object foreignKeyValue = oneColumnField.get(mParent);
-            mCache = Query.where(mModelClass)
+            mCache = Query.where(sprinkles, mModelClass)
                     .equalTo(mOneToManyColumnField.manyColumn,foreignKeyValue)
                     .find();
             return mCache;

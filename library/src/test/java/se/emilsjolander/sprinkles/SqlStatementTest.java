@@ -15,24 +15,24 @@ import static junit.framework.Assert.*;
 @RunWith(RobolectricTestRunner.class)
 public class SqlStatementTest {
 
+    private Sprinkles sprinkles;
+
     @Before
     public void setup() {
-        Sprinkles.dropInstances();
-        Sprinkles s = Sprinkles.init(Robolectric.application);
-//        s.addMigration(TestModel.MIGRATION);
+        sprinkles = Sprinkles.init(Robolectric.application);
     }
 
     @Test
     public void execute() {
-        new TestModel().save();
-        new TestModel().save();
-        new TestModel().save();
-        CursorList<TestModel> result = Query.all(TestModel.class).get();
+        new TestModel(sprinkles).save();
+        new TestModel(sprinkles).save();
+        new TestModel(sprinkles).save();
+        CursorList<TestModel> result = Query.all(sprinkles, TestModel.class).get();
         assertEquals(result.size(), 3);
         result.close();
 
-        new SqlStatement("delete from Tests").execute();
-        result = Query.all(TestModel.class).get();
+        new SqlStatement(sprinkles, "delete from Tests").execute();
+        result = Query.all(sprinkles, TestModel.class).get();
         assertEquals(result.size(), 0);
         result.close();
     }

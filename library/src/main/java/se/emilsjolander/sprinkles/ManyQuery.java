@@ -35,10 +35,12 @@ public final class ManyQuery<T extends QueryResult> {
     }
 
 	Class<T> resultClass;
-    String placeholderQuery;
+  String placeholderQuery;
 	String rawQuery;
+  private final Sprinkles sprinkles;
 
-	ManyQuery() {
+  ManyQuery(Sprinkles sprinkles) {
+    this.sprinkles = sprinkles;
 	}
 
     /**
@@ -47,10 +49,10 @@ public final class ManyQuery<T extends QueryResult> {
      * @return the result of the query. Remember to close me!
      */
 	public CursorList<T> get() {
-        DataResolver.assureTableExist(ModelInfo.from(resultClass));
-		final SQLiteDatabase db = Sprinkles.getDatabase();
+    sprinkles.dataResolver.assureTableExist(ModelInfo.from(sprinkles, resultClass));
+		final SQLiteDatabase db = sprinkles.getDatabase();
 		final Cursor c = db.rawQuery(rawQuery, null);
-		return new CursorList<T>(c, resultClass);
+		return new CursorList<T>(sprinkles, c, resultClass);
 	}
 
     /**
@@ -113,20 +115,20 @@ public final class ManyQuery<T extends QueryResult> {
             @Override
             public void onLoaderReset(Loader<Cursor> loader) {
                 if (!loader.isAbandoned()) {
-                    handler.handleResult(new CursorList<T>(null, null));
+                    handler.handleResult(new CursorList<T>(sprinkles, null, null));
                 }
             }
 
             @Override
             public void onLoadFinished(Loader<Cursor> loader, Cursor c) {
-                if (!handler.handleResult(new CursorList<T>(c, resultClass))) {
+                if (!handler.handleResult(new CursorList<T>(sprinkles, c, resultClass))) {
                     loader.abandon();
                 }
             }
 
             @Override
             public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-                return new CursorLoader(Sprinkles.sInstance.mContext, sqlQuery, respondsToUpdatedOf);
+                return new CursorLoader(sprinkles, sqlQuery, respondsToUpdatedOf);
             }
         };
     }
@@ -142,14 +144,14 @@ public final class ManyQuery<T extends QueryResult> {
 			public void onLoaderReset(
 					android.support.v4.content.Loader<Cursor> loader) {
                 if (!loader.isAbandoned()) {
-                    handler.handleResult(new CursorList<T>(null, null));
+                    handler.handleResult(new CursorList<T>(sprinkles, null, null));
                 }
 			}
 
 			@Override
 			public void onLoadFinished(
 					android.support.v4.content.Loader<Cursor> loader, Cursor c) {
-                if (!handler.handleResult(new CursorList<T>(c, resultClass))) {
+                if (!handler.handleResult(new CursorList<T>(sprinkles, c, resultClass))) {
                     loader.abandon();
                 }
 			}
@@ -157,7 +159,7 @@ public final class ManyQuery<T extends QueryResult> {
 			@Override
 			public android.support.v4.content.Loader<Cursor> onCreateLoader(
 					int id, Bundle args) {
-				return new SupportCursorLoader(Sprinkles.sInstance.mContext, sqlQuery, respondsToUpdatedOf);
+				return new SupportCursorLoader(sprinkles, sqlQuery, respondsToUpdatedOf);
 			}
 		};
 	}

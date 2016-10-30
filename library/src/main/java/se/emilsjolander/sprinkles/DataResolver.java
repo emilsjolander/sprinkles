@@ -2,6 +2,7 @@ package se.emilsjolander.sprinkles;
 
 import android.database.Cursor;
 import android.text.TextUtils;
+import android.widget.Spinner;
 
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
@@ -14,23 +15,28 @@ import se.emilsjolander.sprinkles.exceptions.NoTableAnnotationException;
 /**
  * Created by panwenye on 14-10-12.
  */
-public class DataResolver {
+class DataResolver {
     /**
      * when the number of cached records for specific model is larger than RECORD_CACHE_LIMIT,recycleRecordCache method will be triggered
      */
-    public static final int  RECORD_CACHE_LIMIT = 100;
-    static Hashtable<Class,Hashtable<String,WeakReference<Object>>> sCachePool = new Hashtable<Class, Hashtable<String, WeakReference<Object>>>();
+    public  final int  RECORD_CACHE_LIMIT = 100;
+    // use map instead!
+    Hashtable<Class,Hashtable<String,WeakReference<Object>>> cachePool = new Hashtable<>();
+    Sprinkles sprinkles;
 
+    DataResolver(Sprinkles sprinkles) {
+        this.sprinkles = sprinkles;
+    }
     /**
      * update record in cache.usually be called after save or update data
      * @param m
      */
-    static void updateRecordCache(Model m){
+    void updateRecordCache(Model m){
         synchronized (m) {
-            Hashtable<String, WeakReference<Object>> cacheForModel = sCachePool.get(m.getClass());
+            Hashtable<String, WeakReference<Object>> cacheForModel = cachePool.get(m.getClass());
             if (cacheForModel == null) {
                 cacheForModel = new Hashtable<>();
-                sCachePool.put(m.getClass(), cacheForModel);
+                cachePool.put(m.getClass(), cacheForModel);
             }
             if (cacheForModel.size() > RECORD_CACHE_LIMIT) {
                 recycleRecordCache(m.getClass());
@@ -39,16 +45,16 @@ public class DataResolver {
         }
     }
 
-    static void removeRecordCache(Model m){
+    void removeRecordCache(Model m){
         synchronized (m) {
-            Hashtable<String, WeakReference<Object>> cacheForModel = sCachePool.get(m.getClass());
+            Hashtable<String, WeakReference<Object>> cacheForModel = cachePool.get(m.getClass());
             if (cacheForModel != null) {
                 cacheForModel.remove(getKeyValueTag(m));
             }
         }
     }
-    static void resetRecordCache() {
-        sCachePool.clear();
+    void resetRecordCache() {
+        cachePool.clear();
     }
 
     /**
@@ -56,12 +62,12 @@ public class DataResolver {
      * @param keyTag
      * @return
      */
-    public static Model getCachedModel(Class modelClass,String keyTag){
+    public Model getCachedModel(Class modelClass,String keyTag){
         synchronized (modelClass) {
-            if (sCachePool.get(modelClass) == null) {
-                sCachePool.put(modelClass, new Hashtable<String, WeakReference<Object>>());
+            if (cachePool.get(modelClass) == null) {
+                cachePool.put(modelClass, new Hashtable<String, WeakReference<Object>>());
             }
-            Hashtable<String, WeakReference<Object>> cacheForModel = sCachePool.get(modelClass);
+            Hashtable<String, WeakReference<Object>> cacheForModel = cachePool.get(modelClass);
             if (cacheForModel.containsKey(keyTag)
                     && cacheForModel.get(keyTag) != null) {
                 return (Model)cacheForModel.get(keyTag).get();
@@ -76,8 +82,8 @@ public class DataResolver {
          * remove useless record from cache
          * @param modelClazz
          */
-    static void recycleRecordCache(Class modelClazz){
-        Hashtable<String, WeakReference<Object>> cacheForModel = sCachePool.get(modelClazz);
+    void recycleRecordCache(Class modelClazz){
+        Hashtable<String, WeakReference<Object>> cacheForModel = cachePool.get(modelClazz);
         if(cacheForModel !=null){
             for (Object key : cacheForModel.keySet().toArray()){
                 if(cacheForModel.get(key)==null
@@ -89,13 +95,13 @@ public class DataResolver {
     }
 
 
-    public static <T extends QueryResult> T getResultFromCursor(Class<T> resultClass, Cursor c) {
+    public <T extends QueryResult> T getResultFromCursor(Class<T> resultClass, Cursor c) {
         try {
-            if(sCachePool.get(resultClass)==null){
-                sCachePool.put(resultClass, new Hashtable<String, WeakReference<Object>>());
+            if(cachePool.get(resultClass)==null){
+                cachePool.put(resultClass, new Hashtable<String, WeakReference<Object>>());
             }
-            Hashtable<String,WeakReference<Object>> cacheForModel = sCachePool.get(resultClass);
-            final ModelInfo info = ModelInfo.from(resultClass);
+            Hashtable<String,WeakReference<Object>> cacheForModel = cachePool.get(resultClass);
+            final ModelInfo info = ModelInfo.from(sprinkles, resultClass);
             String keyValueTag = getKeyValueTag(info, c);
             if(cacheForModel.containsKey(keyValueTag)
                     &&cacheForModel.get(keyValueTag)!=null){
@@ -104,7 +110,8 @@ public class DataResolver {
                 }
             }
 
-            T result = resultClass.newInstance();
+            T result = resultClass.getDeclaredConstructor(Sprinkles.class).newInstance(sprinkles);
+
             List<String> colNames = Arrays.asList(c.getColumnNames());
             for (ModelInfo.ColumnField column : info.columns) {
                 if (!colNames.contains(column.name)) {
@@ -112,7 +119,7 @@ public class DataResolver {
                 }
                 column.field.setAccessible(true);
                 final Class<?> type = column.field.getType();
-                Object o = Sprinkles.sInstance.getTypeSerializer(type).unpack(c, column.name);
+                Object o = sprinkles.getTypeSerializer(type).unpack(c, column.name);
                 column.field.set(result, o);
             }
             /**
@@ -135,14 +142,14 @@ public class DataResolver {
                     continue;
                 }
                 if(!LazyModelList.class.isAssignableFrom(oneToManyColumnField.field.getType())){
-                    final ManyQuery query = new ManyQuery();
+                    final ManyQuery query = new ManyQuery(sprinkles);
                     query.resultClass = oneToManyColumnField.manyModelClass;
                     query.placeholderQuery = "SELECT * FROM " + getTableName(oneToManyColumnField.manyModelClass)
                             + " WHERE " + oneToManyColumnField.manyColumn + "=?";
                     Integer foreignKeyValue = c.getInt(c.getColumnIndexOrThrow(oneToManyColumnField.oneColumn));
-                    query.rawQuery = Utils.insertSqlArgs(query.placeholderQuery, new Object[]{foreignKeyValue});
+                    query.rawQuery = Utils.insertSqlArgs(sprinkles, query.placeholderQuery, new Object[]{foreignKeyValue});
                     CursorList cursorList = query.get();
-                    ModelList manyModels = ModelList.from(cursorList);
+                    ModelList manyModels = ModelList.from(sprinkles, cursorList);
                     if (manyModels != null) {
                         try {
                             oneToManyColumnField.field.setAccessible(true);
@@ -165,11 +172,11 @@ public class DataResolver {
                     //if is lazy load,just put foreign key value to hiddenFieldsMap
                     ((Model)result).mHiddenFieldsMap.put(manyToOneColumnField.manyColumn,foreignKeyValue);
                 }else {
-                    final OneQuery query = new OneQuery();
+                    final OneQuery query = new OneQuery(sprinkles);
                     query.resultClass = manyToOneColumnField.field.getType();
                     query.placeholderQuery = "SELECT * FROM " + getTableName(query.resultClass)
                             + " WHERE " + manyToOneColumnField.oneColumn + "=?";
-                    query.rawQuery = Utils.insertSqlArgs(query.placeholderQuery, new Object[]{foreignKeyValue});
+                    query.rawQuery = Utils.insertSqlArgs(sprinkles, query.placeholderQuery, new Object[]{foreignKeyValue});
                     Object oneModel = query.get();
                     if (oneModel != null) {
                         try {
@@ -192,8 +199,8 @@ public class DataResolver {
      * @param m
      * @return
      */
-    public static String getKeyValueTag(Model m){
-        final ModelInfo info = ModelInfo.from(m.getClass());
+    public String getKeyValueTag(Model m){
+        final ModelInfo info = ModelInfo.from(sprinkles, m.getClass());
         final StringBuilder keyValuesTag = new StringBuilder();
         for (ModelInfo.ColumnField column : info.columns) {
             if(column.isKey) {
@@ -235,11 +242,11 @@ public class DataResolver {
         throw new NoTableAnnotationException();
     }
 
-    public static void assureTableExist(ModelInfo table) {
+    public void assureTableExist(ModelInfo table) {
         synchronized (table) {
             if (!isTableExist(table)) {
                 String sql = Utils.getCreateTableSQL(table);
-                Sprinkles.getDatabase().execSQL(sql);
+                sprinkles.getDatabase().execSQL(sql);
             }
         }
     }
@@ -250,7 +257,7 @@ public class DataResolver {
      * @param table
      * @return
      */
-    public static boolean isTableExist(ModelInfo table) {
+    public boolean isTableExist(ModelInfo table) {
         if (table.isTableChecked) {
             return true;
         }
@@ -259,7 +266,7 @@ public class DataResolver {
         try {
             String sql = "SELECT COUNT(*) AS c FROM sqlite_master WHERE type ='table' AND name ='"
                     + table.tableName + "' ";
-            cursor = Sprinkles.getDatabase().rawQuery(sql, null);
+            cursor = sprinkles.getDatabase().rawQuery(sql, null);
             if (cursor != null && cursor.moveToNext()) {
                 int count = cursor.getInt(0);
                 if (count > 0) {

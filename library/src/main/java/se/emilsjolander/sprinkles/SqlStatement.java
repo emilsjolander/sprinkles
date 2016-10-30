@@ -2,14 +2,16 @@ package se.emilsjolander.sprinkles;
 
 public class SqlStatement {
 
+    final Sprinkles sprinkles;
     String sql;
 
-    public SqlStatement(String sql) {
+    public SqlStatement(Sprinkles sprinkles, String sql) {
         this.sql = sql;
+        this.sprinkles = sprinkles;
     }
 
     public void execute(Object... args) {
-        Sprinkles.getDatabase().execSQL(Utils.insertSqlArgs(sql, args));
+        sprinkles.getDatabase().execSQL(Utils.insertSqlArgs(sprinkles, sql, args));
     }
 
 }

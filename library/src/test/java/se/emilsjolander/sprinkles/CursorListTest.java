@@ -6,6 +6,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
@@ -23,11 +24,12 @@ public class CursorListTest {
 
     @Before
     public void initList() {
+        Sprinkles sprinkles = Sprinkles.init(Robolectric.application);
         MatrixCursor c = new MatrixCursor(new String[]{"title", "id"});
         c.addRow(new Object[]{"title1", 1});
         c.addRow(new Object[]{"title2", 2});
         c.addRow(new Object[]{"title3", 3});
-        list = new CursorList<TestModel>(c, TestModel.class);
+        list = new CursorList<TestModel>(sprinkles, c, TestModel.class);
     }
 
     @After

@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 import se.emilsjolander.sprinkles.Transaction.OnTransactionCommittedListener;
@@ -15,7 +16,10 @@ import se.emilsjolander.sprinkles.exceptions.IllegalOneToManyColumnException;
 
 public abstract class Model implements QueryResult {
 
-    /**
+  @Ignore
+  final Sprinkles sprinkles;
+
+  /**
      * Notifies you when a model has been saved
      */
 	public interface OnSavedCallback {
@@ -42,17 +46,18 @@ public abstract class Model implements QueryResult {
     @Ignore
     HashMap<String,Object> mHiddenFieldsMap = new HashMap<String, Object>();
 
-    public Model(){
+    public Model(Sprinkles sprinkles){
+      this.sprinkles = sprinkles;
         try {
             //check relationship of model
-            final ModelInfo info = ModelInfo.from(getClass());
+            final ModelInfo info = ModelInfo.from(sprinkles, getClass());
             for (ModelInfo.OneToManyColumnField columnField : info.oneToManyColumns){
                 columnField.field.setAccessible(true);
                 Class one2ManyContainerType = columnField.field.getType();
                 if(LazyModelList.class.isAssignableFrom(one2ManyContainerType)){
-                    columnField.field.set(this,new LazyModelList(columnField.manyModelClass,this,columnField));
+                    columnField.field.set(this,new LazyModelList(sprinkles, columnField.manyModelClass,this,columnField));
                 }else if(ModelList.class.isAssignableFrom(one2ManyContainerType)){
-                    columnField.field.set(this,one2ManyContainerType.newInstance());
+                    columnField.field.set(this,one2ManyContainerType.getDeclaredConstructor(Sprinkles.class).newInstance(sprinkles));
                 }else {
                     throw new IllegalOneToManyColumnException();
                 }
@@ -61,12 +66,16 @@ public abstract class Model implements QueryResult {
                 columnField.field.setAccessible(true);
                 Class one2ManyContainerType = columnField.field.getType();
                 if(LazyModel.class.isAssignableFrom(one2ManyContainerType)){
-                    columnField.field.set(this,new LazyModel(columnField.oneModelClass,this,columnField));
+                    columnField.field.set(this,new LazyModel(sprinkles, columnField.oneModelClass,this,columnField));
                 }
             }
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
     }
@@ -133,7 +142,7 @@ public abstract class Model implements QueryResult {
      * @return true if this model is currently saved in the database (could be an older version)
      */
 	final public boolean exists() {
-        if(!DataResolver.isTableExist(ModelInfo.from(getClass()))){
+        if(!sprinkles.dataResolver.isTableExist(ModelInfo.from(sprinkles, getClass()))){
             return false;
         }
 		return getOlderModel() != null;
@@ -145,15 +154,15 @@ public abstract class Model implements QueryResult {
      * @return true if this model is currently saved in the database (could be an older version)
      */
     final public Model getOlderModel() {
-        if(!DataResolver.isTableExist(ModelInfo.from(getClass()))){
+        if(!sprinkles.dataResolver.isTableExist(ModelInfo.from(sprinkles, getClass()))){
             return null;
         }
         try {
-          return Query.one(
+          return Query.one(sprinkles,
               getClass(),
               String.format("SELECT * FROM %s WHERE %s LIMIT 1",
-                  Utils.getTableName(getClass()),
-                  Utils.getWhereStatement(this))).get();
+                  DataResolver.getTableName(getClass()),
+                  Utils.getWhereStatement(sprinkles, this))).get();
         } catch (SQLiteException e) {
           // We can not guarantee getOlderModel will be call safety. See {@TransactionTest.rollback}
           e.printStackTrace();
@@ -190,7 +199,7 @@ public abstract class Model implements QueryResult {
      * @param m
      */
     final public void copyTo(Model m,IFieldCopyAction fieldCopyAction) {
-        ModelInfo table = ModelInfo.from(getClass());
+        ModelInfo table = ModelInfo.from(sprinkles, getClass());
         //copy normal columns
         for (ModelInfo.ColumnField columnField:table.columns){
             if(fieldCopyAction!=null){
@@ -219,7 +228,7 @@ public abstract class Model implements QueryResult {
      * @return whether or not the save was successful.
      */
 	final public boolean save() {
-		Transaction t = new Transaction();
+		Transaction t = new Transaction(sprinkles);
 		try {
 			t.setSuccessful(save(t));
 		} finally {
@@ -256,9 +265,9 @@ public abstract class Model implements QueryResult {
 		if (!isValid()) {
 			return false;
 		}
-        ModelInfo table = ModelInfo.from(getClass());
-        DataResolver.assureTableExist(table);
-        Model cachedModel = DataResolver.getCachedModel(getClass(), DataResolver.getKeyValueTag(this));
+        ModelInfo table = ModelInfo.from(sprinkles, getClass());
+        sprinkles.dataResolver.assureTableExist(table);
+        Model cachedModel = sprinkles.dataResolver.getCachedModel(getClass(), sprinkles.dataResolver.getKeyValueTag(this));
         if(checkOlder&& !this.equals(cachedModel)){
             //if the model has been cached,just update the older model and update the order model to db
 //            throw new IllegalStateException(""+DataResolver.getKeyValueTag(olderModel));
@@ -305,14 +314,14 @@ public abstract class Model implements QueryResult {
         }
 
         beforeSave();
-        final ContentValues cv = Utils.getContentValues(this);
+        final ContentValues cv = Utils.getContentValues(sprinkles, this);
         if (cv.size() == 0) {
             throw new ContentValuesEmptyException();
         }
 //        final String tableName = Utils.getTableName(getClass());
 
         if (doesExist) {
-            if (t.update(table, cv, Utils.getWhereStatement(this)) == 0) {
+            if (t.update(table, cv, Utils.getWhereStatement(sprinkles, this)) == 0) {
                 return false;
             }
         } else {
@@ -339,14 +348,14 @@ public abstract class Model implements QueryResult {
 
 			@Override
 			public void onTransactionCommitted() {
-                DataResolver.updateRecordCache(Model.this);
-				Sprinkles.sInstance.mContext.getContentResolver().notifyChange(
+                sprinkles.dataResolver.updateRecordCache(Model.this);
+				sprinkles.mContext.getContentResolver().notifyChange(
 						Utils.getNotificationUri(Model.this.getClass()), null, true);
 			}
 
             @Override
             public void onTransactionRollback() {
-                DataResolver.removeRecordCache(Model.this);
+                sprinkles.dataResolver.removeRecordCache(Model.this);
             }
         });
 
@@ -396,7 +405,7 @@ public abstract class Model implements QueryResult {
      * Delete this model
      */
 	final public void delete() {
-		Transaction t = new Transaction();
+		Transaction t = new Transaction(sprinkles);
 		try {
 			delete(t);
 			t.setSuccessful(true);
@@ -412,13 +421,13 @@ public abstract class Model implements QueryResult {
      *      The transaction to delete this model in
      */
 	final public void delete(Transaction t) {
-		t.delete(ModelInfo.from(getClass()), Utils.getWhereStatement(this));
+		t.delete(ModelInfo.from(sprinkles, getClass()), Utils.getWhereStatement(sprinkles, this));
         t.addOnTransactionCommittedListener(new OnTransactionCommittedListener() {
 
             @Override
             public void onTransactionCommitted() {
-                DataResolver.removeRecordCache(Model.this);
-                Sprinkles.sInstance.mContext.getContentResolver().notifyChange(
+                sprinkles.dataResolver.removeRecordCache(Model.this);
+                sprinkles.mContext.getContentResolver().notifyChange(
                         Utils.getNotificationUri(Model.this.getClass()), null);
             }
 

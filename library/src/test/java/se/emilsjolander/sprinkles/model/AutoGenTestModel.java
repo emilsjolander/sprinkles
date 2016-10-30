@@ -4,6 +4,7 @@ package se.emilsjolander.sprinkles.model;
 import java.util.Date;
 
 import se.emilsjolander.sprinkles.Model;
+import se.emilsjolander.sprinkles.Sprinkles;
 import se.emilsjolander.sprinkles.annotations.AutoGen;
 import se.emilsjolander.sprinkles.annotations.AutoIncrement;
 import se.emilsjolander.sprinkles.annotations.Key;
@@ -23,6 +24,10 @@ public class AutoGenTestModel extends Model {
     public boolean created;
     public boolean saved;
     public boolean deleted;
+
+    public AutoGenTestModel(Sprinkles sprinkles) {
+        super(sprinkles);
+    }
 
     @Override
     public boolean isValid() {

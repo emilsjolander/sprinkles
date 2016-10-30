@@ -421,3 +421,8 @@ public class Person extends Model {
 ```
 When call constructor of Model,sprinkles init `staffs` and `company` .
 Then we can use LazyLoaders by calling `staffs.load()` and `company.load` directly
+
+
+TODO：
+1.使用Rx监控数据变化
+2.将LazyModel改成Observable

@@ -1,8 +1,8 @@
 package com.lsjwzh.orm;
 
-import java.lang.reflect.Field;
-
 import com.lsjwzh.orm.exceptions.LazyModelListLoadFailException;
+
+import java.lang.reflect.Field;
 
 /**
  * Created by panwenye on 14-10-14.
@@ -29,9 +29,10 @@ public class LazyModelList<T extends Model> {
             Field oneColumnField = mParent.getClass().getDeclaredField(mOneToManyColumnField.oneColumn);
             oneColumnField.setAccessible(true);
             Object foreignKeyValue = oneColumnField.get(mParent);
-            mCache = Query.where(sprinkles, mModelClass)
-                    .equalTo(mOneToManyColumnField.manyColumn,foreignKeyValue)
-                    .find();
+            mCache = new Query(sprinkles).find(QueryBuilder.from(mModelClass)
+                    .where()
+                    .equalTo(mOneToManyColumnField.manyColumn, foreignKeyValue)
+                    .end());
             return mCache;
         } catch (Exception e) {
             throw new LazyModelListLoadFailException(e);

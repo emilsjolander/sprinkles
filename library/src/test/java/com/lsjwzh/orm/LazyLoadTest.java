@@ -1,14 +1,14 @@
 package com.lsjwzh.orm;
 
+import com.lsjwzh.orm.model.Company;
+import com.lsjwzh.orm.model.Person;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-
-import com.lsjwzh.orm.model.Company;
-import com.lsjwzh.orm.model.Person;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -21,7 +21,7 @@ public class LazyLoadTest {
 
     @Before
     public void initTables() {
-        sprinkles = Sprinkles.init(Robolectric.application,"sprinkle.db",1);
+        sprinkles = Sprinkles.init(Robolectric.application, "sprinkle.db", 1);
         Company company = new Company();
         company.name = "google";
         sprinkles.save(company);
@@ -34,19 +34,19 @@ public class LazyLoadTest {
 
     @Test
     public void lazyModel() {
-        Person staff = Query.where(sprinkles, Person.class).equalTo("name","goodman").findSingle();
-        Company company =  Query.where(sprinkles, Company.class).equalTo("name","google").findSingle();
+        Person staff = new Query(sprinkles).findSingle(QueryBuilder.from(Person.class).where().equalTo("name", "goodman").end());
+        Company company = new Query(sprinkles).findSingle(QueryBuilder.from(Company.class).where().equalTo("name", "google").end());
         assertNotNull(staff.company);
-        assertEquals(company,staff.company.load());
+        assertEquals(company, staff.company.load());
 
     }
 
     @Test
     public void lazyModelList() {
-        Person staff = Query.where(sprinkles, Person.class).equalTo("name","goodman").findSingle();
-        Company company =  Query.where(sprinkles, Company.class).equalTo("name","google").findSingle();
+        Person staff = new Query(sprinkles).findSingle(QueryBuilder.from(Person.class).where().equalTo("name", "goodman").end());
+        Company company = new Query(sprinkles).findSingle(QueryBuilder.from(Company.class).where().equalTo("name", "google").end());
         assertNotNull(company.Staffs);
-        assertEquals(1,company.Staffs.load().size());
+        assertEquals(1, company.Staffs.load().size());
 
     }
 

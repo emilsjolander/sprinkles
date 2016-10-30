@@ -325,14 +325,14 @@ public final class Sprinkles {
     /**
      * Delete this model
      */
-    final public void delete(Model model) {
+    final public boolean delete(Model model) {
         Transaction t = new Transaction(this);
         try {
-            delete(model, t);
-            t.setSuccessful(true);
+            t.setSuccessful(delete(model, t));
         } finally {
             t.finish();
         }
+        return t.isSuccessful();
     }
 
     /**
@@ -340,7 +340,7 @@ public final class Sprinkles {
      *
      * @param t The transaction to delete this model in
      */
-    final public void delete(final Model model, Transaction t) {
+    final public boolean delete(final Model model, Transaction t) {
         t.delete(ModelInfo.from(this, model.getClass()), Utils.getWhereStatement(this, model));
         t.addOnTransactionCommittedListener(new Transaction.OnTransactionCommittedListener() {
 
@@ -356,6 +356,7 @@ public final class Sprinkles {
 
             }
         });
+        return true;
     }
 
 
@@ -432,20 +433,23 @@ public final class Sprinkles {
         return true;
     }
 
-    public <E extends Model> void deleteAll(ModelList<E> modelList) {
+    public <E extends Model> boolean deleteAll(ModelList<E> modelList) {
         Transaction t = new Transaction(this);
         try {
-            deleteAll(modelList, t);
-            t.setSuccessful(true);
+            t.setSuccessful(deleteAll(modelList, t));
         } finally {
             t.finish();
         }
+        return t.isSuccessful();
     }
 
-    public <E extends Model> void deleteAll(ModelList<E> modelList, Transaction t) {
+    public <E extends Model> boolean deleteAll(ModelList<E> modelList, Transaction t) {
         for (Model m : modelList) {
-            delete(m, t);
+            if (!delete(m, t)) {
+                return false;
+            }
         }
+        return true;
     }
 
     private void checkRelationship(Model model) {

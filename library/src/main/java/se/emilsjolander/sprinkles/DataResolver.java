@@ -110,7 +110,7 @@ class DataResolver {
                 }
             }
 
-            T result = resultClass.getDeclaredConstructor(Sprinkles.class).newInstance(sprinkles);
+            T result = resultClass.newInstance();
 
             List<String> colNames = Arrays.asList(c.getColumnNames());
             for (ModelInfo.ColumnField column : info.columns) {
@@ -149,7 +149,7 @@ class DataResolver {
                     Integer foreignKeyValue = c.getInt(c.getColumnIndexOrThrow(oneToManyColumnField.oneColumn));
                     query.rawQuery = Utils.insertSqlArgs(sprinkles, query.placeholderQuery, new Object[]{foreignKeyValue});
                     CursorList cursorList = query.get();
-                    ModelList manyModels = ModelList.from(sprinkles, cursorList);
+                    ModelList manyModels = ModelList.from(cursorList);
                     if (manyModels != null) {
                         try {
                             oneToManyColumnField.field.setAccessible(true);

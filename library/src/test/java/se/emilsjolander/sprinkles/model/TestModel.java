@@ -5,7 +5,6 @@ package se.emilsjolander.sprinkles.model;
 import java.util.Date;
 
 import se.emilsjolander.sprinkles.Model;
-import se.emilsjolander.sprinkles.Sprinkles;
 import se.emilsjolander.sprinkles.annotations.AutoIncrement;
 import se.emilsjolander.sprinkles.annotations.Column;
 import se.emilsjolander.sprinkles.annotations.DynamicColumn;
@@ -27,30 +26,5 @@ public class TestModel extends Model {
     public boolean created;
     public boolean saved;
     public boolean deleted;
-
-    public TestModel(Sprinkles sprinkles) {
-        super(sprinkles);
-    }
-
-    @Override
-    public boolean isValid() {
-        return valid;
-    }
-
-    @Override
-    public void beforeCreate() {
-        createdAt = new Date();
-        created = true;
-    }
-
-    @Override
-    public void beforeSave() {
-        saved = true;
-    }
-
-    @Override
-    public void afterDelete() {
-        deleted = true;
-    }
 
 }

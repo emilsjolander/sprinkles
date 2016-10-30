@@ -34,9 +34,6 @@ public class UtilsTest {
         @AutoIncrement
         @Column("id") private long id;
 
-        public AbsTestModel(Sprinkles sprinkles) {
-            super(sprinkles);
-        }
 
         public long getId() {
             return id;
@@ -53,10 +50,6 @@ public class UtilsTest {
 
         @Column("title")
         private String title;
-
-        public TestModel(Sprinkles sprinkles) {
-            super(sprinkles);
-        }
 
         public void setTitle(String title) {
             this.title = title;
@@ -86,7 +79,7 @@ public class UtilsTest {
 
     @Test
     public void getWhereStatement() {
-        TestModel m = new TestModel(sprinkles);
+        TestModel m = new TestModel();
         m.setId(4);
         String where = Utils.getWhereStatement(sprinkles, m);
         assertEquals(where, "id=4");
@@ -94,7 +87,7 @@ public class UtilsTest {
 
     @Test
     public void getContentValues() {
-        TestModel m = new TestModel(sprinkles);
+        TestModel m = new TestModel();
         m.setId(1);
         m.setTitle("tjena");
         ContentValues cv = Utils.getContentValues(sprinkles, m);

@@ -24,9 +24,9 @@ public class SqlStatementTest {
 
     @Test
     public void execute() {
-        new TestModel(sprinkles).save();
-        new TestModel(sprinkles).save();
-        new TestModel(sprinkles).save();
+        sprinkles.save(new TestModel());
+        sprinkles.save(new TestModel());
+        sprinkles.save(new TestModel());
         CursorList<TestModel> result = Query.all(sprinkles, TestModel.class).get();
         assertEquals(result.size(), 3);
         result.close();

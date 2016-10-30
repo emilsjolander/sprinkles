@@ -28,9 +28,9 @@ public class QueryTest {
 
     @Test
     public void one() {
-        TestModel t = new TestModel(sprinkles);
+        TestModel t = new TestModel();
         t.title = "title";
-        t.save();
+        sprinkles.save(t);
         TestModel result = Query.one(sprinkles, TestModel.class, "select * from Tests where title=?", "title").get();
         assertEquals(result.title, "title");
     }
@@ -38,9 +38,9 @@ public class QueryTest {
     @Test
     public void many() {
         for (int i = 0 ; i<10 ; i++) {
-            TestModel t = new TestModel(sprinkles);
+            TestModel t = new TestModel();
             t.title = "title"+i;
-            t.save();
+            sprinkles.save(t);
         }
         CursorList<TestModel> result = Query.many(sprinkles, TestModel.class, "select * from Tests where title like 'title%'", "title").get();
         assertEquals(result.size(), 10);
@@ -50,9 +50,9 @@ public class QueryTest {
     @Test
     public void all() {
         for (int i = 0 ; i<10 ; i++) {
-            TestModel t = new TestModel(sprinkles);
+            TestModel t = new TestModel();
             t.title = "title"+i;
-            t.save();
+            sprinkles.save(t);
         }
         CursorList<TestModel> result = Query.all(sprinkles, TestModel.class).get();
         assertEquals(result.size(), 10);
@@ -62,9 +62,9 @@ public class QueryTest {
     @Test
     public void dynamicColumnResult() {
         for (int i = 0 ; i<10 ; i++) {
-            TestModel t = new TestModel(sprinkles);
+            TestModel t = new TestModel();
             t.title = "title"+i;
-            t.save();
+            sprinkles.save(t);
         }
 
         TestModel m = Query.one(sprinkles, TestModel.class, "select *, count(*) AS count from Tests limit 1").get();
@@ -74,10 +74,10 @@ public class QueryTest {
     @Test
     public void findSingle() {
         for (int i = 0 ; i<10 ; i++) {
-            TestModel t = new TestModel(sprinkles);
+            TestModel t = new TestModel();
             t.title = "title"+i;
             t.sn = i;
-            t.save();
+            sprinkles.save(t);
         }
         TestModel result = Query.where(sprinkles, TestModel.class)
                 .equalTo("sn",1)
@@ -88,10 +88,10 @@ public class QueryTest {
     @Test
     public void equalTo() {
         for (int i = 0 ; i<10 ; i++) {
-            TestModel t = new TestModel(sprinkles);
+            TestModel t = new TestModel();
             t.title = "title"+i;
             t.sn = i;
-            t.save();
+            sprinkles.save(t);
         }
         ModelList<TestModel> queryForEqualTo = Query.where(sprinkles, TestModel.class)
                 .equalTo("sn",1)
@@ -101,10 +101,10 @@ public class QueryTest {
     @Test
     public void notEqualTo() {
         for (int i = 0 ; i<10 ; i++) {
-            TestModel t = new TestModel(sprinkles);
+            TestModel t = new TestModel();
             t.title = "title"+i;
             t.sn = i;
-            t.save();
+            sprinkles.save(t);
         }
 
         ModelList<TestModel> queryForNotEqualTo = Query.where(sprinkles, TestModel.class)
@@ -117,10 +117,10 @@ public class QueryTest {
     @Test
     public void greaterThan() {
         for (int i = 0 ; i<10 ; i++) {
-            TestModel t = new TestModel(sprinkles);
+            TestModel t = new TestModel();
             t.title = "title"+i;
             t.sn = i;
-            t.save();
+            sprinkles.save(t);
         }
 
         ModelList<TestModel> queryForGreaterThan = Query.where(sprinkles, TestModel.class)
@@ -131,10 +131,10 @@ public class QueryTest {
     @Test
     public void greaterThanOrEqualTo() {
         for (int i = 0 ; i<10 ; i++) {
-            TestModel t = new TestModel(sprinkles);
+            TestModel t = new TestModel();
             t.title = "title"+i;
             t.sn = i;
-            t.save();
+            sprinkles.save(t);
         }
 
         ModelList<TestModel> query = Query.where(sprinkles, TestModel.class)
@@ -145,10 +145,10 @@ public class QueryTest {
     @Test
     public void lessThan() {
         for (int i = 0 ; i<10 ; i++) {
-            TestModel t = new TestModel(sprinkles);
+            TestModel t = new TestModel();
             t.title = "title"+i;
             t.sn = i;
-            t.save();
+            sprinkles.save(t);
         }
 
         ModelList<TestModel> query = Query.where(sprinkles, TestModel.class)
@@ -159,10 +159,10 @@ public class QueryTest {
     @Test
     public void lessThanOrEqualTo() {
         for (int i = 0 ; i<10 ; i++) {
-            TestModel t = new TestModel(sprinkles);
+            TestModel t = new TestModel();
             t.title = "title"+i;
             t.sn = i;
-            t.save();
+            sprinkles.save(t);
         }
 
         ModelList<TestModel> query = Query.where(sprinkles, TestModel.class)
@@ -174,10 +174,10 @@ public class QueryTest {
     @Test
     public void take() {
         for (int i = 0 ; i<10 ; i++) {
-            TestModel t = new TestModel(sprinkles);
+            TestModel t = new TestModel();
             t.title = "title"+i;
             t.sn = i;
-            t.save();
+            sprinkles.save(t);
         }
 
         ModelList<TestModel> query = Query.where(sprinkles, TestModel.class)
@@ -190,10 +190,10 @@ public class QueryTest {
     @Test
     public void skip() {
         for (int i = 0 ; i<10 ; i++) {
-            TestModel t = new TestModel(sprinkles);
+            TestModel t = new TestModel();
             t.title = "title"+i;
             t.sn = i;
-            t.save();
+            sprinkles.save(t);
         }
 
         ModelList<TestModel> query = Query.where(sprinkles, TestModel.class)
@@ -208,10 +208,10 @@ public class QueryTest {
     @Test
     public void like() {
         for (int i = 0 ; i<11 ; i++) {
-            TestModel t = new TestModel(sprinkles);
+            TestModel t = new TestModel();
             t.title = "title"+i;
             t.sn = i;
-            t.save();
+            sprinkles.save(t);
         }
 
         ModelList<TestModel> query = Query.where(sprinkles, TestModel.class)
@@ -224,10 +224,10 @@ public class QueryTest {
     @Test
     public void multiConditionQuery() {
         for (int i = 0 ; i<10 ; i++) {
-            TestModel t = new TestModel(sprinkles);
+            TestModel t = new TestModel();
             t.title = i+"title"+i;
             t.sn = i;
-            t.save();
+            sprinkles.save(t);
         }
 
         ModelList<TestModel> query = Query.where(sprinkles, TestModel.class)

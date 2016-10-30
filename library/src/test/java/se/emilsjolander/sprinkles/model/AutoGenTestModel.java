@@ -20,34 +20,8 @@ public class AutoGenTestModel extends Model {
     public String title;
     public Date createdAt;
 
-    public boolean valid = true;
     public boolean created;
     public boolean saved;
     public boolean deleted;
-
-    public AutoGenTestModel(Sprinkles sprinkles) {
-        super(sprinkles);
-    }
-
-    @Override
-    public boolean isValid() {
-        return valid;
-    }
-
-    @Override
-    public void beforeCreate() {
-//        createdAt = new Date();
-        created = true;
-    }
-
-    @Override
-    public void beforeSave() {
-        saved = true;
-    }
-
-    @Override
-    public void afterDelete() {
-        deleted = true;
-    }
 
 }

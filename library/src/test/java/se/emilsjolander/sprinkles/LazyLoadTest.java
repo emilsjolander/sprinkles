@@ -22,14 +22,14 @@ public class LazyLoadTest {
     @Before
     public void initTables() {
         sprinkles = Sprinkles.init(Robolectric.application,"sprinkle.db",1);
-        Company company = new Company(sprinkles);
+        Company company = new Company();
         company.name = "google";
-        company.save();
+        sprinkles.save(company);
 
-        Person staff = new Person(sprinkles);
+        Person staff = new Person();
         staff.name = "goodman";
         staff.company_id = company.id;
-        staff.save();
+        sprinkles.save(staff);
     }
 
     @Test

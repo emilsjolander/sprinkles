@@ -249,7 +249,7 @@ public final class Query<T extends Model> implements IQueryPart1<T>,IQueryPart2<
     public ModelList<T> find(){
         String sql = build();
         CursorList<T> cursorList = Query.many(sprinkles, this.mClazz, sql).get();
-        ModelList<T> result = ModelList.from(sprinkles, cursorList,mSkip);
+        ModelList<T> result = ModelList.from(cursorList,mSkip);
         cursorList.close();
         return result;
     }

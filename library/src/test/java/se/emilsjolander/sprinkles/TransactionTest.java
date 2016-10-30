@@ -25,23 +25,23 @@ public class TransactionTest {
     @Test
     public void commit() throws InterruptedException {
         Transaction t = new Transaction(sprinkles);
-        TestModel m = new TestModel(sprinkles);
+        TestModel m = new TestModel();
         m.title = "hej";
-        m.save(t);
+        sprinkles.save(m, t);
         t.setSuccessful(true);
         t.finish();
-        assertTrue(m.exists());
+        assertTrue(sprinkles.exists(m));
     }
 
     @Test
     public void rollback() {
         Transaction t = new Transaction(sprinkles);
-        TestModel m = new TestModel(sprinkles);
+        TestModel m = new TestModel();
         m.title = "hej";
-        m.save(t);
+        sprinkles.save(m, t);
         t.setSuccessful(false);
         t.finish();
-        assertFalse(m.exists());
+        assertFalse(sprinkles.exists(m));
     }
 
     @Test
@@ -59,9 +59,9 @@ public class TransactionTest {
 
             }
         });
-        TestModel m = new TestModel(sprinkles);
+        TestModel m = new TestModel();
         m.title = "hej";
-        m.save(t);
+        sprinkles.save(m, t);
         t.setSuccessful(true);
         t.finish();
         assertTrue(called[0]);
@@ -82,9 +82,9 @@ public class TransactionTest {
 
             }
         });
-        TestModel m = new TestModel(sprinkles);
+        TestModel m = new TestModel();
         m.title = "hej";
-        m.save(t);
+        sprinkles.save(m, t);
         t.setSuccessful(false);
         t.finish();
         assertFalse(called[0]);

@@ -2,10 +2,8 @@ package se.emilsjolander.sprinkles;
 
 import android.content.ContentValues;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,17 +11,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import se.emilsjolander.sprinkles.annotations.Index;
-import se.emilsjolander.sprinkles.annotations.Table;
-import se.emilsjolander.sprinkles.exceptions.NoTableAnnotationException;
 import se.emilsjolander.sprinkles.typeserializers.TypeSerializer;
 
 class Utils {
@@ -86,7 +79,7 @@ class Utils {
 
         Collection<ModelInfo.ManyToOneColumnField> manyToOnes = table.manyToOneColumns;
         for (ModelInfo.ManyToOneColumnField manyToOne : manyToOnes) {
-            if(fieldNames.contains(manyToOne.manyColumn)){
+            if (fieldNames.contains(manyToOne.manyColumn)) {
                 continue;
             }
             strSQL.append("\"").append(manyToOne.manyColumn);
@@ -133,7 +126,6 @@ class Utils {
     }
 
 
-
     static ContentValues getContentValues(@NonNull Sprinkles sprinkles, Model model) {
         final ModelInfo info = ModelInfo.from(sprinkles, model.getClass());
         final ContentValues values = new ContentValues();
@@ -154,7 +146,7 @@ class Utils {
         // export foreign key value
         for (ModelInfo.ManyToOneColumnField manyToOneColumnField : info.manyToOneColumns) {
             //skip lazy load field
-            if(LazyModelList.class.isAssignableFrom(manyToOneColumnField.field.getType())){
+            if (LazyModelList.class.isAssignableFrom(manyToOneColumnField.field.getType())) {
                 continue;
             }
             manyToOneColumnField.field.setAccessible(true);
@@ -164,7 +156,7 @@ class Utils {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            if(oneModel!=null){
+            if (oneModel != null) {
                 //fetch oneModel's key value
                 Field fieldInOneMdel = null;
                 try {
@@ -180,7 +172,7 @@ class Utils {
             }
         }
         //export hiddenFields
-        for(Map.Entry<String,Object> hiddenField : model.mHiddenFieldsMap.entrySet()) {
+        for (Map.Entry<String, Object> hiddenField : model.mHiddenFieldsMap.entrySet()) {
             if (hiddenField.getValue() == null) {
                 values.putNull(hiddenField.getKey());
             } else {

@@ -4,38 +4,48 @@ import com.lsjwzh.orm.exceptions.LazyModelListLoadFailException;
 
 import java.lang.reflect.Field;
 
+import rx.Observable;
+import rx.Subscriber;
+
 /**
- * Created by panwenye on 14-10-14.
+ * LazyModelList.
  */
-public class LazyModelList<T extends Model> {
+public class LazyModelList<T extends Model> extends Observable<T> {
     final Sprinkles sprinkles;
-    Class<T> mModelClass;
-    ModelInfo.OneToManyColumnField mOneToManyColumnField;
-    Object mParent;
+    Class<T> modelClass;
+    ModelInfo.OneToManyColumnField oneToManyColumnField;
+    Object parent;
 
-    ModelList<T> mCache;
 
-    public LazyModelList(Sprinkles sprinkles, Class<T> modelClass,Object parent,ModelInfo.OneToManyColumnField columnField){
-        mModelClass = modelClass;
-        mParent = parent;
-        mOneToManyColumnField = columnField;
+    public LazyModelList(final Sprinkles sprinkles, final Class<T> modelClass, final Object parent, final ModelInfo.OneToManyColumnField columnField){
+        super(new Observable.OnSubscribe<T>() {
+            ModelList<T> cache;
+
+            @Override
+            public void call(Subscriber<? super T> subscriber) {
+                subscriber.onStart();
+                if (cache == null) {
+                    try {
+                        Field oneColumnField = parent.getClass().getDeclaredField(columnField.oneColumn);
+                        oneColumnField.setAccessible(true);
+                        Object foreignKeyValue = oneColumnField.get(parent);
+                        cache = new Query(sprinkles).find(QueryBuilder.from(modelClass)
+                                .where()
+                                .equalTo(columnField.manyColumn, foreignKeyValue)
+                                .end());
+                    } catch (Exception e) {
+                        throw new LazyModelListLoadFailException(e);
+                    }
+                }
+                for (T model : cache) {
+                    subscriber.onNext(model);
+                }
+                subscriber.onCompleted();
+            }
+        });
+        this.modelClass = modelClass;
+        this.parent = parent;
+        oneToManyColumnField = columnField;
         this.sprinkles = sprinkles;
-    }
-    public ModelList<T> load(){
-        if(mCache!=null){
-            return mCache;
-        }
-        try {
-            Field oneColumnField = mParent.getClass().getDeclaredField(mOneToManyColumnField.oneColumn);
-            oneColumnField.setAccessible(true);
-            Object foreignKeyValue = oneColumnField.get(mParent);
-            mCache = new Query(sprinkles).find(QueryBuilder.from(mModelClass)
-                    .where()
-                    .equalTo(mOneToManyColumnField.manyColumn, foreignKeyValue)
-                    .end());
-            return mCache;
-        } catch (Exception e) {
-            throw new LazyModelListLoadFailException(e);
-        }
     }
 }

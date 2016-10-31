@@ -11,7 +11,7 @@ class DbOpenHelper extends SQLiteOpenHelper {
     private final Sprinkles sprinkles;
     private int baseVersion;
 
-    protected DbOpenHelper(Sprinkles sprinkles, Context context, String databaseName, int baseVersion) {
+    DbOpenHelper(Sprinkles sprinkles, Context context, String databaseName, int baseVersion) {
         super(context, databaseName, null, baseVersion);
         this.baseVersion = baseVersion;
         this.sprinkles = sprinkles;

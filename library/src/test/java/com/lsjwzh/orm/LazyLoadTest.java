@@ -37,7 +37,7 @@ public class LazyLoadTest {
         Person staff = new Query(sprinkles).findSingle(QueryBuilder.from(Person.class).where().equalTo("name", "goodman").end());
         Company company = new Query(sprinkles).findSingle(QueryBuilder.from(Company.class).where().equalTo("name", "google").end());
         assertNotNull(staff.company);
-        assertEquals(company, staff.company.load());
+        assertEquals(company, staff.company.toBlocking().first());
 
     }
 
@@ -46,7 +46,7 @@ public class LazyLoadTest {
         Person staff = new Query(sprinkles).findSingle(QueryBuilder.from(Person.class).where().equalTo("name", "goodman").end());
         Company company = new Query(sprinkles).findSingle(QueryBuilder.from(Company.class).where().equalTo("name", "google").end());
         assertNotNull(company.Staffs);
-        assertEquals(1, company.Staffs.load().size());
+        assertEquals(1, company.Staffs.toList().toBlocking().first().size());
 
     }
 

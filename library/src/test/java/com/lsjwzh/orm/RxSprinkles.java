@@ -1,23 +1,17 @@
-package com.lsjwzh.orm.rx;
+package com.lsjwzh.orm;
 
 import android.support.annotation.NonNull;
-
-import com.lsjwzh.orm.Model;
-import com.lsjwzh.orm.ModelList;
-import com.lsjwzh.orm.Query;
-import com.lsjwzh.orm.QueryBuilder;
-import com.lsjwzh.orm.Sprinkles;
 
 import rx.Observable;
 import rx.Subscriber;
 
 /**
- * RxORM.
+ * RxSprinkles.
  */
-public final class RxORM {
+public final class RxSprinkles {
     private Sprinkles sprinkles;
 
-    public RxORM(Sprinkles sprinkles) {
+    public RxSprinkles(Sprinkles sprinkles) {
         this.sprinkles = sprinkles;
     }
 

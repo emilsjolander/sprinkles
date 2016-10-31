@@ -1,50 +1,59 @@
 package com.lsjwzh.orm;
 
+
 import com.lsjwzh.orm.exceptions.LazyModelLoadFailException;
 
 import java.lang.reflect.Field;
 
+import rx.Observable;
+import rx.Subscriber;
+
 /**
- * Created by panwenye on 14-10-14.
+ * LazyModel.
  */
-public class LazyModel<T extends Model> {
+public class LazyModel<T extends Model> extends Observable<T> {
     final Sprinkles sprinkles;
-    Class<T> mModelClass;
-    ModelInfo.ManyToOneColumnField mManyToOneColumnField;
-    Object mSource;
+    Class<T> modelClass;
+    ModelInfo.ManyToOneColumnField manyToOneColumnField;
+    Object source;
 
-    T mCache;
 
-    public LazyModel(Sprinkles sprinkles, Class<T> modelClass, Object source, ModelInfo.ManyToOneColumnField columnField){
+    LazyModel(final Sprinkles sprinkles, final Class<T> modelClass, final Object source, final ModelInfo.ManyToOneColumnField columnField) {
+        super(new OnSubscribe<T>() {
+            T cache;
+
+            @Override
+            public void call(Subscriber<? super T> subscriber) {
+                subscriber.onStart();
+                if (cache == null) {
+                    try {
+                        Field manyColumnField = source.getClass().getDeclaredField(columnField.manyColumn);
+                        Object foreignKeyValue = null;
+                        if (manyColumnField != null) {
+                            manyColumnField.setAccessible(true);
+                            foreignKeyValue = manyColumnField.get(source);
+                        } else {
+                            //if manyColumn is not been implicit declared,find it from mHiddenFieldsMap
+                            foreignKeyValue = ((Model) source).mHiddenFieldsMap.get(columnField.manyColumn);
+                        }
+                        if (foreignKeyValue != null) {
+                            cache = new Query(sprinkles).findSingle(QueryBuilder.from(modelClass)
+                                    .where()
+                                    .equalTo(columnField.oneColumn, foreignKeyValue)
+                                    .end());
+                        }
+                    } catch (Exception e) {
+                        throw new LazyModelLoadFailException(e);
+                    }
+                }
+                subscriber.onNext(cache);
+                subscriber.onCompleted();
+            }
+        });
         this.sprinkles = sprinkles;
-        mModelClass = modelClass;
-        mSource = source;
-        mManyToOneColumnField = columnField;
+        this.modelClass = modelClass;
+        this.source = source;
+        this.manyToOneColumnField = columnField;
     }
-    public T load(){
-        if(mCache!=null){
-            return mCache;
-        }
-        try {
-            Field manyColumnField = mSource.getClass().getDeclaredField(mManyToOneColumnField.manyColumn);
-            Object foreignKeyValue = null;
-            if(manyColumnField!=null){
-                manyColumnField.setAccessible(true);
-                foreignKeyValue = manyColumnField.get(mSource);
-            }else {
-                //if manyColumn is not been implicit declared,find it from mHiddenFieldsMap
-                foreignKeyValue = ((Model)mSource).mHiddenFieldsMap.get(mManyToOneColumnField.manyColumn);
-            }
-            if(foreignKeyValue==null){
-                return null;
-            }
-            mCache = new Query(sprinkles).findSingle(QueryBuilder.from(mModelClass)
-                    .where()
-                    .equalTo(mManyToOneColumnField.oneColumn, foreignKeyValue)
-                    .end());
-            return mCache;
-        } catch (Exception e) {
-            throw new LazyModelLoadFailException(e);
-        }
-    }
+
 }

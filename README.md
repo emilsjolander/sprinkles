@@ -424,5 +424,4 @@ Then we can use LazyLoaders by calling `staffs.load()` and `company.load` direct
 
 
 TODO：
-1.使用Rx监控数据变化
-2.将LazyModel改成Observable
+1.使用Rx监控Model数据变化

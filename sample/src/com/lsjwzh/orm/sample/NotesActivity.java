@@ -13,23 +13,17 @@ import android.widget.ListView;
 import com.lsjwzh.orm.CursorList;
 import com.lsjwzh.orm.ManyQuery;
 import com.lsjwzh.orm.Query;
+import com.lsjwzh.orm.QueryBuilder;
 import com.lsjwzh.orm.sample.models.Note;
 import com.lsjwzh.orm.sample.models.NoteTagLink;
+
+import se.emilsjolander.sprinkles.sample.R;
 
 public class NotesActivity extends FragmentActivity {
 
 	private ListView mListView;
 	private NotesAdapter mAdapter;
 
-	private ManyQuery.ResultHandler<Note> onNotesLoaded =
-            new ManyQuery.ResultHandler<Note>() {
-
-        @Override
-		public boolean handleResult(CursorList<Note> result) {
-            mAdapter.swapNotes(result);
-            return true;
-		}
-	};
 
 	private OnItemClickListener onNoteSelected =
             new OnItemClickListener() {
@@ -60,6 +54,9 @@ public class NotesActivity extends FragmentActivity {
         )
 				.getAsync(getLoaderManager(), onNotesLoaded,
 						NoteTagLink.class);
+		MyApplication.getApplication()
+				.rxSprinkles
+				.query(QueryBuilder.from(NoteTagLink.class).where())
 
     }
 

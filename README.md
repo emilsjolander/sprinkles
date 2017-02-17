@@ -425,3 +425,5 @@ Then we can use LazyLoaders by calling `staffs.load()` and `company.load` direct
 
 TODO：
 1.使用Rx监控Model数据变化
+2.Cache自定义化
+3.增加对计算字段的支持

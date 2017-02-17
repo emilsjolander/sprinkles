@@ -10,115 +10,135 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import com.lsjwzh.orm.CursorList;
-import com.lsjwzh.orm.ManyQuery;
-import com.lsjwzh.orm.Query;
-import com.lsjwzh.orm.sample.models.Note;
+import com.lsjwzh.orm.QueryBuilder;
 import com.lsjwzh.orm.sample.models.NoteTagLink;
 import com.lsjwzh.orm.sample.models.Tag;
 
+import java.util.List;
+
+import rx.Subscriber;
+import rx.schedulers.Schedulers;
+import se.emilsjolander.sprinkles.sample.R;
+
 public class ChooseTagActivity extends Activity {
 
-	public static final String EXTRA_NOTE_ID = "note_id";
+    public static final String EXTRA_NOTE_ID = "note_id";
 
-	private ListView mListView;
-	private TagsAdapter mAdapter;
+    private ListView mListView;
+    private TagsAdapter mAdapter;
 
-	private CursorList<Tag> mTags;
-	private CursorList<NoteTagLink> mLinks;
+    private List<Tag> mTags;
+    private List<NoteTagLink> mLinks;
 
-	private ManyQuery.ResultHandler<Tag> onTagsLoaded =
-            new ManyQuery.ResultHandler<Tag>() {
 
-		@Override
-		public boolean handleResult(CursorList<Tag> result) {
-            mTags = result;
-			mAdapter.swapTags(result);
-			updateCheckedPositions();
-            return true;
-		}
-	};
-
-	private ManyQuery.ResultHandler<NoteTagLink> onLinksLoaded =
-            new ManyQuery.ResultHandler<NoteTagLink>() {
-
-		@Override
-		public boolean handleResult(CursorList<NoteTagLink> result) {
-            if (mLinks != null) {
-                mLinks.close();
+    private OnItemClickListener onListItemClicked = new OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> l, View v, int pos,
+                                long id) {
+            NoteTagLink link = new NoteTagLink(mNoteId, id);
+            if (mListView.isItemChecked(pos)) {
+                MyApplication.getApplication().rxSprinkles
+                        .save(link)
+                        .subscribeOn(Schedulers.io())
+                        .subscribe();
+            } else {
+                MyApplication.getApplication().rxSprinkles
+                        .delete(link)
+                        .subscribeOn(Schedulers.io())
+                        .subscribe();
             }
-			mLinks = result;
-			updateCheckedPositions();
-            return true;
-		}
-	};
+        }
+    };
 
-	private OnItemClickListener onListItemClicked = new OnItemClickListener() {
-		@Override
-		public void onItemClick(AdapterView<?> l, View v, int pos,
-				long id) {
-			NoteTagLink link = new NoteTagLink(mNoteId, id);
-			if (mListView.isItemChecked(pos)) {
-				link.saveAsync();
-			} else {
-				link.deleteAsync();
-			}
-		}
-	};
-	
-	private long mNoteId;
+    private long mNoteId;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.acitivty_choose_tag);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.acitivty_choose_tag);
 
-		mNoteId = getIntent().getLongExtra(EXTRA_NOTE_ID, -1);
+        mNoteId = getIntent().getLongExtra(EXTRA_NOTE_ID, -1);
 
-		Query.many(Tag.class, "select * from Tags").getAsync(
-				getLoaderManager(), onTagsLoaded);
-		Query.many(NoteTagLink.class,
-				"select * from NoteTagLinks where note_id=?", mNoteId).getAsync(
-				getLoaderManager(), onLinksLoaded, Note.class, Tag.class);
+        MyApplication.getApplication().rxSprinkles
+                .query(QueryBuilder.from(Tag.class).where().end())
+                .toList()
+                .subscribe(new Subscriber<List<Tag>>() {
+                    @Override
+                    public void onCompleted() {
+                        updateCheckedPositions();
+                    }
 
-		mListView = (ListView) findViewById(R.id.list);
-		mListView.setEmptyView(findViewById(R.id.empty));
-		mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-		mListView.setOnItemClickListener(onListItemClicked);
+                    @Override
+                    public void onError(Throwable e) {
 
-		mAdapter = new TagsAdapter(this);
-		mListView.setAdapter(mAdapter);
-	}
+                    }
 
-	private void updateCheckedPositions() {
-		for (int i = 0 ; i<mAdapter.getCount() ; i++) {
-			if (mLinks != null) {
-				for (NoteTagLink link : mLinks) {
-					if (link.getTagId() == mTags.get(i).getId()) {
-						mListView.setItemChecked(i, true);
-						break;
-					}
-				}
-			} else {
-				mListView.setItemChecked(i, false);
-			}
-		}
-	}
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.activity_choose_tag, menu);
-		return true;
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.new_tag:
-			startActivity(new Intent(this, CreateTagActivity.class));
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
+                    @Override
+                    public void onNext(List<Tag> tags) {
+                        mTags = tags;
+                        mAdapter.swapTags(tags);
+                    }
+                });
+        MyApplication.getApplication().rxSprinkles
+                .query(QueryBuilder.from(NoteTagLink.class).where()
+                        .equalTo("note_id", mNoteId).end())
+                .toList()
+                .subscribe(new Subscriber<List<NoteTagLink>>() {
+                    @Override
+                    public void onCompleted() {
+                        updateCheckedPositions();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(List<NoteTagLink> links) {
+                        mLinks = links;
+                        updateCheckedPositions();
+                    }
+                });
+
+        mListView = (ListView) findViewById(R.id.list);
+        mListView.setEmptyView(findViewById(R.id.empty));
+        mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        mListView.setOnItemClickListener(onListItemClicked);
+
+        mAdapter = new TagsAdapter(this);
+        mListView.setAdapter(mAdapter);
+    }
+
+    private void updateCheckedPositions() {
+        for (int i = 0; i < mAdapter.getCount(); i++) {
+            if (mLinks != null) {
+                for (NoteTagLink link : mLinks) {
+                    if (link.getTagId() == mTags.get(i).getId()) {
+                        mListView.setItemChecked(i, true);
+                        break;
+                    }
+                }
+            } else {
+                mListView.setItemChecked(i, false);
+            }
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_choose_tag, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.new_tag:
+                startActivity(new Intent(this, CreateTagActivity.class));
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
 }

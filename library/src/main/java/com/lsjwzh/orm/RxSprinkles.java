@@ -9,7 +9,7 @@ import rx.Subscriber;
  * RxSprinkles.
  */
 public final class RxSprinkles {
-    private Sprinkles sprinkles;
+    public final Sprinkles sprinkles;
 
     public RxSprinkles(Sprinkles sprinkles) {
         this.sprinkles = sprinkles;

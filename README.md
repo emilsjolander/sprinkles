@@ -98,14 +98,14 @@ There is a lot more you can do with sprinkles so please read the next section wh
 
 API
 ---
-###Annotations
+### Annotations
 - `@Table` Used to associate a model class with a SQL table.
 - `@AutoIncrement` Used to mark a field as an auto-incrementing. The field must be an `int` or a `long`.
 - `@Column` Used to associate a class field with a SQL column.
 - `@DynamicColumn` Used to associate a class field with a dynamic SQL column such as an alias in a query.
 - `@Key` Used to mark a field as a key. Multiple keys in a class are allowed and will result in a composite key. Keys will most often want to be mapped directly to primary keys in your database.
 
-###Saving
+### Saving
 The save method is both an insert and an update method, the correct operation will be done depending on the model's existence in the database. The first two methods below are synchronous, the second is for use together with a transaction (more on that later). There are also two asynchronous methods, one with a callback and one without. The synchronous methods will return a boolean indicating if the model was saved or not. The asynchronous method with a callback will just not invoke the callback if saving failed.
 ```java
 boolean save();
@@ -119,7 +119,7 @@ All the save methods use this method to check if a model exists in the database.
 boolean exists();
 ```
 
-###Deleting
+### Deleting
 Similar to saving there are four methods that let you delete a model. These work in the same way as save but will not return a boolean indicating the result.
 ```java
 void delete();
@@ -128,7 +128,7 @@ void deleteAsync();
 void deleteAsync(OnDeletedCallback callback);
 ```
 
-###Querying
+### Querying
 Start a query with on of the following static methods:
 ```java
 Query.one(Class<? extends QueryResult> clazz, String sql, Object[] args);
@@ -145,7 +145,7 @@ boolean getAsync(LoaderManager lm, ResultHandler<? extends Model> handler, Class
 
 `get()` returns either the `QueryResult` or a list of the `QueryResult` represented by the `Class` you sent in as the first argument to the query method. `getAsync()` is the same only that the result is delivered on a callback function after executing `get()` on another thread. `getAsync()` also delivers updated results once the backing model of the query is updated if you return `true` indicating you want further updates. `getAsync()` uses loaders and therefore needs a `LoaderManager` instance. `getAsync()` also takes an optional array of classes which is used when the query relies on more models than the one you are querying for and you want the query to be updated when those models change as well.
 
-###CursorList
+### CursorList
 All Queries return a `CursorList` subclass. This is a `Iterable` subclass which lazily unpacks a cursor into its corresponding model when you ask for the next item. This leads to having the efficiency of a `Cursor` but without the pain. Excluding the `Iterable` methods `CursorList` also provides the following methods.
 ```java
 public int size();
@@ -154,7 +154,7 @@ public List<T> asList();
 ```
 Remember to always call `close()` on a `CursorList` instance! This will close the underlying cursor.
 
-###ModelList
+### ModelList
 For mass saving/deletion of models you can use the `ModelList` class. It extends `ArrayList` and has the following additional methods:
 ```java
 public static <E extends Model> ModelList<E> from(CursorList<E> cursorList);
@@ -170,7 +170,7 @@ public void deleteAllAsync(OnAllDeletedCallback callback);
 
 `from(CursorList<E extends Model> cursorList)` is a helper method which creates a `ModelList` from a `CursorList`, so you can e.g. delete all models from a previous query in one batch. Be aware, that the cursor is not closed for you when calling this method and you have to do it yourself!
 
-###Transactions
+### Transactions
 Both `save()` and `delete()` methods exist which take in a `Transaction`. Here is a quick example on how to use them. If any exception is thrown while saving a model or if any model fails to save the transaction will be rolled back.
 ```java
 public void doTransaction(List<Note> notes) {
@@ -188,7 +188,7 @@ public void doTransaction(List<Note> notes) {
 }
 ```
 
-###Callbacks
+### Callbacks
 Each model subclass can override a couple of callbacks.
 
 Use the following callback to ensure that your model is not saved in an invalid state.
@@ -223,7 +223,7 @@ protected void afterDelete() {
 }
 ```
 
-###Migrations
+### Migrations
 Migrations are the way you add things to your database. I suggest putting all your migrations in the `onCreate()` method of a `Application` subclass. Here is a quick example of how that would look:
 ```java
 public class MyApplication extends Application {
@@ -262,10 +262,10 @@ public class MyApplication extends Application {
 ```
 Migrations are performed using raw SQL, this allowes full freedom to use all of the powerfull contraints that are possible to put on columns. Two optional methods are provided that allow you do some form of processing of your data before and after a migration, this can be usefull when recreating a table with different properties but you want to keep the data that was previously stored in the now deleted table. Once a migration has been added with `sprinkles.addMigration()` it should NEVER be changed, and all new migrations should be added after the previous migration. This ensures both old and new clients will have a consistent database and you will not need to care about database versioning.
 
-###Type serializers
+### Type serializers
 Through an instance of `Sprinkles` you can register your own `TypeSerializer` instances via `registerType()` for serializing an object in your model into a column in the database. Sprinkles uses a `TypeSerializer` implementation internally for all the different data types that it supports. So check out the `se.emilsjolander.sprinkles.typeserializers` package for example implementations. These serializers will be used both when saving a model and when querying rows from the database.
 
-###ContentObservers
+### ContentObservers
 Sprinkles supports ContentObservers for change notifications. By registering your models for observation you can ensure your ContentObserver will be notified of changes.
 ```java
 SprinklesContentObserver observer;
@@ -286,5 +286,5 @@ public void onPause() {
 }
 ```
 
-###Relationships
+### Relationships
 Sprinkles does nothing to handle relationships for you; this is by design. You will have to use the regular ways to handle relationships in SQL. Sprinkles gives you all the tools needed for this and it works very well.

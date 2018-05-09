@@ -25,7 +25,6 @@ public class Tag extends Model {
 		this.name = name;
 	}
 	
-	@Override
 	public boolean isValid() {
 		return name != null && !name.isEmpty();
 	}

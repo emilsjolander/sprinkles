@@ -10,6 +10,8 @@ import android.widget.TextView;
 import com.lsjwzh.orm.CursorList;
 import com.lsjwzh.orm.sample.models.Note;
 
+import se.emilsjolander.sprinkles.sample.R;
+
 public class NotesAdapter extends BaseAdapter {
 
     private Context mContext;

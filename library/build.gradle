@@ -27,8 +27,8 @@ gradle.projectsEvaluated {
 //    preBuild.dependsOn(pushDownJdkDependency)
 }
 android {
-    compileSdkVersion 24
-    buildToolsVersion '24.0.1'
+    compileSdkVersion 26
+    buildToolsVersion '26.0.2'
 
     sourceSets {
         main {
@@ -38,9 +38,9 @@ android {
         }
     }
     defaultConfig {
-        minSdkVersion 9
-        targetSdkVersion 19
-        versionCode 2
+        minSdkVersion 21
+        targetSdkVersion 26
+        versionCode 3
         versionName "2.0.0"
         testInstrumentationRunner "com.google.android.apps.common.testing.testrunner.GoogleInstrumentationTestRunner"
     }
@@ -50,7 +50,7 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:24.1.1'
+    compile 'com.android.support:support-v4:26.0.2'
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'io.reactivex:rxjava:1.2.1'
     testCompile 'org.robolectric:robolectric:2.4'

@@ -5,13 +5,18 @@ repositories {
 }
 dependencies {
     compile project(':library')
-    compile 'com.android.support:support-v4:24.1.0'
+    compile 'com.android.support:support-v4:26.0.2'
 }
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion '24.0.1'
-
+    compileSdkVersion 26
+    buildToolsVersion '26.0.2'
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 26
+        versionCode 3
+        versionName "2.0.0"
+    }
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'

@@ -12,6 +12,7 @@ import android.widget.ListView;
 
 import com.lsjwzh.orm.CursorList;
 import com.lsjwzh.orm.ManyQuery;
+import com.lsjwzh.orm.Model;
 import com.lsjwzh.orm.Query;
 import com.lsjwzh.orm.QueryBuilder;
 import com.lsjwzh.orm.sample.models.Note;
@@ -47,16 +48,16 @@ public class NotesActivity extends FragmentActivity {
 		mListView.setEmptyView(findViewById(R.id.empty));
 		mListView.setOnItemClickListener(onNoteSelected);
 
-		Query.many(Note.class,
-                "select Notes.*, " +
-                        "(select count(*) from NoteTagLinks where NoteTagLinks.note_id = Notes.id) as tag_count " +
-                        "from Notes order by created_at desc"
-        )
-				.getAsync(getLoaderManager(), onNotesLoaded,
-						NoteTagLink.class);
+//		Query.many(Note.class,
+//                "select Notes.*, " +
+//                        "(select count(*) from NoteTagLinks where NoteTagLinks.note_id = Notes.id) as tag_count " +
+//                        "from Notes order by created_at desc"
+//        )
+//				.getAsync(getLoaderManager(), onNotesLoaded,
+//						NoteTagLink.class);
 		MyApplication.getApplication()
 				.rxSprinkles
-				.query(QueryBuilder.from(NoteTagLink.class).where())
+				.query(QueryBuilder.from(NoteTagLink.class).where());
 
     }
 

@@ -43,15 +43,11 @@ public class Note extends Model {
         return tagCount;
     }
 	
-	@Override
 	protected void beforeCreate() {
-		super.beforeCreate();
 		createdAt = new Date();
 	}
 	
-	@Override
 	protected void beforeSave() {
-		super.beforeSave();
 		updatedAt = new Date();
 	}
 

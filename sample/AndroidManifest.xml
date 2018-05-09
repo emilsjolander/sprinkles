@@ -4,19 +4,15 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
-    <uses-sdk
-        android:minSdkVersion="14"
-        android:targetSdkVersion="19" />
-
     <application
-        android:name=".MyApplication"
+        android:name="com.lsjwzh.orm.sample.MyApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
 
         <activity
-            android:name=".NotesActivity"
+            android:name="com.lsjwzh.orm.sample.NotesActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,13 +21,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".CreateNoteActivity" >
+            android:name="com.lsjwzh.orm.sample.CreateNoteActivity" >
         </activity>
         <activity
-            android:name=".ChooseTagActivity" >
+            android:name="com.lsjwzh.orm.sample.ChooseTagActivity" >
         </activity>
         <activity
-            android:name=".CreateTagActivity" >
+            android:name="com.lsjwzh.orm.sample.CreateTagActivity" >
         </activity>
     </application>
 

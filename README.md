@@ -1,5 +1,8 @@
-![Icon](https://github.com/emilsjolander/sprinkles/raw/master/sprinkles.png) Sprinkles [![Build Status](https://travis-ci.org/emilsjolander/sprinkles.png)](https://travis-ci.org/emilsjolander/sprinkles)
+RX-ORMDB[Developing] [![Build Status](https://travis-ci.org/emilsjolander/sprinkles.png)](https://travis-ci.org/emilsjolander/sprinkles)
 =========
+RX-ORMDB is a orm lib works with rx-android.
+The core database code is derived from Sprinkles.
+
 Sprinkles is a boiler-plate-reduction-library for dealing with databases in android applications. Some would call it a kind of ORM but I don't see it that way. Sprinkles lets SQL do what it is good at, making complex queries. SQL however is a mess (in my opinion) when is comes to everything else. This is why sprinkles helps you with things such as inserting, updating, and destroying models. Sprinkles will also help you with the tedious task of unpacking a cursor into a model. Sprinkles actively supports version 2.3 of Android and above but it should work on older versions as well.
 
 Download
@@ -17,7 +20,8 @@ If you are not using gradle for whatever reason i suggest you clone the reposito
 Getting started
 ---------------
 When you have added the library to your project add a model class to it. I will demonstrate this with a `Note.java` class. I have omitted the import statements to keep it brief.
-```java
+
+```
 @Table("Notes")
 public class Note extends Model {
 
@@ -38,6 +42,38 @@ public class Note extends Model {
 
 }
 ```
+
+or you can use mark it as a autogen model like this: 
+   
+```
+@Table
+@AutoGen
+public class Note extends Model {
+
+    @Key
+	@AutoIncrement
+	private long id;
+	
+	//@Index annotation will make this field be created as index
+	@Index
+	public String index;
+
+	public String title;
+
+	public String body;
+	
+	//@Ignore annotation will prevent this field from attaching with database
+	@Ignore
+	public String ignoreField;
+
+	public long getId() {
+		return id;
+	}
+
+}
+```
+
+
 Ok, a lot of important stuff in this short class. First of all, a model must subclass `se.emilsjolander.sprinkles.Model` and it also must have a `@Table` annotations specifying the table name that the model corresponds to. After the class declaration we have declared three members: `id`, `title` and `body`. Notice how all of them have a `@Column` annotation to mark that they are not only a member of this class but also a column of the table that this class represents. We have one last annotation in the above example. The `@AutoIncrement` annotation tells sprinkles that the field should automatically be set upon the creation of its corresponding row in the table. Key columns are the columns that are used to decide whether a model is already stored in the database when using methods such as `delete()` and `save()`.
 
 Before using this class you must migrate it into the database. I recommend doing this in the `onCreate()` method of an `Application` subclass like this:
@@ -96,6 +132,7 @@ public void queryStuff() {
 
 There is a lot more you can do with sprinkles so please read the next section which covers the whole API!
 
+
 API
 ---
 ###Annotations
@@ -104,6 +141,12 @@ API
 - `@Column` Used to associate a class field with a SQL column.
 - `@DynamicColumn` Used to associate a class field with a dynamic SQL column such as an alias in a query.
 - `@Key` Used to mark a field as a key. Multiple keys in a class are allowed and will result in a composite key. Keys will most often want to be mapped directly to primary keys in your database.
+
+- `@AutoGen` Used to mark a Model which will been auto transform to sqlite table.
+- `@Index` Used to mark a field as a index field.
+- `@ManyToOne` Declare a many-one relationship with another model.
+- `@OneToMany` Declare a one-many relationship with another model.
+
 
 ###Saving
 The save method is both an insert and an update method, the correct operation will be done depending on the model's existence in the database. The first two methods below are synchronous, the second is for use together with a transaction (more on that later). There are also two asynchronous methods, one with a callback and one without. The synchronous methods will return a boolean indicating if the model was saved or not. The asynchronous method with a callback will just not invoke the callback if saving failed.
@@ -144,6 +187,19 @@ boolean getAsync(LoaderManager lm, ResultHandler<? extends Model> handler, Class
 ```
 
 `get()` returns either the `QueryResult` or a list of the `QueryResult` represented by the `Class` you sent in as the first argument to the query method. `getAsync()` is the same only that the result is delivered on a callback function after executing `get()` on another thread. `getAsync()` also delivers updated results once the backing model of the query is updated if you return `true` indicating you want further updates. `getAsync()` uses loaders and therefore needs a `LoaderManager` instance. `getAsync()` also takes an optional array of classes which is used when the query relies on more models than the one you are querying for and you want the query to be updated when those models change as well.
+
+###Fluent Query Interface
+The `Query` class also provide lots of api with style of Fluent Interface,you will get it easily.
+example:
+
+```
+Query<TestModel> query = Query.Where(TestModel.class)
+                .lessThanOrEqualTo("sn",10)
+                .and()
+                .like("title","1%");
+ModelList<TestModel> queryResult = query.find();
+```
+
 
 ###CursorList
 All Queries return a `CursorList` subclass. This is a `Iterable` subclass which lazily unpacks a cursor into its corresponding model when you ask for the next item. This leads to having the efficiency of a `Cursor` but without the pain. Excluding the `Iterable` methods `CursorList` also provides the following methods.
@@ -287,4 +343,87 @@ public void onPause() {
 ```
 
 ###Relationships
-Sprinkles does nothing to handle relationships for you; this is by design. You will have to use the regular ways to handle relationships in SQL. Sprinkles gives you all the tools needed for this and it works very well.
+There are two kinds of relationships:one-to-many,many-to-one.
+You can declare relationships in your model like this：
+
+```
+@Table
+@AutoGen
+public class Person extends Model {
+
+    @Key
+    @AutoIncrement
+    public long id;
+    public String name;
+    public long company_id;
+
+	/* declare a relationship with another model.
+	 * manyColumn is a column of Email.
+	 * oneColumn is column of Person.
+	 * manyModelClass must be same with model in ModelList<***> or it will raise a error.
+	 */
+    @OneToMany(manyColumn = "owner_id",oneColumn = "id",manyModelClass = Email.class)
+    public ModelList<Email> emails;
+}
+
+@Table
+@AutoGen
+public class Email extends Model {
+
+    @Key
+    @AutoIncrement
+    public long id;
+
+    public String address;
+
+	/* declare a relationship with another model.
+	 * manyColumn is a column of Email.
+	 * oneColumn is column of Person.
+	 * oneModelClass must be same with the return type of owner field. Actually,we don't need oneModelClass to do any work,unless we declare the field as LazyLoad field
+	 */
+    @ManyToOne(manyColumn = "owner_id",oneColumn = "id",oneModelClass = Person.class)
+    public Person owner;
+}
+```
+
+###LazyLoad
+Sometimes,we may fetch just few data immediately and need other data at other times.
+To catch that,we need lazyload relationships.
+
+
+```
+@Table
+@AutoGen
+public class Company extends Model {
+
+    @Key
+    @AutoIncrement
+    public long id;
+    public String name;
+
+    @OneToMany(manyColumn = "company_id",oneColumn = "id",manyModelClass = Person.class)
+    public LazyModelList<Person> staffs;
+}
+
+@Table
+@AutoGen
+public class Person extends Model {
+
+    @Key
+    @AutoIncrement
+    public long id;
+    public String name;
+    public long company_id;
+
+    @ManyToOne(manyColumn = "company_id",oneColumn = "id",oneModelClass = Company.class)
+    public LazyModel<Company> company;
+}
+```
+When call constructor of Model,sprinkles init `staffs` and `company` .
+Then we can use LazyLoaders by calling `staffs.load()` and `company.load` directly
+
+
+TODO：
+1.使用Rx监控Model数据变化
+2.Cache自定义化
+3.增加对计算字段的支持

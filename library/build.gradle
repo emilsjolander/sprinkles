@@ -1,34 +1,62 @@
-apply plugin: 'android-library'
-apply plugin: 'android-test'
-
-repositories {
-    mavenCentral()
-    maven {
-        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+apply plugin: 'com.android.library'
+apply plugin: 'idea'
+idea {
+    module {
+        testOutputDir = file('build/test-classes')
     }
 }
-
-dependencies {
-	compile 'com.android.support:support-v4:19.0.+'
-
-    androidTestCompile 'junit:junit:4.10'
-    androidTestCompile 'org.mockito:mockito-all:1.9.5'
-    androidTestCompile 'org.robolectric:robolectric:2.3'
-    androidTestCompile 'com.squareup:fest-android:1.0.+'
+//task pushDownJdkDependency {
+//    def imlFile = file("library.iml")
+//    doLast {
+//        try {
+//            def parsedXml = (new XmlParser()).parse(imlFile)
+//            def jdkNode = parsedXml.component[1].orderEntry.find { it.'@type' == 'jdk' }
+//
+//            parsedXml.component[1].remove(jdkNode)
+//            new Node(parsedXml.component[1], 'orderEntry', ['type': 'jdk', 'jdkName': "Android API 19 Platform", 'jdkType': 'Android SDK'])
+//            def writer = new StringWriter()
+//            new XmlNodePrinter(new PrintWriter(writer)).print(parsedXml)
+//            imlFile.text = writer.toString()
+//
+//        } catch (FileNotFoundException e) {
+//            // nop, iml not found
+//        }
+//    }
+//}
+gradle.projectsEvaluated {
+//    preBuild.dependsOn(pushDownJdkDependency)
 }
-
 android {
-    compileSdkVersion 19
-    buildToolsVersion '19.0.3'
+    compileSdkVersion 26
+    buildToolsVersion '26.0.2'
 
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
             java.srcDirs = ['src/main/java']
             res.srcDirs = ['res']
-            androidTest.setRoot('src/test')
         }
+    }
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 26
+        versionCode 3
+        versionName "2.0.0"
+        testInstrumentationRunner "com.google.android.apps.common.testing.testrunner.GoogleInstrumentationTestRunner"
+    }
+    testOptions {
+        unitTests.returnDefaultValues = true
     }
 }
 
-apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/eaa6b5404b7594e6c23b884fdc5795f545db55dd/gradle-mvn-push.gradle'
+dependencies {
+    compile 'com.android.support:support-v4:26.0.2'
+    compile 'io.reactivex.rxjava2:rxjava:2.1.0'
+    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    testCompile 'org.robolectric:robolectric:2.4'
+    // Required -- JUnit 4 framework
+    testCompile 'junit:junit:4.12'
+    // Optional -- Mockito framework
+    testCompile 'org.mockito:mockito-core:1.10.19'
+    compile 'com.google.code.gson:gson:2.5'
+}

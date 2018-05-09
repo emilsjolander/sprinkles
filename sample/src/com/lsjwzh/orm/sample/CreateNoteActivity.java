@@ -16,7 +16,7 @@ import com.lsjwzh.orm.sample.models.Note;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-import rx.schedulers.Schedulers;
+import io.reactivex.schedulers.Schedulers;
 import se.emilsjolander.sprinkles.sample.R;
 
 public class CreateNoteActivity extends Activity {
@@ -40,8 +40,7 @@ public class CreateNoteActivity extends Activity {
                     .rxSprinkles
                     .query(QueryBuilder.from(Note.class)
                             .where().equalTo("id", noteId).end())
-                    .subscribeOn(Schedulers.io())
-                    .toBlocking().first();
+                    .subscribeOn(Schedulers.io()).blockingFirst();
         }
 
         final TextView lastUpdatedAt = (TextView) findViewById(R.id.last_updated);

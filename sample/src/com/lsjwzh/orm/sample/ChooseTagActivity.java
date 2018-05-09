@@ -16,8 +16,8 @@ import com.lsjwzh.orm.sample.models.Tag;
 
 import java.util.List;
 
-import rx.Subscriber;
-import rx.schedulers.Schedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import se.emilsjolander.sprinkles.sample.R;
 
 public class ChooseTagActivity extends Activity {
@@ -62,43 +62,24 @@ public class ChooseTagActivity extends Activity {
         MyApplication.getApplication().rxSprinkles
                 .query(QueryBuilder.from(Tag.class).where().end())
                 .toList()
-                .subscribe(new Subscriber<List<Tag>>() {
-                    @Override
-                    public void onCompleted() {
-                        updateCheckedPositions();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(List<Tag> tags) {
-                        mTags = tags;
-                        mAdapter.swapTags(tags);
-                    }
+                .subscribe(new Consumer<List<Tag>>() {
+                  @Override
+                  public void accept(List<Tag> tags) throws Exception {
+                    mTags = tags;
+                    mAdapter.swapTags(tags);
+                    updateCheckedPositions();
+                  }
                 });
         MyApplication.getApplication().rxSprinkles
                 .query(QueryBuilder.from(NoteTagLink.class).where()
                         .equalTo("note_id", mNoteId).end())
                 .toList()
-                .subscribe(new Subscriber<List<NoteTagLink>>() {
-                    @Override
-                    public void onCompleted() {
-                        updateCheckedPositions();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(List<NoteTagLink> links) {
-                        mLinks = links;
-                        updateCheckedPositions();
-                    }
+                .subscribe(new Consumer<List<NoteTagLink>>() {
+                  @Override
+                  public void accept(List<NoteTagLink> noteTagLinks) throws Exception {
+                    mLinks = noteTagLinks;
+                    updateCheckedPositions();
+                  }
                 });
 
         mListView = (ListView) findViewById(R.id.list);

@@ -26,9 +26,6 @@ import com.lsjwzh.orm.typeserializers.LongSerializer;
 import com.lsjwzh.orm.typeserializers.StringSerializer;
 import com.lsjwzh.orm.typeserializers.TypeSerializer;
 
-import rx.Observable;
-import rx.Subscriber;
-
 public final class Sprinkles {
 
     Context mContext;

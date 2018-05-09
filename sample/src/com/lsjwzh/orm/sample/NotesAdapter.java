@@ -10,26 +10,26 @@ import android.widget.TextView;
 import com.lsjwzh.orm.CursorList;
 import com.lsjwzh.orm.sample.models.Note;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import se.emilsjolander.sprinkles.sample.R;
 
 public class NotesAdapter extends BaseAdapter {
 
     private Context mContext;
 	private LayoutInflater mInflater;
-	private CursorList<Note> mNotes;
+	private List<Note> mNotes = new ArrayList<>();
 	
 	public NotesAdapter(Context context) {
         mContext = context;
 		mInflater = LayoutInflater.from(context);
 	}
-	
-	public void swapNotes(CursorList<Note> notes) {
-        if (mNotes != null) {
-            mNotes.close();
-        }
-		mNotes = notes;
-		notifyDataSetChanged();
+
+	public void add(Note note) {
+		mNotes.add(note);
 	}
+
 
 	@Override
 	public int getCount() {

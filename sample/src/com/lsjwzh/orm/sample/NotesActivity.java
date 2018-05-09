@@ -18,6 +18,7 @@ import com.lsjwzh.orm.QueryBuilder;
 import com.lsjwzh.orm.sample.models.Note;
 import com.lsjwzh.orm.sample.models.NoteTagLink;
 
+import rx.functions.Action1;
 import se.emilsjolander.sprinkles.sample.R;
 
 public class NotesActivity extends FragmentActivity {
@@ -57,7 +58,13 @@ public class NotesActivity extends FragmentActivity {
 //						NoteTagLink.class);
 		MyApplication.getApplication()
 				.rxSprinkles
-				.query(QueryBuilder.from(NoteTagLink.class).where());
+				.query(QueryBuilder.from(Note.class).where()).subscribe(new Action1<Note>() {
+			@Override
+			public void call(Note note) {
+				mAdapter.add(note);
+				mAdapter.notifyDataSetChanged();
+			}
+		});
 
     }
 

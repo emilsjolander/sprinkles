@@ -15,8 +15,8 @@ public class Note extends Model {
 	@AutoIncrement
     @Key @Column("id") private long id;
 	@Column("content") private String content;
-	@Column("created_at") private Date createdAt;
-	@Column("updated_at") private Date updatedAt;
+	@Column("created_at") private Date createdAt = new Date();
+	@Column("updated_at") private Date updatedAt = new Date();
     @DynamicColumn("tag_count") private int tagCount;
 	
 	public long getId() {
